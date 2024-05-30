@@ -15,7 +15,7 @@ This is the GitHub repository for the MATH50002 Group Research Project (M2R) pro
 2.1 An elaboration of the steps taken to solve a Neural ODE/CDE - Training the neural differential equation (James)  
     - Loss functions and minima  
 		- Automatic Differentiation  
-	  - Gradient Descent and its applications in Neural ODes and CDEs  
+	  - Gradient Descent and its applications in Neural ODEs and CDEs  
   
 2.1 Back-propagation  
 	  - Discretise-then-optimise  
@@ -44,3 +44,10 @@ James Tay:
 - Examining the implementations of commonly used Julia modules (Autodiff, Zygote, etc) which make use of (reverse-mode) automatic differentiation based on Labs 2 and 3 of SciMLSANUM2024.
 - Working on basic ideas of gradient descent and extending them to more sophisticated methods used in practice (including but not limited to SGD) to locate various minima.
 - Currently working on how to apply these methods in solving neural ODEs/CDEs (where applicable) to make them more efficient. Largely working in Julia.
+
+Xinyan Wang:
+- Explan backpropagation for nueral network and the adjoint method for neural ODEs.
+- Provide an explanation of the idea behind neural ODEs.
+- Use Julia to construct a neural ODE model and apply it to some applications.
+- Show the limitations and strengths of neural ODEs, and introduce some ways to optimize a simple neural ODE.
+
