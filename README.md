@@ -75,7 +75,7 @@ Tianshi Liu:
 
 Jiankuan Liu:
 - Basic introduction of Neural Network and mainly focus on two of its application:
-  (1) Hand-written numbers identification: this is a feedforward Neural Networks(FNN), with n*n pixels input and 10 outputs(numbers 0-9), design the hidden layers of a neural network using empirical methods involves training the model by breaking down tasks into smaller modules, such as segmenting handwritten digits and combining them. Backpropagation is then applied to adjust the weights.
+- (1) Hand-written numbers identification: this is a feedforward Neural Networks(FNN), with n*n pixels input and 10 outputs(numbers 0-9), design the hidden layers of a neural network using empirical methods involves training the model by breaking down tasks into smaller modules, such as segmenting handwritten digits and combining them. Backpropagation is then applied to adjust the weights.
 
   In gradient descent, finding the optimal minimum efficiently is crucial. If the step size is too large, the algorithm might overshoot the minimum and land at another point, while a step size that is too small can be inefficient and energy-consuming. Therefore, research focuses on finding the appropriate step size to balance efficiency and accuracy.
 
