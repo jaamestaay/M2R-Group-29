@@ -67,8 +67,8 @@ Xinyan Wang:
 - Show the limitations and strengths of neural ODEs, and introduce some ways to optimize a simple neural ODE.
 
 Tianshi Liu:
-- Extend the proof of the adjoint method for neural ODEs to neural CDEs。
-- State the definitions for tensor product, signature, log signature, and introduce log ODE method. (statement maybe omitted in the presentation, and the lengthy proof omitted in the report)
+- Extend the proof of the adjoint method for neural ODEs to neural CDEs.
+- State the definitions for tensor product, signature, log signature, and introduce log ODE method. (Statement maybe omitted in the presentation, and the lengthy proof omitted in the report)
 - Use Julia to construct and apply a neural CDE model based on previous neural ODE model.
 - Perform a modelling of time series data combining the work of Xinyan and me, and analyze the results of the experiment.
 - Show the limitations and strengths of neural CDEs.
