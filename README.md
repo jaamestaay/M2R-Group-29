@@ -6,7 +6,7 @@ This is the GitHub repository for the MATH50002 Group Research Project (M2R) on 
 
 ### 0. Basic Neural Network Theory
 
-0.1 Definition and Implementation of Basic Neural Networks
+0.1 Definition and Implementation of Basic Neural Networks (Jiaru)
 
 - Feedforward Neural Networks vs Recurrent Neural Networks
 - Construction and Basic Applications (Regression, Classification)
