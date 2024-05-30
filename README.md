@@ -33,7 +33,10 @@ This is the GitHub repository for the MATH50002 Group Research Project (M2R) on 
 - Discretise-then-optimise
 - Optimise-then-discretise: Adjoint Equation
 
-2.3 log ODE Method (Xinyan, Tianshi) (State it for completeness, and then mention that it can be cleverly avoided provided that we choose a continuously differentiable control path)
+2.3 log ODE Method (Xinyan, Tianshi)
+
+- State it for completeness
+- Mention that it can be cleverly avoided provided that we choose a continuously differentiable control path
 
 2.4 Numerical Solvers
 
