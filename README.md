@@ -28,12 +28,12 @@ This is the GitHub repository for the MATH50002 Group Research Project (M2R) on 
 - Automatic Differentiation
 - Gradient Descent and its Applications in Neural ODEs and CDEs
 
-2.2 Back-propagation (Xinyan)
+2.2 Back-propagation (Xinyan for ODE, Tianshi for CDE (briefly extend the proof of adjoint method to the CDE case))
 
 - Discretise-then-optimise
 - Optimise-then-discretise: Adjoint Equation
 
-2.3 log ODE Method (Xinyan, Tianshi) (*do we really need to do this? honestly not sure how useful this is*)
+2.3 log ODE Method (Xinyan, Tianshi) (State it for completeness, and then mention that it can be cleverly avoided provided that we choose a continuously differentiable control path)
 
 2.4 Numerical Solvers
 
@@ -62,3 +62,11 @@ Xinyan Wang:
 - Provide an explanation of the idea behind neural ODEs.
 - Use Julia to construct and apply a neural ODE model.
 - Show the limitations and strengths of neural ODEs, and introduce some ways to optimize a simple neural ODE.
+
+Tianshi Liu:
+- Extend the proof of the adjoint method for neural ODEs to neural CDEs。
+- State the definitions for tensor product, signature, log signature, and introduce log ODE method. (statement maybe omitted in the presentation, and the lengthy proof omitted in the report)
+- Use Julia to construct and apply a neural CDE model based on previous neural ODE model.
+- Perform a modelling of time series data combining the work of Xinyan and me, and analyze the results of the experiment.
+- Show the limitations and strengths of neural CDEs.
+
