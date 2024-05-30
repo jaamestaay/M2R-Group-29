@@ -2,7 +2,7 @@ This is the GitHub repository for the MATH50002 Group Research Project (M2R) pro
 
 ## Report Outline
 ### 1. Introduction to Neural CDE Theory
-1.1 Definition of Neural ODEs, Neural CDEs (Xinyan, Tianshi)
+1.1 Definition of Neural ODEs, Neural CDEs (Xinyan, Tianshi)  
   1.1.1 Construction of Neural ODEs and CDEs (???)
     1.1.1.1 Neural ODEs vs Neural CDEs: Advantages and Disadvantages
   1.2.1 Why a Neural ODE/CDE may be advantageous compared to other formulations for problems (and thus using least squares) (Jiaru)
