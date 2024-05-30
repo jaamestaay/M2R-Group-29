@@ -67,6 +67,7 @@ Xinyan Wang:
 - Show the limitations and strengths of neural ODEs, and introduce some ways to optimize a simple neural ODE.
 
 Tianshi Liu:
+
 - Extend the proof of the adjoint method for neural ODEs to neural CDEs.
 - State the definitions for tensor product, signature, log signature, and introduce log ODE method. (Statement maybe omitted in the presentation, and the lengthy proof omitted in the report)
 - Use Julia to construct and apply a neural CDE model based on previous neural ODE model.
@@ -74,8 +75,6 @@ Tianshi Liu:
 - Show the limitations and strengths of neural CDEs.
 
 Jiankuan Liu:
-- Neural Network and its two application:
-- (1) Hand-written numbers identification: this is a feedforward Neural Networks(FNN), with n*n pixels input and 10 outputs(numbers 0-9). In gradient descent, finding the optimal minimum efficiently is crucial. If the step size is too large, the algorithm might overshoot the minimum and land at another point, while a step size that is too small can be inefficient and energy-consuming. Therefore, research focuses on finding the appropriate step size to balance efficiency and accuracy.
 
-- (2) Continuous dynamics of financial time series data, such as stock prices and market indices. This is a application of Recurrunt Neural Network. Neural ODEs naturally capture the continuous evolution of market data by embedding neural network architectures within the differential equation solving process. The Detail of it would be studied by Alex.
-
+- Hand-written numbers identification. This is an application of feedforward Neural Network, with n*n pixels input and 10 outputs (numbers 0-9). In gradient descent, finding the optimal minimum efficiently is crucial. If the step size is too large, the algorithm might overshoot the minimum and land at another point, while a step size that is too small can be inefficient and energy-consuming. Therefore, research focuses on finding the appropriate step size to balance efficiency and accuracy.
+- Continuous dynamics of financial time series data, such as stock prices and market indices. This is an application of Recurrunt Neural Network. Neural ODEs naturally capture the continuous evolution of market data by embedding neural network architectures within the differential equation solving process. The details would be studied by Tianshi.
