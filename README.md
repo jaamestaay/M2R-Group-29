@@ -3,26 +3,34 @@ This is the GitHub repository for the MATH50002 Group Research Project (M2R) pro
 ## Report Outline
 ### 1. Introduction to Neural CDE Theory
 1.1 Definition of Neural ODEs, Neural CDEs (Xinyan, Tianshi)  
-  1.1.1 Construction of Neural ODEs and CDEs (???)  
-    1.1.1.1 Neural ODEs vs Neural CDEs: Advantages and Disadvantages  
-  1.2.1 Why a Neural ODE/CDE may be advantageous compared to other formulations for problems (and thus using least squares) (Jiaru)  
+    - Construction of Neural ODEs and CDEs (???)  
+		-->Neural ODEs vs Neural CDEs: Advantages and Disadvantages  
+		- Why a Neural ODE/CDE may be advantageous compared to other formulations for problems (and thus using least squares) (Jiaru)  
+  
 1.2 Construction of Feedforward Neural Networks/Recurrent Neural Networks (Jiaru)  
-  1.2.2 Natural Cubic Splines, for continuous path $X_t$ (???)  
-  1.2.3 Other methods (???)  
+    - Natural Cubic Splines, for continuous path $X_t$ (???)  
+    - Other methods (???)  
+  
 ### 2. Solving Neural ODEs/CDEs
 2.1 An elaboration of the steps taken to solve a Neural ODE/CDE - Training the neural differential equation (James)  
-  2.1.1 Loss functions and minima  
-  2.1.2 Automatic Differentiation  
-  2.1.3 Gradient Descent and its applications in Neural ODes and CDEs  
+    - Loss functions and minima  
+		- Automatic Differentiation  
+	  - Gradient Descent and its applications in Neural ODes and CDEs  
+  
 2.1 Back-propagation  
-  2.1.1 Discretise-then-optimise  
-  2.1.2 Optimise-then-discretise: Adjoint Equation  
+	  - Discretise-then-optimise  
+	  - Optimise-then-discretise: Adjoint Equation  
+  
 2.2 log ODE Method (Xinyan, Tianshi) (do we really need to do this? honestly not sure how useful this is)  
+
 2.3 Numerical Solvers  
+
 ### 3. An application: (TBC)
 
 
 
+
+## Current Work
 
 Jiaru Li:
 - Description and explanation of neural network (NN) and how it works, based on Lab 5 of SciMLSANUM2024.
