@@ -76,5 +76,4 @@ Tianshi Liu:
 
 Jiankuan Liu:
 
-- Hand-written numbers identification. This is an application of feedforward Neural Network, with n*n pixels input and 10 outputs (numbers 0-9). In gradient descent, finding the optimal minimum efficiently is crucial. If the step size is too large, the algorithm might overshoot the minimum and land at another point, while a step size that is too small can be inefficient and energy-consuming. Therefore, research focuses on finding the appropriate step size to balance efficiency and accuracy.
 - Continuous dynamics of financial time series data, such as stock prices and market indices. This is an application of Recurrunt Neural Network. Neural ODEs naturally capture the continuous evolution of market data by embedding neural network architectures within the differential equation solving process. The details would be studied by Tianshi.
