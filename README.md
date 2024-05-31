@@ -38,7 +38,11 @@ This is the GitHub repository for the MATH50002 Group Research Project (M2R) on 
 - State it for completeness
 - Mention that it can be cleverly avoided provided that we choose a continuously differentiable control path
 
-2.4 Numerical Solvers
+2.4 Numerical Solvers (James)
+- Implicit Solvers (and why we don't use them)
+- Euler's Method and Runge-Kutta Methods
+- Heun's Method
+- Other methods if time permits
 
 ### 3. An Application (TBC)
 
