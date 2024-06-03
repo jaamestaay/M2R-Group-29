@@ -3,6 +3,8 @@
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage[a4paper,top=1in,bottom=1in,left=1in,right=1in,marginparwidth=1.75cm]{geometry}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
 \usepackage{afterpage}
 \usepackage{amsmath}
 \usepackage{amsthm}
@@ -10,7 +12,6 @@
 \usepackage{csquotes}
 \usepackage{enumitem}
 \usepackage{graphicx}
-\usepackage{lipsum}
 \usepackage{booktabs}
 \usepackage{listings}
 \lstset{
@@ -18,8 +19,7 @@
     framexleftmargin=15pt
 }
 \usepackage{caption}
-\captionsetup[figure]{labelfont={bf},name={Figure},labelsep=quad}
-\captionsetup[table]{labelfont={bf},name={Table},labelsep=quad}
+\captionsetup[figure]{labelfont={bf},labelsep=quad}
 \usepackage[ruled,vlined]{algorithm2e}
 \makeatletter
 \renewcommand{\SetKwInOut}[2]{%
@@ -42,6 +42,7 @@
 \makeatother
 \usepackage{bm}
 \usepackage[normalem]{ulem}
+\setlength{\marginparwidth}{2cm}
 \usepackage[colorinlistoftodos]{todonotes}
 \usepackage[colorlinks=true, allcolors=blue]{hyperref}
 \renewcommand*{\rmdefault}{bch}
@@ -60,7 +61,6 @@
 \newtheorem{lemma}[theorem]{Lemma}
 \theoremstyle{remark}
 \newtheorem*{remark}{Remark}
-
 \newcommand{\reporttitle}{Scientific Machine Learning: Neural Ordinary and Control Differential Equations}
 \newcommand{\reportauthorA}{James Tay (CID: 02015786)}
 \newcommand{\reportauthorB}{Jiaru (Eric) Li (CID: 02216531)}
@@ -68,11 +68,10 @@
 \newcommand{\reportauthorD}{Student name 4 (CID: -------------)}
 \newcommand{\reportauthorE}{Student name 5 (CID: -------------)}
 \newcommand{\supervisor}{Sheehan Olver}
-
 \begin{document}
 \begin{titlepage}
 \newcommand{\HRule}{\rule{\linewidth}{0.5mm}}
-\includegraphics[width=8cm]{Imperial_logo.png}\\[1cm]
+\includegraphics[width=8cm]{figures/Imperial_logo.png}\\[1cm]
 \center
 \textsc{\LARGE Imperial College London}\\[0.5cm] 
 \textsc{\Large Department of Mathematics}\\[1.5cm] 
@@ -104,7 +103,6 @@
 {\large \today}\\[2cm]
 \makeatother
 \end{titlepage}
-
 \begin{abstract}
 \textcolor{red}{Type your abstract here. The abstract is a summary of the contents of the project. It should be brief but informative, and
 should avoid technicalities as far as possible.}
@@ -125,15 +123,15 @@ examples, proofs, conjectures, codes etc. are your own?}
 
 \subsection{History and Introduction}
 
-Generally speaking, a \textit{neural network} is a group of units called \textit{neurons} connected by signals called \textit{synapses}.
+Before diving into neural ordinary and control differential equations, we shall first explore the field of \textit{neural network}. Generally speaking, a neural network is a group of units called \textit{neurons} connected by signals called \textit{synapses}.
 
-Back in 1943, Warren McCulloch and Walter Pitts published a seminal paper \cite{McCulloch1943}, in which they proposed the first mathematical model of an \textit{artificial neural network}, inspired by biological neural networks in animal brains. This model was named the McCulloch–Pitts neuron, or \textit{perceptron}. In some sense, it could ‘learn’ from given data and make decisions or predictions based on some parameters. The process of optimising the choice of such parameters is called \textit{training}.
+Back in 1943, Warren McCulloch and Walter Pitts published a seminal paper \cite{McCulloch1943}, in which they proposed the first mathematical model of an \textit{artificial neural network}, inspired by biological neural networks in animal brains. This model was named the McCulloch–Pitts neuron, or \textit{perceptron}. In some sense, it could ‘learn’ from given data and make decisions or predictions based on some parameters. The process of optimising the choice of such parameters is called \textit{training} the neural network.
 
-Later in 1958, Frank Rosenblatt described an implementation of perceptron in detail \cite{Rosenblatt1958}. He is sometimes called the father of deep learning \cite{IEEE}. This field expanded quickly, and nowadays, neural networks are extensively used in various fields such as machine learning and artificial intelligence. We shall explore some simple applications later.
+Later in 1958, Frank Rosenblatt described an implementation of perceptron in detail \cite{Rosenblatt1958}. The field of neural network expanded quickly, and nowadays, it is extensively used in various fields such as machine learning and artificial intelligence. We shall explore some simple applications later.
 
 \subsection{Basic Concepts}
 
-\subsubsection{Layers}
+\subsubsection{Structure}
 
 A neural network (abbreviated NN) consists of interconnected neurons, each of which can be thought as a mathematical function. They are typically organised into \textit{layers} consisting of
 
@@ -145,8 +143,6 @@ A neural network (abbreviated NN) consists of interconnected neurons, each of wh
 
 The input and output data are usually given as real numbers. The whole neural network can therefore be thought as a function $f:\mathbb{R}^m\rightarrow\mathbb{R}^n$ that takes an input vector $\mathbf{x}$ of dimension $m$ and an output vector $\mathbf{y}$ of dimension $n$.
 
-\subsubsection{Structure}
-
 The ultimate purpose of training a neural network is to minimise the error between the predicted output $\mathbf{y}$ and targeted output $\mathbf{\hat{y}}$, usually given as a \textit{loss function} $L(\mathbf{y}, \mathbf{\hat{y}})$. Each connection between neurons has a \textit{weight}, and possibly a \textit{bias}, which are adjusted in the process of training, allowing the model to generalise to unseen data. They are usually given altogether as a \textit{weight matrix} $\mathbf{W}$ and a \textit{bias vector} $\mathbf{b}$.
 
 \subsubsection{Activation Function}
@@ -154,6 +150,73 @@ The ultimate purpose of training a neural network is to minimise the error betwe
 For neural networks with multiple layers, an \textit{activation function} $\sigma$ is usually used. This is because it helps to decide whether a neuron should be ‘activated’ and introduces non-linearity into the model. The output of each neuron in a layer is therefore computed as $\mathbf{z}^l=\sigma\left(\mathbf{W}^l\mathbf{z}^{l-1}+\mathbf{b}^l\right)$, where $\sigma$ acts element-wise, $\mathbf{z}^l$ is the output vector for layer $l$, $\mathbf{W}^l$ is the weight matrix connecting layer $l-1$ to layer $l$, and $\mathbf{b}^l$ is the bias vector for layer $l$. 
 
 As for the choice of the activation function, the S-shaped \textit{sigmoid function} has some nice properties: it is bounded, differentiable with a non-negative derivative, and has exactly one point of inflection. Two familiar examples of sigmoid functions are the \textit{logistic function} $\sigma(x)=1/\left(1+e^{-x}\right)$ and the hyperbolic tangent function $\sigma(x)=\tanh x$. Another commonly used activation function is the \textit{rectifier}, or \textit{rectified linear unit} (ReLU), defined as $\sigma(x)=\max(0, x)$.
+
+\begin{figure}[htbp]
+    \centering
+    \begin{minipage}{0.32\textwidth}
+        \centering
+        \begin{tikzpicture}
+            \begin{axis}[
+                title={$1/\left(1+e^{-x}\right)$},
+                xlabel={$x$},
+                ylabel={$y$},
+                grid=major,
+                width=\textwidth,
+                height=0.75\textwidth,
+                xmin=-5, xmax=5,
+                ymin=-0.1, ymax=1.1,
+            ]
+                \addplot[blue, thick, samples=200] {1 / (1 + exp(-x))};
+            \end{axis}
+        \end{tikzpicture}
+    \end{minipage}%
+    \hfill
+    \begin{minipage}{0.32\textwidth}
+        \centering
+        \begin{tikzpicture}
+            \begin{axis}[
+                title={$\tanh(x)$},
+                xlabel={$x$},
+                ylabel={$y$},
+                grid=major,
+                width=\textwidth,
+                height=0.75\textwidth,
+                xmin=-5, xmax=5,
+                ymin=-1.1, ymax=1.1,
+            ]
+                \addplot[red, thick, samples=200] {tanh(x)};
+            \end{axis}
+        \end{tikzpicture}
+    \end{minipage}%
+    \hfill
+    \begin{minipage}{0.32\textwidth}
+        \centering
+        \begin{tikzpicture}
+            \begin{axis}[
+                title={$\max(0,x)$},
+                xlabel={$x$},
+                ylabel={$y$},
+                grid=major,
+                width=\textwidth,
+                height=0.75\textwidth,
+                xmin=-5, xmax=5,
+                ymin=-1, ymax=5,
+            ]
+                \addplot[green, thick, samples=200, domain=-5:5] {max(0,x)};
+            \end{axis}
+        \end{tikzpicture}
+    \end{minipage}
+    \centering
+    \caption{Three activation functions.}
+\end{figure}
+
+\subsubsection{Types}
+
+\textit{Feedforward neural networks} (FNN) and \textit{recurrent neural networks} (RNN) are two main categories of neural networks. So far, we have been discussing FNN only, whose flow of information is uni-directional, from the input layer to the output layer, without any cycles or loops. FNN is sufficient for ordinary tasks such as regression and classification. However, for more complicated problems, RNN plays an important role. In RNN, outputs from previous steps can be fed as input to the current step, allowing it to maintain a form of ‘memory’. This makes RNN particularly effective for tasks such as time series prediction, natural language processing, and speech recognition. We will delve into RNN more deeply later.
+
+\subsubsection{Gradient Descent and Backpropagation}
+
+\textit{Gradient descent} is an algorithm that helps to find the local minima of a function. Intuitively speaking, it starts at a given point and proceeds to the opposite direction of the gradient, where the function descends the most, then continues until the gradient vanishes, which is the local minimum. In the context of neural network, it is used to minimise the loss function. During the process of calculating the gradients with respect to the parameters, another algorithm called \textit{backpropagation} (backward propagation of errors) is typically used. It operates by ‘propagating’ the error from the output layer back through the network and calculating the gradients by the chain rule. We will discuss these two concepts in more detail later.
 
 \subsection{Example: Regression}
 points to cover:
@@ -177,7 +240,7 @@ points to cover:
 
 \subsection{Solving Steps}
 
-Solving differential equations has long been a difficult process, requiring much effort in existence theorems and techniques. Solving neural ODEs and NCDEs therefore poses a significant challenge in and of itself. Having defined basic neural network and neural ODEs/CDEs theory, we now turn our attention to the steps required to solve such problems numerically.
+Solving differential equations is a difficult process, requiring much effort in existence theorems and techniques. Solving neural ODEs and NCDEs therefore poses a significant challenge in and of itself. Having defined basic neural network and neural ODEs/CDEs theory, we now turn our attention to the steps required to solve such problems numerically.
 
 Consider \textcolor{red}{need to edit this based on the formal definition of the neural ODEs/CDEs we define, likely in an earlier section} a neural ODE defined by neural networks $f$ and $g$, such that $f_\theta$, when provided with parameters $\theta$, defines the differential equation of the system $\dot{x} = f_\theta\left(t, x\right)$, and $g_\phi$, when provided with paramters $\phi$, defines the initial value of the system $x\left(t_0\right) = g_\phi(t_0)$. In order to solve the neural ODE/CDE numerically, we are required to: 
 \begin{enumerate}
@@ -252,183 +315,10 @@ points to cover:
 \section{Conclusion}
 \textcolor{red}{The conclusion section is required but the previous sections (background, methods, results and discussion) are just examples of sections which may be useful.}
 
-
-%%%%%%% TO BE DELETED AFTER %%%%%%%
-\section{Examples (to be deleted)}
-
-Here is a section with a few useful examples. 
-
-\begin{figure}[b!] %Use h,t,b,! to enforce the location of the figure
-    \centering
-    \includegraphics[width=0.8\textwidth]{figures/imperial.jpg}
-    \caption{This is an example of how you include a figure with a descriptive caption. This is an image of the South Kensington campus of Imperial College London on which we can recognize Queen's tower.}
-    \label{fig:imperial-picture}
-\end{figure}
-
-Here is some filler text to show you what a few pages may look like. \lipsum[2-4] See Figure \ref{fig:imperial-picture}. \textbf{This is how you reference your figure in the text.}
-
-\begin{table}[]
-    \centering
-    \begin{tabular}{llr}  
-        \toprule
-        \multicolumn{2}{c}{Module} \\
-        \cmidrule(r){1-2}
-        Module code    & Module name & Number of students \\
-        \midrule
-              & per gram    & 13.65      \\
-                      &    each     & 0.01       \\
-        Gnu       & stuffed     & 92.50      \\
-        Emu       & stuffed     & 33.33      \\
-        Armadillo & frozen      & 8.99       \\
-        \bottomrule
-    \end{tabular}
-    \caption{Example booktabs table. Booktabs tables are nicer than regular ones. This site has a nice GUI for making LaTeX tables, and has a Booktabs option: https://www.tablesgenerator.com/}
-    \label{tab:my_label}
-\end{table}
-
-\lipsum[1-4] \textbf{This is how you would reference a table:} Table \ref{tab:my_label}. 
-
-\subsection{Section Example}
-\label{sec:sec_example}
-\lipsum[1]
-\subsubsection{Subsection Example}
-\label{sec:subsec_example}
-\lipsum[1]
-
-Note that you can reference chapters, sections, subsections and subsubsections. For example: Subsection \ref{sec:subsec_example}!
-
-\subsection{Math Example}
-
-While math can be written inline like so $f(x) = \sum_{n=0}^{\infty} \frac{x^n}{n!}$, we often need to write stand-alone equations like so
-\begin{equation}
-\textrm{score}(x) = \left(\lambda_m\sum_{i=0}^{|\mathbf{m}|} \log \hat{p}_m(d(x, \mathbf{m}_i) \mid l_i)\right) + \left(\lambda_l\sum_{i=0}^{|\mathbf{l}|} \log\hat{p}_l(d(x, \mathbf{l}_i) \mid \mathbf{v}_i)\right) + \lambda_p \hat{p}_p(x)
-\end{equation}
-
-To write equations over multiple lines (like systems of equation or equations too long to fit the page), one can use the \textit{align} environment coupled to the \textit{subequations} environment like so
-\begin{subequations}
-\begin{align}
-    \mathbb{P}(0 \leadsto -a) &= D\int_0^\infty dt\, k_r e^{-k_r t}\int_0^t d\tau\,\partial_x u \big|_{x=-a}, \\
-    \mathbb{P}(0 \leadsto b) &= -D\int_0^\infty dt\, k_r e^{-k_r t}\int_0^t d\tau\,\partial_x u \big|_{x=b}.
-\end{align}
-\end{subequations}
-
-\subsection{Theorem and Proofs}
-
-This section is directly taken from \href{https://www.overleaf.com/learn/latex/Theorems_and_proofs}{Overleaf}. Please do consult the webpage for more information and discuss with your supervisors. 
-
-Theorems can easily be defined:
-
-\begin{theorem}
-Let \(f\) be a function whose derivative exists in every point, then \(f\) is 
-a continuous function.
-\end{theorem}
-
-\begin{theorem}[Pythagorean theorem]
-\label{pythagorean}
-This is a theorem about right triangles and can be summarised in the next 
-equation 
-\[ x^2 + y^2 = z^2 \]
-\end{theorem}
-
-And a consequence of theorem \ref{pythagorean} is the statement in the next 
-corollary.
-
-\begin{corollary}
-There's no right rectangle whose sides measure 3cm, 4cm, and 6cm.
-\end{corollary}
-
-You can reference theorems such as \ref{pythagorean} when a label is assigned.
-
-\begin{lemma}
-Given two line segments whose lengths are \(a\) and \(b\) respectively there is a 
-real number \(r\) such that \(b=ra\).
-\end{lemma}
-
-As you can see, theorems, corollaries and lemmas are italicised. Often, definitions are not: 
-\begin{definition}[Fibration]
-A fibration is a mapping between two topological spaces that has the homotopy lifting property for every space \(X\).
-\end{definition}
-This can be changed using the \verb!\theoremstyle{}! command in the preamble. 
-
-It can be useful to have an unnumbered theorem-like environment to add remarks, comments or examples to a mathematical document. Here, you can do so by using the following environment: 
-
-\begin{remark}
-This statement is true, I guess.
-\end{remark}
-
-Finally here is an example of proof: 
-
-\begin{lemma}
-Given two line segments whose lengths are \(a\) and \(b\) respectively there 
-is a real number \(r\) such that \(b=ra\).
-\end{lemma}
-
-\begin{proof}
-To prove it by contradiction try and assume that the statement is false,
-proceed from there and at some point you will arrive to a contradiction.
-\end{proof}
-
-
-\subsection{Algorithm Example}
-
-See Algorithm \ref{algorithm:posit}
-
-\begin{algorithm}[]
-\SetAlgoLined
-\SetKwInOut{KwInput}{Input}
-\SetKwInOut{KwOutput}{Output}
-\SetKwInOut{KwPre}{Pre}
-\SetKw{Return}{return}
-\SetKwProg{Fn}{Function}{}{end}
-\LinesNumbered
-\KwInput{$\textbf{m}$, such that $\mathbf{m}_i$ is the position of the $i$'th monitor\newline
-$\textbf{l}$, such that $\mathbf{l}_i$ is the position of the $i$'th landmark\newline
-$\mathbf{p}^m$, such that $\mathbf{p}^m_i$ is the ping latency from monitor $i$ to the target\newline
-$\mathbf{p}^l$, such that $\mathbf{p}^l_i$ is the set of ping latencies to landmark $i$}
-
-\BlankLine
-\KwPre{Compute $\hat{p}_m(d \mid l)$, an estimator giving the likelihood of the target being distance $d$ away from the monitor, given that the monitor records a latency of $l$ to that target. Implemented by training a KDE using $\mathbf{p}^l$.\newline
-Compute $\hat{p}_l(d \mid v)$, an estimator giving the likelihood of the target being distance $d$ away from the landmark, given a Canberra distance of $v$ between the target and the landmark, using training targets.
-}
-\BlankLine
-\KwOutput{Most likely location of the target}
-\BlankLine
-
-\Fn{Likelihood($x$, $\mathbf{v}$)} {
-MonitorScore $\gets \sum_{i=0}^{|\mathbf{m}|} \log{\hat{p}_m(d(x, \mathbf{m}_i) \mid l_i)}$\;
-LandmarkScore $\gets \sum_{i=0}^{|\mathbf{l}|} \log{\hat{p}_l(d(x, \mathbf{l}_i) \mid \mathbf{v}_i)}$\;
-\Return MonitorScore + LandmarkScore
-}
-
-\BlankLine
-$\mathbf{v} \gets $\{$\mathrm{canberra\_distance}(\mathbf{l}_i, \mathbf{p}^m) \mid \mathbf{l}_i \in \mathbf{l}$\}
-
-$\mathbf{C}$ $\gets$ Constraint-Based-Geolocation($\mathbf{m}$, $\mathbf{p}^m$)\;
-$\mathbf{C_l}$ $\gets$ \{$m \in \mathbf{m} \mid \mathbf{C}$ contains $m\} \cup \{l \in \mathbf{l} \mid \mathbf{C}$ contains $l$\}\;
-\BlankLine
-\Return argmax$_{x\in \mathbf{C_l}}$ Likelihood($x$)
-
- \caption{Algorithm example}
- \label{algorithm:posit}
-\end{algorithm}
-
-\subsection{Reference Example}
-
-Here is how you can cite papers which you have added in the \verb!/bibs/bibliography.bib! file. You can cite single reference or multiple references.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Acknowledgements
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section*{Acknowledgments}
 \addcontentsline{toc}{section}{Acknowledgement}
 \textcolor{red}{Comment this out if not needed.}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Appendices
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \appendix
 
 \section{First appendix}
@@ -437,10 +327,5 @@ Here is how you can cite papers which you have added in the \verb!/bibs/bibliogr
 \section{Second appendix}
 \label{sec:appendix2}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \bibliography{bibliography.bib}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 \end{document}
