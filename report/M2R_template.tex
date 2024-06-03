@@ -105,7 +105,7 @@
 %----------------------------------------------------------------------------------------
 % IMPORTANT INFORMATION TO MODIFY FOR THE TITLE PAGE
 %----------------------------------------------------------------------------------------
-\newcommand{\reporttitle}{Scientific Machine Learning} % Title of your research project
+\newcommand{\reporttitle}{Scientific Machine Learning: Neural Ordinary and Control Differential Equations} % Title of your research project
 \newcommand{\reportauthorA}{James Tay (CID: 02015786)} % First Name, Last Name and CID of student 1
 \newcommand{\reportauthorB}{Jiaru (Eric) Li (CID: 02216531)} % First Name, Last Name and CID of student 2
 \newcommand{\reportauthorC}{Student name 3 (CID: -------------)} % First Name, Last Name and CID of student 3
@@ -150,7 +150,7 @@
 %----------------------------------------------------------------------------------------
 \makeatletter
 \HRule \\[0.6cm]
-{ \huge \bfseries \reporttitle}\\[0.6cm] % Title of your document
+{\huge \bfseries \reporttitle}\\[0.6cm] % Title of your document
 \HRule \\[1.5cm]
 %----------------------------------------------------------------------------------------
 %	AUTHOR SECTION
@@ -186,8 +186,8 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Abstract
 \begin{abstract}
-Type your abstract here. The abstract is a summary of the contents of the project. It should be brief but informative, and
-should avoid technicalities as far as possible.
+\textcolor{red}{Type your abstract here. The abstract is a summary of the contents of the project. It should be brief but informative, and
+should avoid technicalities as far as possible.}
 \end{abstract}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  
@@ -203,13 +203,142 @@ should avoid technicalities as far as possible.
 \section{Introduction}
 \label{sec:introduction}
 
-The introduction should attempt to set your work in the context of other work done in the field. It
+\textcolor{red}{The introduction should attempt to set your work in the context of other work done in the field. It
 should demonstrate that you are aware of what you are doing, and how it relates to other work
 (with references). It should also provide an overview of the contents of the project. You should
 highlight your individual contributions and any novel result: which of the calculations, theorems,
-examples, proofs, conjectures, codes etc. are your own?
+examples, proofs, conjectures, codes etc. are your own?}
 
-\section{Examples}
+\section{Neural Networks}
+
+\subsection{History and Introduction}
+
+Generally speaking, a \textit{neural network} is a group of units called \textit{neurons} connected by signals called \textit{synapses}. Back in 1943, two American scientists, Warren McCulloch and Walter Pitts, published a seminal paper titled "A Logical Calculus of Ideas Immanent in Nervous Activity" that gave the first mathematical model of an \textit{artificial neural network}, inspired by biological neural networks in animal brains. Nowadays, it is extensively used in various fields such as machine learning (ML) and artificial intelligence (AI).
+
+points to cover:
+
+\begin{itemize}
+    \item motivation
+    \item applications
+\end{itemize}
+
+\subsection{Basic Concepts}
+
+An (artificial) neural network (abbreviated (A)NN) consists of interconnected neurons, each of which can be thought as a mathematical function. They are typically organised into \textit{layers} consisting of
+
+\begin{itemize}
+    \item an \textit{input layer} that receives the data,
+    \item multiple \textit{hidden layers} that processes the data, and
+    \item an \textit{output layer} that produces the result.
+\end{itemize}
+
+The ultimate purpose of \textit{training} a neural network is to minimise the error between the predicted and targeted outputs, usually given as a \textit{loss function}. Each connection between neurons has a \textit{weight} and possibly a \textit{bias}, which are adjusted in the process of training, allowing the model to generalise to unseen data.
+
+points to cover:
+
+\begin{itemize}
+    \item activation function
+    \item feedforward vs recurrent
+\end{itemize}
+
+\subsection{Example: Regression}
+points to cover:
+\begin{itemize}
+    \item Lux.jl
+    \item an implementation
+\end{itemize}
+
+\subsection{Example: Number Classification}
+points to cover:
+\begin{itemize}
+    \item Flux.jl
+    \item an implementation
+\end{itemize}
+
+\section{Introduction to Neural ODEs/CDEs}
+
+\section{Solving Neural ODEs/CDEs}
+
+\subsection{Solving Steps}
+
+Solving differential equations have long been a difficult process, requiring much effort in existence theorems and techniques. Solving Ordinary or Control Neural Differential Equations (NODEs and NCDEs) therefore pose a significant challenge in and of itself. Having defined basic Neural Network (NN) and NODE/NCDE theory, we now turn our attention to the steps required to solve such problems numerically.
+
+Consider \textcolor{red}{need to edit this based on the formal definition of the neural ODE/CDE we define, likely in an earlier section} a NODE defined by neural networks $f_\theta$ and $g_\phi$, such that $f_\theta$ (when provided with parameters $\theta$)defines the differential equation of the system $\frac{dx}{dt} = f_\theta\left(t, x\right)$ and $g_\phi$ (when provided with paramters $\phi$) defines the initial value of the system, $x\left(t_0\right) = g_\phi(t_0)$. In order to solve the neural ODE/CDE numerically, we are required to: 
+\begin{enumerate}
+    \item \textit{Train $g_\phi$ to predict the initial value of the system.} This requires the use of a \textit{loss function} to \textit{train} neural network $g_\phi$, providing the parameters required to accurately predict the initial value of the system. 
+    \item \textit{Train $f_\theta$ to provide the parameters of the NODE/NCDE.} Similar to the prior step, this requires a loss function to train neural network $f_\theta$, providing the parameters required to accurately state the specific ODE in question. Once the parameters have been approximated, we are left with a standard ODE problem.
+    \item \textit{Solve the ODE Problem.} As most ODEs do not have analytical solutions, we make use of \textit{numerical ODE solvers} to approximate the solution of the system (along with the initial value provided by $g_\phi\left(t_0\right)$.
+\end{enumerate}
+
+This section aims to define and discuss the methods and techniques required to conduct such numerical analysis on NODEs/NCDEs. In particular, the basic ideas of loss functions, gradient descent and automatic differentiation are introduced here in Section 4.1. Sections 4.2 and 4.3 cover the methods used to train the relevant neural networks, and finally Section 4.4 discusses several numerical methods of solving the eventual ODEs after training. \textcolor{red}{edit section numbering if it changes. do this at the end when all has been confirmed}
+
+\subsubsection{Loss Functions}
+points to cover:
+\begin{itemize}
+    \item why we need loss functions
+    \item defintion of loss function
+    \item how to choose loss functions
+    \item basic examples
+    \item what to do with loss functions?
+\end{itemize}
+
+\subsubsection{Gradient Descent and Applications}
+points to cover:
+\begin{itemize}
+    \item motivation for gradient descent
+    \item basic gradient descent and possible issues
+    \item stochastic gradient descent - costly calculations
+    \item adaptive gradient techniques - RMSProp, ADAM
+    \item when to use what method for training
+\end{itemize}
+
+\subsubsection{Automatic Differentiation}
+points to cover:
+\begin{itemize}
+    \item motivation behind AD
+    \item starting with dual numbers
+    \item extending dual numbers to higher dimensions
+    \item extending dual numbers to multivariable contexts (taylor series)
+    \item AD in general scenarios: chain rule
+    \item julia packages implementing AD
+\end{itemize}
+\textcolor{red}{might be useful to move this to 3.2 instead, since the ideas in AD extend into backpropagation. but honestly it doesnt really matter since they're next to each other.}
+
+\subsection{Backpropagation}
+
+\subsection{log ODE Method}
+
+\subsection{Numerical ODE Solvers}
+Upon completion of training of the neural networks (where we have derived the learned parameters $\theta$, $\phi$), all that remains is to solve the subsequent ODE numerically. This can be done in a number of methods, which are generally known as the \textit{Runge-Kutta} methods.
+
+\subsubsection{Euler's Method}
+points to cover:
+\begin{itemize}
+    \item motivation for euler's method
+    \item definition of euler's method
+    \item proof of euler's method
+    \item limitations of euler's method
+    \item (maybe an implementation of euler's method? but its not going to be used anyway. see how)
+\end{itemize}
+
+\subsubsection{Runge-Kutta Methods}
+points to cover:
+\begin{itemize}
+    \item general runge-kutta methods definition (including matrix representation)
+    \item euler's method is a runge-kutta method (1st order)
+    \item an example: RK4 (basic? proof and full extension of definition)
+    \item actual runge-kutta methods used in julia packages - 5th orders and above  
+    \item a short comment on what makes a good method for solving ODEs
+\end{itemize}
+
+\section{Application: TBC}
+
+\section{Conclusion}
+\textcolor{red}{The conclusion section is required but the previous sections (background, methods, results and discussion) are just examples of sections which may be useful.}
+
+
+%%%%%%% TO BE DELETED AFTER %%%%%%%
+\section{Examples (to be deleted)}
 
 Here is a section with a few useful examples. 
 
@@ -371,28 +500,6 @@ $\mathbf{C_l}$ $\gets$ \{$m \in \mathbf{m} \mid \mathbf{C}$ contains $m\} \cup \
 
 Here is how you can cite papers which you have added in the \verb!/bibs/bibliography.bib! file. You can cite single references as such \cite{Einstein1905} or multiple references like so \cite{Dirac1981,Einstein1905}. Here is a reference to a website \cite{Riemann2024}.
 
-\section{Background}
-
-\section{Methods}
-
-\section{Results}
-
-\section{Discussion}
-
-\section{Section 2.1: Solving Steps}
-Solving differential equations have long been a non-trivial matter, requiring much effort in existence theorems and techniques. Solving Neural Differential Equations (Ordinary or Control, NODEs and NCDEs) therefore pose a significant challenge in and of itself. Having defined basic Neural Network (NN) and NODE/NCDE theory, we now turn our attention to the steps required to solve such problems numerically:
-
-
-\subsection{Loss Functions and Minima}
-
-\subsection{Automatic Differentiation}
-
-
-\subsection{Gradient Descent and Applications}
-
-\section{Conclusion}
-The conclusion section is required but the previous sections (background, methods, results and discussion) are just examples of sections which may be useful. 
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -400,7 +507,7 @@ The conclusion section is required but the previous sections (background, method
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section*{Acknowledgments}
 \addcontentsline{toc}{section}{Acknowledgement}
-Comment this out if not needed.
+\textcolor{red}{Comment this out if not needed.}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
