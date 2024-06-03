@@ -1,25 +1,8 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Mathematics Final Year Research Projects
-% LaTeX Template
-% Version 1.0 (31/01/24)
-%
-% This template has been adapted from: https://www.overleaf.com/latex/templates/imperial-college-report-template/wncnzptkhnbc
-% Students should feel free to adapt this template to their needs.
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%----------------------------------------------------------------------------------------
-% PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
-%----------------------------------------------------------------------------------------
 \documentclass[a4paper,11pt, titlepage]{article}
-
-%% Language and font encodings
 \usepackage[english]{babel}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
-
-%% Sets page size and margins
 \usepackage[a4paper,top=1in,bottom=1in,left=1in,right=1in,marginparwidth=1.75cm]{geometry}
-
-%% Useful packages
 \usepackage{afterpage}
 \usepackage{amsmath}
 \usepackage{amsthm}
@@ -29,21 +12,14 @@
 \usepackage{graphicx}
 \usepackage{lipsum}
 \usepackage{booktabs}
-
-% Listings (for displaying code):
 \usepackage{listings}
 \lstset{
     frame = single, 
     framexleftmargin=15pt
 }
-
-% Center figure captions:
 \usepackage{caption}
 \captionsetup[figure]{labelfont={bf},name={Figure},labelsep=quad}
 \captionsetup[table]{labelfont={bf},name={Table},labelsep=quad}
-
-
-% ----------- Algorithm2e setup
 \usepackage[ruled,vlined]{algorithm2e}
 \makeatletter
 \renewcommand{\SetKwInOut}[2]{%
@@ -64,31 +40,18 @@
     \algocf@linesnumbered% reset the numbering of the lines
   }}%
 \makeatother
-% --------- end algorithm2e setup
-
-% \bm allows typing bold math:
 \usepackage{bm}
 \usepackage[normalem]{ulem}
-
 \usepackage[colorinlistoftodos]{todonotes}
 \usepackage[colorlinks=true, allcolors=blue]{hyperref}
-
 \renewcommand*{\rmdefault}{bch}
 \renewcommand*{\ttdefault}{lmtt}
 \newcommand{\citationneeded}{\textcolor{red}{[citation-needed]}}
-
 \DeclareMathOperator*{\argmin}{\arg\!\min}
 \DeclareMathOperator*{\argmax}{\arg\!\max}
-
-% Add bigger skip between paragraphs, makes reading easier:
 \setlength{\parskip}{0.5em}
-
-% Bibliography
 \usepackage[numbers, comma, square, sort&compress]{natbib}
 \bibliographystyle{abbrvunsrtnat.bst}
-
-
-% Theorem, Lemma, Corollary and Proofs
 \theoremstyle{definition}
 \newtheorem{definition}{Definition}[section]
 \theoremstyle{plain}
@@ -98,63 +61,26 @@
 \theoremstyle{remark}
 \newtheorem*{remark}{Remark}
 
-%----------------------------------------------------------------------------------------
-% END OF DOCUMENT CONFIGURATION
-%----------------------------------------------------------------------------------------
+\newcommand{\reporttitle}{Scientific Machine Learning: Neural Ordinary and Control Differential Equations}
+\newcommand{\reportauthorA}{James Tay (CID: 02015786)}
+\newcommand{\reportauthorB}{Jiaru (Eric) Li (CID: 02216531)}
+\newcommand{\reportauthorC}{Student name 3 (CID: -------------)}
+\newcommand{\reportauthorD}{Student name 4 (CID: -------------)}
+\newcommand{\reportauthorE}{Student name 5 (CID: -------------)}
+\newcommand{\supervisor}{Sheehan Olver}
 
-%----------------------------------------------------------------------------------------
-% IMPORTANT INFORMATION TO MODIFY FOR THE TITLE PAGE
-%----------------------------------------------------------------------------------------
-\newcommand{\reporttitle}{Scientific Machine Learning: Neural Ordinary and Control Differential Equations} % Title of your research project
-\newcommand{\reportauthorA}{James Tay (CID: 02015786)} % First Name, Last Name and CID of student 1
-\newcommand{\reportauthorB}{Jiaru (Eric) Li (CID: 02216531)} % First Name, Last Name and CID of student 2
-\newcommand{\reportauthorC}{Student name 3 (CID: -------------)} % First Name, Last Name and CID of student 3
-\newcommand{\reportauthorD}{Student name 4 (CID: -------------)} % First Name, Last Name and CID of student 4
-\newcommand{\reportauthorE}{Student name 5 (CID: -------------)} % First Name, Last Name and CID of student 5
-\newcommand{\supervisor}{Sheehan Olver} % First Name and Last Name of your supervisor(s)
-%----------------------------------------------------------------------------------------
-
-%----------------------------------------------------------------------------------------
-% To compile this file, use the following sequence: 
-%	latex main.tex
-%	bibtex main.tex
-%	latex main.tex
-%	latex main.tex
-%----------------------------------------------------------------------------------------
-
-%----------------------------------------------------------------------------------------
-% START OF DOCUMENT
-%----------------------------------------------------------------------------------------
 \begin{document}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Title page
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{titlepage}
-\newcommand{\HRule}{\rule{\linewidth}{0.5mm}} % Defines a new command for the horizontal lines, change thickness here
-%----------------------------------------------------------------------------------------
-%	LOGO SECTION
-%----------------------------------------------------------------------------------------
-\includegraphics[width=8cm]{Imperial_logo.png}\\[1cm] % Include a department/university logo - this will require the graphicx package
-%----------------------------------------------------------------------------------------
-\center % Center everything on the page
-%----------------------------------------------------------------------------------------
-%	HEADING SECTIONS
-%----------------------------------------------------------------------------------------
-% For M3R or M4R reports, comment out as appropriate
+\newcommand{\HRule}{\rule{\linewidth}{0.5mm}}
+\includegraphics[width=8cm]{Imperial_logo.png}\\[1cm]
+\center
 \textsc{\LARGE Imperial College London}\\[0.5cm] 
 \textsc{\Large Department of Mathematics}\\[1.5cm] 
 \textsc{\Large Second-year Group Research Project}\\[0.5cm]
-%----------------------------------------------------------------------------------------
-%	TITLE SECTION
-%----------------------------------------------------------------------------------------
 \makeatletter
 \HRule \\[0.6cm]
-{\huge \bfseries \reporttitle}\\[0.6cm] % Title of your document
+{\huge \bfseries \reporttitle}\\[0.6cm]
 \HRule \\[1.5cm]
-%----------------------------------------------------------------------------------------
-%	AUTHOR SECTION
-%----------------------------------------------------------------------------------------
 \begin{minipage}{0.4\textwidth}
 \begin{flushleft} \large
 \emph{Author:}\\
@@ -169,37 +95,23 @@
 \begin{minipage}{0.4\textwidth}
 \begin{flushright} \large
 \emph{Supervisor(s):} \\
-\supervisor % Supervisor's name
+\supervisor
 \end{flushright}
 \end{minipage}\\[2cm]
 \makeatother
-%----------------------------------------------------------------------------------------
-%	FOOTER & DATE SECTION
-%----------------------------------------------------------------------------------------
 \vfill
 \makeatletter
-{\large \today}\\[2cm] % Date, change the \today to a set date if you want to be precise
+{\large \today}\\[2cm]
 \makeatother
 \end{titlepage}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Abstract
 \begin{abstract}
 \textcolor{red}{Type your abstract here. The abstract is a summary of the contents of the project. It should be brief but informative, and
 should avoid technicalities as far as possible.}
 \end{abstract}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
- 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Table of contents
 \tableofcontents
 \clearpage
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Main sections
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Introduction}
 \label{sec:introduction}
 
@@ -213,18 +125,17 @@ examples, proofs, conjectures, codes etc. are your own?}
 
 \subsection{History and Introduction}
 
-Generally speaking, a \textit{neural network} is a group of units called \textit{neurons} connected by signals called \textit{synapses}. Back in 1943, two American scientists, Warren McCulloch and Walter Pitts, published a seminal paper titled "A Logical Calculus of Ideas Immanent in Nervous Activity" that gave the first mathematical model of an \textit{artificial neural network}, inspired by biological neural networks in animal brains. Nowadays, it is extensively used in various fields such as machine learning (ML) and artificial intelligence (AI).
+Generally speaking, a \textit{neural network} is a group of units called \textit{neurons} connected by signals called \textit{synapses}.
 
-points to cover:
+Back in 1943, Warren McCulloch and Walter Pitts published a seminal paper \cite{McCulloch1943}, in which they proposed the first mathematical model of an \textit{artificial neural network}, inspired by biological neural networks in animal brains. This model was named the McCulloch–Pitts neuron, or \textit{perceptron}. In some sense, it could ‘learn’ from given data and make decisions or predictions based on some parameters. The process of optimising the choice of such parameters is called \textit{training}.
 
-\begin{itemize}
-    \item motivation
-    \item applications
-\end{itemize}
+Later in 1958, Frank Rosenblatt described an implementation of perceptron in detail \cite{Rosenblatt1958}. He is sometimes called the father of deep learning \cite{IEEE}. This field expanded quickly, and nowadays, neural networks are extensively used in various fields such as machine learning and artificial intelligence. We shall explore some simple applications later.
 
 \subsection{Basic Concepts}
 
-An (artificial) neural network (abbreviated (A)NN) consists of interconnected neurons, each of which can be thought as a mathematical function. They are typically organised into \textit{layers} consisting of
+\subsubsection{Layers}
+
+A neural network (abbreviated NN) consists of interconnected neurons, each of which can be thought as a mathematical function. They are typically organised into \textit{layers} consisting of
 
 \begin{itemize}
     \item an \textit{input layer} that receives the data,
@@ -232,18 +143,22 @@ An (artificial) neural network (abbreviated (A)NN) consists of interconnected ne
     \item an \textit{output layer} that produces the result.
 \end{itemize}
 
-The ultimate purpose of \textit{training} a neural network is to minimise the error between the predicted and targeted outputs, usually given as a \textit{loss function}. Each connection between neurons has a \textit{weight} and possibly a \textit{bias}, which are adjusted in the process of training, allowing the model to generalise to unseen data.
+The input and output data are usually given as real numbers. The whole neural network can therefore be thought as a function $f:\mathbb{R}^m\rightarrow\mathbb{R}^n$ that takes an input vector $\mathbf{x}$ of dimension $m$ and an output vector $\mathbf{y}$ of dimension $n$.
 
-points to cover:
+\subsubsection{Structure}
 
-\begin{itemize}
-    \item activation function
-    \item feedforward vs recurrent
-\end{itemize}
+The ultimate purpose of training a neural network is to minimise the error between the predicted output $\mathbf{y}$ and targeted output $\mathbf{\hat{y}}$, usually given as a \textit{loss function} $L(\mathbf{y}, \mathbf{\hat{y}})$. Each connection between neurons has a \textit{weight}, and possibly a \textit{bias}, which are adjusted in the process of training, allowing the model to generalise to unseen data. They are usually given altogether as a \textit{weight matrix} $\mathbf{W}$ and a \textit{bias vector} $\mathbf{b}$.
+
+\subsubsection{Activation Function}
+
+For neural networks with multiple layers, an \textit{activation function} $\sigma$ is usually used. This is because it helps to decide whether a neuron should be ‘activated’ and introduces non-linearity into the model. The output of each neuron in a layer is therefore computed as $\mathbf{z}^l=\sigma\left(\mathbf{W}^l\mathbf{z}^{l-1}+\mathbf{b}^l\right)$, where $\sigma$ acts element-wise, $\mathbf{z}^l$ is the output vector for layer $l$, $\mathbf{W}^l$ is the weight matrix connecting layer $l-1$ to layer $l$, and $\mathbf{b}^l$ is the bias vector for layer $l$. 
+
+As for the choice of the activation function, the S-shaped \textit{sigmoid function} has some nice properties: it is bounded, differentiable with a non-negative derivative, and has exactly one point of inflection. Two familiar examples of sigmoid functions are the \textit{logistic function} $\sigma(x)=1/\left(1+e^{-x}\right)$ and the hyperbolic tangent function $\sigma(x)=\tanh x$. Another commonly used activation function is the \textit{rectifier}, or \textit{rectified linear unit} (ReLU), defined as $\sigma(x)=\max(0, x)$.
 
 \subsection{Example: Regression}
 points to cover:
 \begin{itemize}
+    \item theory
     \item Lux.jl
     \item an implementation
 \end{itemize}
@@ -251,6 +166,7 @@ points to cover:
 \subsection{Example: Number Classification}
 points to cover:
 \begin{itemize}
+    \item theory
     \item Flux.jl
     \item an implementation
 \end{itemize}
@@ -261,22 +177,22 @@ points to cover:
 
 \subsection{Solving Steps}
 
-Solving differential equations have long been a difficult process, requiring much effort in existence theorems and techniques. Solving Ordinary or Control Neural Differential Equations (NODEs and NCDEs) therefore pose a significant challenge in and of itself. Having defined basic Neural Network (NN) and NODE/NCDE theory, we now turn our attention to the steps required to solve such problems numerically.
+Solving differential equations has long been a difficult process, requiring much effort in existence theorems and techniques. Solving neural ODEs and NCDEs therefore poses a significant challenge in and of itself. Having defined basic neural network and neural ODEs/CDEs theory, we now turn our attention to the steps required to solve such problems numerically.
 
-Consider \textcolor{red}{need to edit this based on the formal definition of the neural ODE/CDE we define, likely in an earlier section} a NODE defined by neural networks $f_\theta$ and $g_\phi$, such that $f_\theta$ (when provided with parameters $\theta$)defines the differential equation of the system $\frac{dx}{dt} = f_\theta\left(t, x\right)$ and $g_\phi$ (when provided with paramters $\phi$) defines the initial value of the system, $x\left(t_0\right) = g_\phi(t_0)$. In order to solve the neural ODE/CDE numerically, we are required to: 
+Consider \textcolor{red}{need to edit this based on the formal definition of the neural ODEs/CDEs we define, likely in an earlier section} a neural ODE defined by neural networks $f$ and $g$, such that $f_\theta$, when provided with parameters $\theta$, defines the differential equation of the system $\dot{x} = f_\theta\left(t, x\right)$, and $g_\phi$, when provided with paramters $\phi$, defines the initial value of the system $x\left(t_0\right) = g_\phi(t_0)$. In order to solve the neural ODE/CDE numerically, we are required to: 
 \begin{enumerate}
-    \item \textit{Train $g_\phi$ to predict the initial value of the system.} This requires the use of a \textit{loss function} to \textit{train} neural network $g_\phi$, providing the parameters required to accurately predict the initial value of the system. 
-    \item \textit{Train $f_\theta$ to provide the parameters of the NODE/NCDE.} Similar to the prior step, this requires a loss function to train neural network $f_\theta$, providing the parameters required to accurately state the specific ODE in question. Once the parameters have been approximated, we are left with a standard ODE problem.
-    \item \textit{Solve the ODE Problem.} As most ODEs do not have analytical solutions, we make use of \textit{numerical ODE solvers} to approximate the solution of the system (along with the initial value provided by $g_\phi\left(t_0\right)$.
+    \item \textit{Train $g_\phi$ to predict the initial value of the system.} This requires the use of a loss function to train the neural network $g_\phi$, providing the parameters required to accurately predict the initial value of the system. 
+    \item \textit{Train $f_\theta$ to provide the parameters of the neural ODE/CDE.} Similar to the prior step, this requires a loss function to train the neural network $f_\theta$, providing the parameters required to accurately state the specific ODE in question. Once the parameters have been approximated, we are left with a standard ODE problem.
+    \item \textit{Solve the ODE Problem.} As most ODEs do not have analytical solutions, we make use of numerical ODE solvers to approximate the solution of the system.
 \end{enumerate}
 
-This section aims to define and discuss the methods and techniques required to conduct such numerical analysis on NODEs/NCDEs. In particular, the basic ideas of loss functions, gradient descent and automatic differentiation are introduced here in Section 4.1. Sections 4.2 and 4.3 cover the methods used to train the relevant neural networks, and finally Section 4.4 discusses several numerical methods of solving the eventual ODEs after training. \textcolor{red}{edit section numbering if it changes. do this at the end when all has been confirmed}
+This section aims to define and discuss the methods and techniques required to conduct such numerical analysis on neural ODEs/CDEs. In particular, the basic ideas of loss functions, gradient descent and automatic differentiation are introduced here in Section 4.1. Sections 4.2 and 4.3 cover the methods used to train the relevant neural networks, and finally Section 4.4 discusses several numerical methods of solving the eventual ODEs after training. \textcolor{red}{edit section numbering if it changes. do this at the end when all has been confirmed}
 
 \subsubsection{Loss Functions}
 points to cover:
 \begin{itemize}
     \item why we need loss functions
-    \item defintion of loss function
+    \item definition of loss function
     \item how to choose loss functions
     \item basic examples
     \item what to do with loss functions?
@@ -498,7 +414,7 @@ $\mathbf{C_l}$ $\gets$ \{$m \in \mathbf{m} \mid \mathbf{C}$ contains $m\} \cup \
 
 \subsection{Reference Example}
 
-Here is how you can cite papers which you have added in the \verb!/bibs/bibliography.bib! file. You can cite single references as such \cite{Einstein1905} or multiple references like so \cite{Dirac1981,Einstein1905}. Here is a reference to a website \cite{Riemann2024}.
+Here is how you can cite papers which you have added in the \verb!/bibs/bibliography.bib! file. You can cite single reference or multiple references.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
