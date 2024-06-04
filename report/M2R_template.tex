@@ -215,7 +215,22 @@ As for the choice of the activation function, the S-shaped \textit{sigmoid funct
 
 \textit{Regression} is a technique that approximates data and estimates the relationship between variables. In the second year, we learnt about some basics of regression: linear regression in the statistical modelling course and polynomial regression in the numerical analysis course. With the help of neural networks, we might take the idea further and explore non-linear regression.
 
-Consider a simple example of a neural network that performs regression based on $y = \sin x$. Assume that we are given $n$ data points between $[-\pi, \pi]$. For any point $x$, we try to minimise the difference between the predicted output $f(x)$ and the target output $\sin (x)$, where $f$ is the neural network being considered. Therefore, we might consider our loss function to be the $L^2$-norm of $f(x) - \sin (x)$.
+Consider a simple example of a neural network that performs regression based on $y = \sin x$. Assume that we are given $n$ data points between $[-\pi, \pi]$, denoted by $\mathbf{x}$. We try to minimise the difference between the predicted output $f(\mathbf{x})$ and the target output $\sin (\mathbf{x})$, where $f$ is the neural network being considered. Therefore, we might consider our loss function to be the $L^2$-norm of $f(\mathbf{x}) - \sin (\mathbf{x})$.
+
+We are now going to present an implementation of this neural network in Julia. We first need to import some packages.
+
+\begin{verbatim}
+using Lux, Random, Optimization, OptimizationOptimisers,
+      ComponentArrays, Zygote, Plots, LinearAlgebra
+\end{verbatim}
+
+Then we define the data. Let us select 100 evenly spaced points from $[-\pi, \pi]$.
+
+\begin{verbatim}
+n = 100
+x = range(-pi, pi; length = n)
+y = sin.(x)
+\end{verbatim}
 
 \subsection{Example: Number Classification}
 points to cover:
@@ -311,7 +326,6 @@ points to cover:
     \item definition of euler's method
     \item proof of euler's method
     \item limitations of euler's method
-    \item (maybe an implementation of euler's method? But its not going to be used anyway. see how)
 \end{itemize}
 
 \subsubsection{Runge-Kutta Methods}
@@ -334,10 +348,8 @@ points to cover:
 \appendix
 
 \section{First appendix}
-\label{sec:appendix1}
 
 \section{Second appendix}
-\label{sec:appendix2}
 
 \bibliography{bibliography.bib}
 \end{document}
