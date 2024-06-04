@@ -39,6 +39,7 @@ This is the GitHub repository for the MATH50002 Group Research Project (M2R) on 
 - Mention that it can be cleverly avoided provided that we choose a continuously differentiable control path
 
 2.4 Numerical Solvers (James)
+
 - Implicit Solvers (and why we don't use them)
 - Euler's Method and Runge-Kutta Methods
 - Heun's Method
@@ -82,4 +83,3 @@ Jiankuan Liu:
 
 - Example of a Neural Network: Continuous dynamics of financial time series data, such as stock prices and market indices. This is an application of Recurrunt Neural Network. Neural ODEs naturally capture the continuous evolution of market data by embedding neural network architectures within the differential equation solving process. The details would be studied by Tianshi.
 - Neural Network Implementation in Julia
-
