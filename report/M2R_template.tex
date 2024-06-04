@@ -213,24 +213,70 @@ As for the choice of the activation function, the S-shaped \textit{sigmoid funct
 
 \subsection{Example: Regression}
 
-\textit{Regression} is a technique that approximates data and estimates the relationship between variables. In the second year, we learnt about some basics of regression: linear regression in the statistical modelling course and polynomial regression in the numerical analysis course. With the help of neural networks, we might take the idea further and explore non-linear regression.
+\textit{Regression} is a technique that approximates data and estimates the relationship between variables. In the second year, we learnt some basics of regression: linear regression in the statistical modelling course and polynomial regression in the numerical analysis course. With the help of neural networks, we might take the idea further and explore non-linear regression.
 
-Consider a simple example of a neural network that performs regression based on $y = \sin x$. Assume that we are given $n$ data points between $[-\pi, \pi]$, denoted by $\mathbf{x}$. We try to minimise the difference between the predicted output $f(\mathbf{x})$ and the target output $\sin (\mathbf{x})$, where $f$ is the neural network being considered. Therefore, we might consider our loss function to be the $L^2$-norm of $f(\mathbf{x}) - \sin (\mathbf{x})$.
+Consider a simple example of a neural network that performs regression based on $y = \sin x$. Assume that we are given $n$ data points between $[-\pi, \pi]$, denoted by $\mathbf{x}$. We try to minimise the difference between the predicted output $f(\mathbf{x})$ and the target output $\sin (\mathbf{x})$, where $f$ is the neural network being considered.
 
-We are now going to present an implementation of this neural network in Julia. We first need to import some packages.
+We are now going to present an implementation of this neural network in Julia. We first need to import some packages for later use. 
 
 \begin{verbatim}
 using Lux, Random, Optimization, OptimizationOptimisers,
       ComponentArrays, Zygote, Plots, LinearAlgebra
 \end{verbatim}
 
-Then we define the data. Let us select 100 evenly spaced points from $[-\pi, \pi]$.
+Then we define the data. Let us select 100 evenly spaced points from $[-\pi, \pi]$ and store them in \verb|x|. We will also define the target output in \verb|y|.
 
 \begin{verbatim}
-n = 100
-x = range(-pi, pi; length = n)
+x = range(-pi, pi; length = 100)
 y = sin.(x)
 \end{verbatim}
+
+To create the neural network model, a Julia package \verb|Lux| is usually used. For the purpose of this example, we could use three layers, all of which are \verb|Dense|, i.e., every neuron in one layer is connected to every other neuron in the next layer. For 100 data points, 10 neurons in the hidden layer would be enough. We can create the composition of such layers using the \verb|Chain| command. The input and hidden layers will have ReLU as the activation function.
+
+\begin{verbatim}
+model = Chain(
+    Dense(1 => 10, relu),
+    Dense(10 => 10, relu),
+    Dense(10 => 1)
+)
+\end{verbatim}
+
+After that, we will implement the loss function based on \verb|norm| from the \verb|LinearAlgebra| package. We might consider our loss function to be the $L^2$-norm of $f(\mathbf{x}) - \sin (\mathbf{x})$.
+
+\begin{verbatim}
+function regression_loss(ps, (model, st, (x, y)))
+    return norm(vec(model(x', ps, st)[1]) - y)
+end
+\end{verbatim}
+
+We now turn our attention to the optimisation problem. We can use \verb|setup| from the package \verb|Lux| to create an initial guess of the parameters and \verb|MersenneTwister| from the package \verb|Random| to make it random.
+
+\begin{verbatim}
+ps, st = Lux.setup(MersenneTwister(), model)
+\end{verbatim}
+
+To define and solve the optimisation problem, we use the aforementioned gradient descent method supplied by \verb|Adam| in \verb|OptimizationOptimisers|. To calculate the gradients needed, \verb|AutoZygote| from the \verb|Zygote| package is used. Details of these will be explored later. We also need to wrap \verb|ps| in an array type supplied in the \verb|ComponentArrays| package, as the \verb|Optimization| package requires the optimisation to be over an array type.
+
+\begin{verbatim}
+prob = OptimizationProblem(OptimizationFunction(regression_loss,
+       Optimization.AutoZygote()), ComponentArray(ps), (model, st, (x, y)))
+ret = solve(prob, Adam(0.03), maxiters = 250)
+\end{verbatim}
+
+Lastly, we can visualise our results by plotting supplied in the \verb|Plots| package:
+
+\begin{verbatim}
+plot(x, y, label = "True")
+plot!(x, vec(model(x', ret.u, st)[1]), label = "Predicted")
+\end{verbatim}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.8\textwidth]{figures/Regression.png}
+    \caption{Regression of $y = \sin x$}
+\end{figure}
+
+This is a pretty impressive result!
 
 \subsection{Example: Number Classification}
 points to cover:
