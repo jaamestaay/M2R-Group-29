@@ -1,6 +1,6 @@
 # M2R Group 29: Scientific Machine Learning
 
-This is the GitHub repository for the MATH50002 Group Research Project (M2R) on Scientific Machine Learning by Group 29 (James Tay, Jiaru Li, Xinyan Wang, Tianshi Liu, Jiankuan Liu)
+This is the GitHub repository for the MATH50002 Group Research Project (M2R) on Scientific Machine Learning by Group 29 (James Tay, Jiaru Li, Xinyan Wang, Tianshi Liu, Jiankuan Liu).
 
 ## Report Outline
 
@@ -8,8 +8,9 @@ This is the GitHub repository for the MATH50002 Group Research Project (M2R) on 
 
 2.1 Definition and Implementation of Basic Neural Networks (Jiaru)
 
-- Feedforward Neural Networks vs Recurrent Neural Networks
-- Construction and Basic Applications (Regression, Classification)
+- History
+- Basic Concepts
+- Basic Applications (Regression, Classification)
 
 ### 3. Introduction to Neural ODEs/CDEs
 
@@ -49,14 +50,15 @@ This is the GitHub repository for the MATH50002 Group Research Project (M2R) on 
 - Why Neural CDEs may be advantageous compared to other formulations for problems
 - Natural cubic splines for continuous path $X_t$
 
-6.2 solving Neural CDEs
+6.2 Solving Neural CDEs
 - Optimise-then-discretise: Adjoint Equation for CDE (proof)
 - log ODE Method (no proof, just statement)
 - State it for completeness
 - Mention that it can be cleverly avoided provided that we choose a continuously differentiable control path
 
-6.3 applications
-time series(part of it might be a rough sketch of pseudocode/algorithm)
+6.3 Applications
+
+- Time Series (Part of it might be a rough sketch of pseudocode/algorithm)
 
 ## Current Work
 
