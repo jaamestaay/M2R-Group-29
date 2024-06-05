@@ -43,7 +43,7 @@ This is the GitHub repository for the MATH50002 Group Research Project (M2R) on 
 
 ### 6. Extension: Neural CDEs (Tianshi)
 
-6.1 Definition and Formulation 
+6.1 Definition and Formulation
 
 - Motivation for Neural CDEs
 - Neural ODEs vs CDEs: Advantages and Disadvantages
@@ -51,6 +51,7 @@ This is the GitHub repository for the MATH50002 Group Research Project (M2R) on 
 - Natural cubic splines for continuous path $X_t$
 
 6.2 Solving Neural CDEs
+
 - Optimise-then-discretise: Adjoint Equation for CDE (proof)
 - log ODE Method (no proof, just statement)
 - State it for completeness
