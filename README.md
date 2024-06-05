@@ -40,19 +40,23 @@ This is the GitHub repository for the MATH50002 Group Research Project (M2R) on 
 
 ### 5. An Application: Time Series Analysis
 
-### 6. Extension: Neural CDEs
+### 6. Extension: Neural CDEs (Tianshi)
 
-6.1 Definition and Formulation (Tianshi)
+6.1 Definition and Formulation 
 
 - Motivation for Neural CDEs
 - Neural ODEs vs CDEs: Advantages and Disadvantages
 - Why Neural CDEs may be advantageous compared to other formulations for problems
 - Natural cubic splines for continuous path $X_t$
 
-6.2 log ODE Method (Tianshi)
-
+6.2 solving Neural CDEs
+- Optimise-then-discretise: Adjoint Equation for CDE (proof)
+- log ODE Method (no proof, just statement)
 - State it for completeness
 - Mention that it can be cleverly avoided provided that we choose a continuously differentiable control path
+
+6.3 applications
+time series(part of it might be a rough sketch of pseudocode/algorithm)
 
 ## Current Work
 
