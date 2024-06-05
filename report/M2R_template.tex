@@ -10,7 +10,6 @@
 \usepackage{amsthm}
 \usepackage{amssymb}
 \usepackage{csquotes}
-\usepackage{enumitem}
 \usepackage{graphicx}
 \usepackage{booktabs}
 \usepackage{listings}
@@ -204,7 +203,8 @@ As for the choice of the activation function, the S-shaped \textit{sigmoid funct
 \end{figure}
 
 \subsubsection{Types}
-\textit{Feedforward neural networks} (FNN) and \textit{recurrent neural networks} (RNN) are two main categories of neural networks. So far, we have been discussing FNN only, whose flow of information is uni-directional, from the input layer to the output layer, without any cycles or loops. FNN is sufficient for ordinary tasks such as regression and classification. However, for more complicated problems, RNN plays an important role. In RNN, outputs from previous steps can be fed as input to the current step, allowing it to maintain a form of ‘memory’. This makes RNN particularly effective for tasks such as time series prediction, natural language processing, and speech recognition. We will delve into RNN more deeply later.
+
+\textit{Feedforward neural networks} (FNN) and \textit{recurrent neural networks} (RNN) are two main categories of neural networks. So far, we have been discussing FNN only, whose flow of information is uni-directional, from the input layer to the output layer, without any cycles or loops. FNN is sufficient for ordinary tasks such as regression and classification. However, for more complicated problems, RNN plays an important role. In RNN, outputs from previous steps can be fed as input to the current step, allowing it to maintain a form of ‘memory’. This makes RNN particularly effective for tasks such as time series prediction, natural language processing, and speech recognition. We will dive into RNN more deeply later.
 
 \subsubsection{Gradient Descent}
 
@@ -254,7 +254,9 @@ We now turn our attention to the optimisation problem. We can use \verb|setup| f
 ps, st = Lux.setup(MersenneTwister(), model)
 \end{verbatim}
 
-To define and solve the optimisation problem, we use the aforementioned gradient descent method supplied by \verb|Adam| in \verb|OptimizationOptimisers|. To calculate the gradients needed, \verb|AutoZygote| from the \verb|Zygote| package is used. Details of these will be explored later. We also need to wrap \verb|ps| in an array type supplied in the \verb|ComponentArrays| package, as the \verb|Optimization| package requires the optimisation to be over an array type.
+To define and solve the optimisation problem, we use the aforementioned gradient descent method supplied by \verb|Adam| in \verb|OptimizationOptimisers|. To calculate the gradients needed, \verb|AutoZygote| from the \verb|Zygote| package is used. Details of these will be explored later.
+
+We also need to wrap \verb|ps| in an array type supplied in the \verb|ComponentArrays| package, as the \verb|Optimization| package requires the optimisation to be over an array type.
 
 \begin{verbatim}
 prob = OptimizationProblem(OptimizationFunction(regression_loss,
@@ -361,11 +363,26 @@ This motivates us to consider ordinary differential equations, which can be writ
 This is the most important equation in neural ODE. The function $f$ on the right is a function derived from a neural network, with $\theta$ representing the parameters of that network. By convention, since there is no concept of hidden layers in neural ODE, we usually write the function \ref{eq3} as
 $$\frac{\mathrm{d}z}{\mathrm{d}t}= f(z(t), \theta,t).$$
 
+\subsection{Comparing Neural ODEs with ResNet}
+
+According to the previous part, we know that the inspiration for neural ODEs originates from ResNet, where it transforms a discrete function into a continuous one. In ResNet, with $L$ layers, the transition between states from one layer to the next is discrete, and each layer has its own function to alter the current state. However, in an ODE network, it defines a continuous vector field, which essentially represents a neural network with infinitely many layers. The state change can be interpreted as a flow within this vector field.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.5\textwidth]{report/figures/ResNetvsODENet.png}
+    \caption{Enter Caption}
+    \label{fig:enter-label}
+\end{figure}
+
+Note the points on the right graph (ODE network) representing the \textit{observation points}. Observation points are specific points that become the output of the model, usually defined by a sequence of different time steps within the model's time span. This means that if we want the model to have $N$ outputs, we need to have an increasing time sequence $(t_i)_{i=1,\dots ,N}$ within the time span $[t_0,t_N]$. For a vector fed into the neural ODE layer, there would be N outputs from this layer. The output corresponding to time $t_i$ is the value of $z$ at that time. Since all these points are in the same space, each output has the same dimension as the input vector.
+
+Unlike a neural network, where depth refers to the number of layers, in a neural ODE network, depth can be seen as the number of observation points. Our goal is to find an $f$ that is good enough to predict the output given an input. For a neural network, more layers can help the model fit the training dataset better. Similarly, in an ODE network, more observation points can provide a better understanding of the $f$ we are looking for, thus allowing the model to better fit the training set.
+
 \section{Solving Neural ODEs}
 
 \subsection{Solving Steps}
 
-Solving differential equations are a generally difficult procedure, requiring much effort in existence theorems and techniques. Solving neural ODEs therefore poses a significant challenge in and of itself. Having defined basic neural network and neural ODE theory, we now turn our attention to the steps required to solve such problems numerically.
+Solving differential equations is a difficult procedure in general, requiring a great deal of effort in existence theorems and techniques. Solving neural ODEs therefore poses a significant challenge in itself. Having defined basic neural network and neural ODE theory, we now turn our attention to the steps required to solve such problems numerically.
 
 Consider a neural ODE defined by neural networks $f_\theta$, such that $f_\theta$, when provided with parameters $\theta$, defines the differential equation of the system $\dot{x} = f_\theta\left(t, x\right)$. In order to solve the neural ODE numerically, we are required to:
 
@@ -374,7 +391,7 @@ Consider a neural ODE defined by neural networks $f_\theta$, such that $f_\theta
     \item \textit{Solve the ODE Problem.} As most ODEs do not have analytical solutions, we make use of numerical ODE solvers to approximate the solution of the system.
 \end{enumerate}
 
-This section aims to define and discuss the methods and techniques required to perform such numerical analysis on neural ODEs. In particular, the basic ideas of loss functions, gradient descent, and automatic differentiation are introduced here in Section 4.1. Sections 4.2 defines and discusses backpropagation as a means to train the neural network, and finally Section 4.4 covers several numerical methods to solve the ODEs after training.
+This section aims to define and discuss the methods and techniques required to perform such numerical analysis on neural ODEs. In particular, the basic ideas of loss functions, gradient descent, and automatic differentiation are introduced here in Section 4.1. Section 4.2 defines and discusses backpropagation as a means to train the neural network, and finally Section 4.4 covers several numerical methods to solve the ODEs after training.
 
 \subsubsection{Loss Functions}
 
@@ -388,6 +405,7 @@ points to cover:
 \end{itemize}
 
 \subsubsection{Gradient Descent and Applications}
+
 points to cover:
 \begin{itemize}
     \item motivation for gradient descent
@@ -398,6 +416,7 @@ points to cover:
 \end{itemize}
 
 \subsubsection{Automatic Differentiation}
+
 points to cover:
 \begin{itemize}
     \item motivation behind AD
@@ -410,10 +429,19 @@ points to cover:
 
 \subsection{Backpropagation}
 
+Similar to classical neural networks, we aim to optimise the parameters in the neural ODE model to better fit the real data. We achieve this by minimising the cost function. Considering our approximation process as a vector field, for an input
+$z(t_0)$, the output produced by this model is $z(t_i)_{i=1,\dots,N}$, with:
+$$z(t_i)=\mathrm{ODESolve}(z(t_0),f,\theta(t),t_0,t_i), i=1,\dots,N$$
+So the cost function would be applied to all observation points $z(t_i)_{i=1,\dots,N}$, which means the cost of the model is $\mathcal{L}(z_1,\dots,z_N)$. The next step is to develop a method to update the parameters. It is equivalent to calculate the gradient of the cost function with respect to different parameters in the model, so we can use the gradient to minimise the cost function. For classical neural networks, the computational cost of backpropagation increases as the number of layers increases. In the case of neural ODEs, if we want to perform backpropagation, we use the same method as we do for residual networks; this would be very computationally expensive. Backpropagating through an ODE solver would be very inefficient. This motivates us to use a method to calculate the gradient without needing the explicit solution.
+
+\subsubsection{Adjoint Sensitivity Method}
+
 \subsection{Numerical ODE Solvers}
-Upon completion of training of the neural networks (where we have derived the learnt parameters $\theta$), all that remains is to solve the subsequent ODE numerically. This can be done in a number of methods, which are generally known as the \textit{Runge-Kutta} methods.
+
+Upon completion of training the neural networks (where we have derived the learnt parameters $\theta$), all that remains is to solve the subsequent ODE numerically. This can be done in a number of methods, which are generally known as the \textit{Runge-Kutta} methods.
 
 \subsubsection{Euler's Method}
+
 points to cover:
 \begin{itemize}
     \item motivation for euler's method
@@ -423,6 +451,7 @@ points to cover:
 \end{itemize}
 
 \subsubsection{Runge-Kutta Methods}
+
 points to cover:
 \begin{itemize}
     \item general runge-kutta methods definition (including matrix representation)
@@ -437,9 +466,11 @@ points to cover:
 \section{Extension: Neural Controlled Differential Equations}
 
 \subsection{Motivation}
+
 As we have seen before, neural networks and differential equations seem to be irrelevant but, in fact, they have been proven to be two sides of the same coin. In particular, neural ODEs can be seen as a continuous-time analogue to the ResNet. However, there exist certain real-life applications such as time series forecasting where neural ODEs are no longer effective in solving the problem. Fortunately, a famous British mathematician Terry Lyons developed a novel and exciting field of mathematics called rough path theory in the 1990s, and we can use some mathematical insights from this theory to develop a new concept called \textit{neural controlled differential equations}.
 
 \subsection{Controlled Differential Equations}
+
 Before defining neural CDEs, it is essential to understand the definition of CDEs. To formally introduce it, we need to introduce a new notion of integration called the Riemann–Stieltjes integral, and a new concept of real functions called bounded variation.
 
 \definition{(Riemann–Stieltjes integral)}
