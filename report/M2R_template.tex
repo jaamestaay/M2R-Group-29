@@ -66,7 +66,7 @@
 \newcommand{\reportauthorB}{Jiaru (Eric) Li (CID: 02216531)}
 \newcommand{\reportauthorC}{Xinyan Wang (CID: 02205857)}
 \newcommand{\reportauthorD}{Tianshi Liu (CID: 02218664)}
-\newcommand{\reportauthorE}{Student name 5 (CID: -------------)}
+\newcommand{\reportauthorE}{Jiankuan Liu (CID: 02215415)}
 \newcommand{\supervisor}{Sheehan Olver}
 \begin{document}
 \begin{titlepage}
@@ -112,9 +112,9 @@
 
 \section{Introduction}
 
-\section{Neural Networks}
+\section{Basic Neural Networks}
 
-\subsection{History and Introduction}
+\subsection{History}
 
 Before diving into neural ordinary and control differential equations, we shall first explore the field of \textit{neural network}. Generally speaking, a neural network is a group of units called \textit{neurons} connected by signals called \textit{synapses}.
 
@@ -122,7 +122,7 @@ In 1943, Warren McCulloch and Walter Pitts published a seminal paper \cite{McCul
 
 Later in 1958, Frank Rosenblatt described an implementation of perceptron in detail \cite{Rosenblatt1958}. The field of neural network expanded quickly, and nowadays, it is extensively used in various fields such as machine learning and artificial intelligence. We shall explore some simple applications later.
 
-\subsection{Basic Concepts}
+\subsection{Concepts}
 
 \subsubsection{Structure}
 
@@ -337,9 +337,9 @@ sum(Flux.onecold(model(x_test_flat)) .== (y_test .+ 1)) / length(y_test)
 
 which is normally around $80\%$. That is great but not extremely satisfying. This inspires us to consider a better model, as detailed below. 
 
-\section{Introduction to Neural Ordinary Differential Equations (ODEs) and Controlled Differential Equations (CDEs)}
+\section{Introduction to Neural ODEs/CDEs}
 
-\subsection{Motivation of Neural ODEs}
+\subsection{Neural ODEs}
 
 The method of \textit{neural ODEs} (neural ordinary differential equations) was first proposed in a 2018 paper titled "Neural Ordinary Differential Equations". This paper won the Best Paper Award at NeurIPS in the same year. The inspiration for neural ODEs came from the observation of a specific neural network model called the \textit{residual neural network} (ResNet). This model was introduced by a research team at Microsoft in 2015. Unlike traditional neural networks, ResNet incorporates residual connections by adding a residual term to the output of each layer, as shown in the equations below.
 \begin{equation}\label{eq1}
@@ -362,16 +362,21 @@ This motivates us to consider ordinary differential equations, which can be writ
 This is the most important equation in neural ODE. The function $f$ on the right is a function derived from a neural network, with $\theta$ representing the parameters of that network. By convention, since there is no concept of hidden layers in neural ODE, we usually write the function \ref{eq3} as
 $$\frac{\mathrm{d}z}{\mathrm{d}t}= f(z(t), \theta,t).$$
 
-\subsection{Motivation of Neural CDEs}
-As we have seen before, neural networks and differential equations seem to be irrelevant, but in fact, they have been proved to be two sides of the same coin. In particular, neural ODEs can be seen as a continuous time analogue to the Residual Neural Network. However, there exist certain real life applications such as time series forecasting where neural ODEs are no longer effective in solving the problem. Fortunately, the famous British mathematician Terry Lyons developed a novel and exciting field of mathematics called Rough Path Theory in the 1990s, and we can use some mathematical insights from Rough Path Theory to develop a new concept called Neural Controlled Differential Equations (CDEs).
-\subsubsection{Definition of CDEs}
-Before defining Neural CDEs, it is essential for us to understand the definition of CDEs.\\
-\textbf{Definition 3.2.1}
+\subsection{Neural CDEs}
+As we have seen before, neural networks and differential equations seem to be irrelevant, but in fact they have been proven to be two sides of the same coin. In particular, neural ODEs can be seen as a continuous-time analogue to the ResNet. However, there exist certain real-life applications such as time series forecasting where neural ODEs are no longer effective in solving the problem. Fortunately, a famous British mathematician Terry Lyons developed a novel and exciting field of mathematics called rough path in the 1990s, and we can use some mathematical insights from this theory to develop a new concept called \textit{neural CDEs} (neural controlled differential equations).
+
+\subsubsection{Definition}
+Before defining neural CDEs, it is essential that we understand the definition of CDEs. To formally introduce it, we need to introduce a new notion of integration, the Riemann–Stieltjes integral.
+
+\definition{(Riemann–Stieltjes integral)}
+
+For a function $f$
+
 \section{Solving Neural ODEs/CDEs}
 
 \subsection{Solving Steps}
 
-Solving differential equations is a difficult process, requiring much effort in existence theorems and techniques. Solving neural ODEs and NCDEs therefore poses a significant challenge in and of itself. Having defined basic neural network and neural ODEs/CDEs theory, we now turn our attention to the steps required to solve such problems numerically.
+Solving differential equations is a difficult process, requiring much effort in existence theorems and techniques. Solving neural ODEs and CDEs therefore poses a significant challenge in and of itself. Having defined basic neural network and neural ODEs/CDEs theory, we now turn our attention to the steps required to solve such problems numerically.
 
 Consider a neural ODE defined by neural networks $f$ and $g$, such that $f_\theta$, when provided with parameters $\theta$, defines the differential equation of the system $\dot{x} = f_\theta\left(t, x\right)$, and $g_\phi$, when provided with parameters $\phi$, defines the initial value of the system $x\left(t_0\right) = g_\phi(t_0)$. In order to solve the neural ODE/CDE numerically, we are required to:
 
