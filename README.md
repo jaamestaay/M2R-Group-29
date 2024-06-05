@@ -4,48 +4,55 @@ This is the GitHub repository for the MATH50002 Group Research Project (M2R) on 
 
 ## Report Outline
 
-### 0. Basic Neural Network Theory
+### 2. Basic Neural Network Theory
 
-0.1 Definition and Implementation of Basic Neural Networks (Jiaru)
+2.1 Definition and Implementation of Basic Neural Networks (Jiaru)
 
 - Feedforward Neural Networks vs Recurrent Neural Networks
 - Construction and Basic Applications (Regression, Classification)
 
-### 1. Introduction to Neural ODEs/CDEs
+### 3. Introduction to Neural ODEs/CDEs
 
-1.1 Definition of Neural ODEs and CDEs (Xinyan, Tianshi)
+3.1 Definition of Neural ODEs (Xinyan)
 
-- Construction of Neural ODEs and CDEs
-- Neural ODEs vs CDEs: Advantages and Disadvantages
-- Why Neural ODEs/CDEs may be advantageous compared to other formulations for problems
-- Natural cubic splines for continuous path $X_t$
+- Construction of Neural ODEs
+- Why Neural ODEs may be advantageous compared to other formulations
 
-### 2. Solving Neural ODEs/CDEs
+### 4. Solving Neural ODEs
 
-2.1 An elaboration of the steps taken to train and solve a Neural ODE/CDE (James)
+4.1 An elaboration of the steps taken to train and solve a Neural ODE (James)
 
 - Loss Functions and Minima
 - Automatic Differentiation
-- Gradient Descent and its Applications in Neural ODEs and CDEs
+- Gradient Descent and its Applications in Neural ODEs
 
-2.2 Back-propagation (Xinyan for ODE, Tianshi for CDE (briefly extend the proof of adjoint method to the CDE case))
+4.2 Back-propagation
 
-- Discretise-then-optimise
-- Optimise-then-discretise: Adjoint Equation
+- Discretise-then-optimise (James)
+- Optimise-then-discretise: Adjoint Equation (Xinyan)
 
-2.3 log ODE Method (Xinyan, Tianshi)
-
-- State it for completeness
-- Mention that it can be cleverly avoided provided that we choose a continuously differentiable control path
-
-2.4 Numerical Solvers (James)
+4.3 Numerical Solvers (James)
 
 - Implicit Solvers (and why we don't use them)
 - Euler's Method and Runge-Kutta Methods
 - Heun's Method
 - Other methods if time permits
 
-### 3. An Application (TBC)
+### 5. An Application: Time Series Analysis
+
+### 6. Extension: Neural CDEs
+
+6.1 Definition and Formulation (Tianshi)
+
+- Motivation for Neural CDEs
+- Neural ODEs vs CDEs: Advantages and Disadvantages
+- Why Neural CDEs may be advantageous compared to other formulations for problems
+- Natural cubic splines for continuous path $X_t$
+
+6.2 log ODE Method (Tianshi)
+
+- State it for completeness
+- Mention that it can be cleverly avoided provided that we choose a continuously differentiable control path
 
 ## Current Work
 
