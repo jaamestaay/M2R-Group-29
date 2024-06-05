@@ -204,12 +204,11 @@ As for the choice of the activation function, the S-shaped \textit{sigmoid funct
 \end{figure}
 
 \subsubsection{Types}
-
 \textit{Feedforward neural networks} (FNN) and \textit{recurrent neural networks} (RNN) are two main categories of neural networks. So far, we have been discussing FNN only, whose flow of information is uni-directional, from the input layer to the output layer, without any cycles or loops. FNN is sufficient for ordinary tasks such as regression and classification. However, for more complicated problems, RNN plays an important role. In RNN, outputs from previous steps can be fed as input to the current step, allowing it to maintain a form of ‘memory’. This makes RNN particularly effective for tasks such as time series prediction, natural language processing, and speech recognition. We will delve into RNN more deeply later.
 
 \subsubsection{Gradient Descent}
 
-\textit{Gradient descent} is an algorithm that helps to find the local minima of a function. Intuitively speaking, it starts at a given point and proceeds to the opposite direction of the gradient, where the function descends the most, then continues until the gradient vanishes, which is the local minimum. In the context of neural network, it is used to minimise the loss function. To solve the optimisation problem, several algorithms will be used. We will discuss this in more detail later.
+\textit{Gradient descent} is an algorithm that helps to find the local minima of a function. Intuitively speaking, it starts at a given point and proceeds to the opposite direction of the gradient, where the function descends the most, then continues until the gradient vanishes, which is the local minimum. In the context of neural network, it is used to minimise the loss function. To solve the optimisation problem, several algorithms will be used. We will discuss this in more detail in Section 4.
 
 \subsection{Example: Regression}
 
@@ -366,19 +365,19 @@ $$\frac{\mathrm{d}z}{\mathrm{d}t}= f(z(t), \theta,t).$$
 
 \subsection{Solving Steps}
 
-Solving differential equations is a difficult process, requiring much effort in existence theorems and techniques. Solving neural ODEs and CDEs therefore poses a significant challenge in and of itself. Having defined basic neural network and neural ODEs/CDEs theory, we now turn our attention to the steps required to solve such problems numerically.
+Solving differential equations are a generally difficult procedure, requiring much effort in existence theorems and techniques. Solving neural ODEs therefore poses a significant challenge in and of itself. Having defined basic neural network and neural ODE theory, we now turn our attention to the steps required to solve such problems numerically.
 
-Consider a neural ODE defined by neural networks $f$ and $g$, such that $f_\theta$, when provided with parameters $\theta$, defines the differential equation of the system $\dot{x} = f_\theta\left(t, x\right)$, and $g_\phi$, when provided with parameters $\phi$, defines the initial value of the system $x\left(t_0\right) = g_\phi(t_0)$. In order to solve the neural ODE/CDE numerically, we are required to:
+Consider a neural ODE defined by neural networks $f_\theta$, such that $f_\theta$, when provided with parameters $\theta$, defines the differential equation of the system $\dot{x} = f_\theta\left(t, x\right)$. In order to solve the neural ODE numerically, we are required to:
 
 \begin{enumerate}
-    \item \textit{Train $g_\phi$ to predict the initial value of the system.} This requires the use of a loss function to train the neural network $g_\phi$, providing the parameters required to accurately predict the initial value of the system. 
-    \item \textit{Train $f_\theta$ to provide the parameters of the neural ODE/CDE.} Similar to the prior step, this requires a loss function to train the neural network $f_\theta$, providing the parameters required to accurately state the specific ODE in question. Once the parameters have been approximated, we are left with a standard ODE problem.
+    \item \textit{Train $f_\theta$ to provide the parameters of the neural ODE.} This requires the use of a loss function to train the neural network $f_\theta$, providing the parameters required to accurately state the specific ODE in question. Once the parameters have been approximated, we are left with a standard ODE problem.
     \item \textit{Solve the ODE Problem.} As most ODEs do not have analytical solutions, we make use of numerical ODE solvers to approximate the solution of the system.
 \end{enumerate}
 
-This section aims to define and discuss the methods and techniques required to perform such numerical analysis on neural ODEs/CDEs. In particular, the basic ideas of loss functions, gradient descent, and automatic differentiation are introduced here in Section 4.1. Sections 4.2 and 4.3 cover the methods used to train the relevant neural networks, and finally Section 4.4 discusses several numerical methods to solve the eventual ODEs after training.
+This section aims to define and discuss the methods and techniques required to perform such numerical analysis on neural ODEs. In particular, the basic ideas of loss functions, gradient descent, and automatic differentiation are introduced here in Section 4.1. Sections 4.2 defines and discusses backpropagation as a means to train the neural network, and finally Section 4.4 covers several numerical methods to solve the ODEs after training.
 
 \subsubsection{Loss Functions}
+
 points to cover:
 \begin{itemize}
     \item why we need loss functions
@@ -411,10 +410,8 @@ points to cover:
 
 \subsection{Backpropagation}
 
-\subsection{log ODE Method}
-
 \subsection{Numerical ODE Solvers}
-Upon completion of training of the neural networks (where we have derived the learnt parameters $\theta$, $\phi$), all that remains is to solve the subsequent ODE numerically. This can be done in a number of methods, which are generally known as the \textit{Runge-Kutta} methods.
+Upon completion of training of the neural networks (where we have derived the learnt parameters $\theta$), all that remains is to solve the subsequent ODE numerically. This can be done in a number of methods, which are generally known as the \textit{Runge-Kutta} methods.
 
 \subsubsection{Euler's Method}
 points to cover:
@@ -437,16 +434,42 @@ points to cover:
 
 \section{Application (Jiankuan Liu's Part)}
 
-\section{Extension: Neural CDEs}
+\section{Extension: Neural Controlled Differential Equations}
 
 \subsection{Motivation}
-As we have seen before, neural networks and differential equations seem to be irrelevant but, in fact, they have been proven to be two sides of the same coin. In particular, neural ODEs can be seen as a continuous-time analogue to the ResNet. However, there exist certain real-life applications such as time series forecasting where neural ODEs are no longer effective in solving the problem. Fortunately, a famous British mathematician Terry Lyons developed a novel and exciting field of mathematics called rough path in the 1990s, and we can use some mathematical insights from this theory to develop a new concept called \textit{neural CDEs} (neural controlled differential equations).
+As we have seen before, neural networks and differential equations seem to be irrelevant but, in fact, they have been proven to be two sides of the same coin. In particular, neural ODEs can be seen as a continuous-time analogue to the ResNet. However, there exist certain real-life applications such as time series forecasting where neural ODEs are no longer effective in solving the problem. Fortunately, a famous British mathematician Terry Lyons developed a novel and exciting field of mathematics called rough path theory in the 1990s, and we can use some mathematical insights from this theory to develop a new concept called \textit{neural controlled differential equations}.
 
-\subsubsection{Definition}
-Before defining neural CDEs, it is essential that we understand the definition of CDEs. To formally introduce it, we need to introduce a new notion of integration, the Riemann–Stieltjes integral.
+\subsection{Controlled Differential Equations}
+Before defining neural CDEs, it is essential to understand the definition of CDEs. To formally introduce it, we need to introduce a new notion of integration called the Riemann–Stieltjes integral, and a new concept of real functions called bounded variation.
 
 \definition{(Riemann–Stieltjes integral)}
-For a function $f$
+Let $f$ and $g$ be two bounded and real functions defined on $[a,b]$, and let $P=\{a=t_0<t_1<...<t_n=b\}$ be an arbitrary partition on $[a,b]$. $\forall i = 1,...,n$, let $\Delta g_i = g(t_i) - g(t_{i-1})$, $M_i=\mathrm{sup}f(t)$, $m_i=\mathrm{inf}f(t)$, where $t\in[t_{i-1},t_i]$.
+
+We now define the upper and lower ‘Darboux sums’ similar to those in the construction of Riemann integrals as $U(P,f,g)=\Sigma M_i\Delta g_i$ and $L(P,f,g)=\Sigma m_i\Delta g_i$.
+
+If $\mathrm{sup}L(P,f,g)$ and $\mathrm{inf}U(P,f,g)$ exist and they are equal, then denote their common value by $\int^b_afdg$, or $\int^b_af(t)dg(t)$, which is the Riemann–Stieltjes integral of $f$ with respect to $g$ on $[a,b]$.
+
+In short, the Riemann–Stieltjes integral is just a simple extension of the Riemann integral.
+
+\definition{(Bounded variation)}
+The total variation of a real-valued function $f$ on an interval $[a,b]$, denoted by $V_a^b(f)$, is defined as $\mathrm{sup}_{P\in\mathbb{P}}\Sigma_{i=0}^{n_P-1}|f(t_{i+1})-f(t_i)|$, where $\mathbb{P}=\{P=\{a=t_0<t_1<...<t_{n_P}=b\}\}$, the set of all partitions on $[a,b]$.
+
+Then $f$ is a function of bounded variation iff $V_a^b(f)<\infty$.
+
+\definition{(Controlled differential equations (CDE))}
+Let $a,b\in\mathbb{R}$ with $a<b$ and let $v,w\in\mathbb{N}$. Let $x:[a,b]\rightarrow\mathbb{R}^v$ be a continuous function of bounded variation. Let $f:\mathbb{R}^w\rightarrow\mathbb{R}^{w\times v}$ be Lipschitz continuous. Let $y_a\in\mathbb{R}^w$.
+
+A continuous function $y:[a,b]\rightarrow\mathbb{R}^w$ is a solution of the following initial value problem:
+$$y(a)=y_a, y(t)=y(a)+\int_a^bf(y(s))dx(s),$$
+where $t\in(a,b].$
+
+In the above controlled differential equation, $\int_a^bf(y(s))dx(s)$ is a Riemann–Stieltjes integral, and $f(y(s))dx(s)$ is a matrix vector multiplication.
+
+Note that the continuity of $f$ and the bounded variation of $x$ guarantee the existence of the Riemann–Stieltjes integral, and the Lipschitz continuity of $f$ satisfies the condition of the Picard–Lindelöf theorem for controlled differential equations. Hence, the solution to this initial value problem is unique. The existence of the integral and the uniqueness of the solution will not be investigated in detail.
+
+From now on, $y(t)$ will be referred to as $y_t$, which is a notation commonly used to describe CDEs.
+
+\subsection{Neural Controlled Differential Equations}
 
 \section{Conclusion}
 
