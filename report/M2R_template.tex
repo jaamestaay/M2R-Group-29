@@ -410,7 +410,7 @@ Consider a neural ODE defined by neural networks $f_\theta$, such that $f_\theta
 
 For now, we introduce the ideas of discretising and optimising to provide a general understanding of the techniques required. Discretisation (of the neural ODE) involves solving the ODE numerically. These involve breaking the (continuous) differential equation into discrete time steps and employing numerical methods to calculate the solution at each time step. Optimisation, on the other hand, involves deriving the parameters $\theta$ that minimises some loss function of our choice. 
 
-As such, the two methods to solve Neural ODEs require similar numerical methods, albeit used in different contexts. Section \ref{sec:nummethods} aims to introduce these ideas, before Sections \ref{sec:do} and \ref{sec:od} discusses their applications DO and OD respectively.
+As such, the two methods to solve Neural ODEs require similar numerical methods, albeit used in different contexts. Section \ref{sec:nummethods} aims to introduce these ideas, before Sections \ref{sec:do} and \ref{sec:od} describes their applications in DO and OD respectively - specifically detailing the method of calculating gradients used in their optimisation processes. The sections also discuss the advantages and disadvantages of each method.
 
 \subsection{Numerical Methods}
 \label{sec:nummethods}
@@ -482,8 +482,12 @@ points to cover:
 The Discretise-then-Optimise (DO) method can be described in the following steps:
 \begin{enumerate}
     \item \textit{Solve the Neural ODE numerically with starting parameters.} This involves choosing an initial 'guess' of parameters $\theta$ and solving the neural ODE with the guessed parameters. The Runge-Kutta methods, typically the RK4 or DOPRI method as described in Section \ref{sec:rungekutta} are most commonly used to achieve this.
-    \item \textit{Compute the Loss Function based on }
+    \item \textit{Compute the Loss Function.} We can compare the solution derived from the previous step to the dataset. This inevitably gives some amount of discrepancy, which the loss function measures.
+    \item \textit{Calculate gradients associated with current parameters.} This can be achieved through backpropagation of the gradients by use of the chain rule. 
+    \item \textit{Gradient Descent to update the parameters.} This is done using the methods detailed in \ref{sec:gd}.
 \end{enumerate}
+
+These steps are repeated until the loss function is minimised (by monitoring the rate of change of the loss function) or the maximum number of iterations have been reached. \textcolor{red}{this might have already been discussed in the gradient descent section}
 
 \subsubsection{Automatic Differentiation}
 \label{sec:ad}
@@ -569,7 +573,7 @@ From now on, controlled differential equations will be referred to as CDEs, and 
 One fundamental assumption of neural CDEs is that the data we observed should form a continuous path $X:[a,b]\rightarrow\mathbb{R}^v$ with bounded variation. This assumption is made simply for theoretical purposes, i.e. the continuous data corresponds to an evolutionary process or control path in the neural CDE. However, it is worthwhile to note that it is highly unlikely to observe data in such form in real life applications, and thus a trick that converts discrete observations to a continuous control path would be introduced in later parts. Let's now formulate the definition of neural CDEs rigorously, and then it will be clear that neural CDE is the continuous analogue to the recurrent neural network.
 
 \definition{(Neural CDEs)}
-Let $f_\theta:\mathbb{R}^w\rightarrow\mathbb{R}^{w\times v}$ be an arbitrary neural network with parameters $\theta$ that represents the dynamics between the hidden states. Note that $v$ represents the dimension of the input, and $w$ represents the dimension of the hidden states. Let $g_\theta$ be a neural network mapping the input $X_t$ to the hidden states $Z_t$.
+Let $f_\theta:\mathbb{R}^w\rightarrow\mathbb{R}^{w\times v}$ be an arbitrary neural network with parameters $\theta$ that represents the dynamics between the hidden states. Note that $v$ represents the dimension of the input $X_t$, and $w$ represents the dimension of the hidden states $Z_t$. Let $g_\theta:\mathbb{R}^v\rightarrow\mathbb{R}^w$ be a neural network mapping the input $X_t$ to the hidden states $Z_t$.
 
 Then, we define the initial value problem of a neural CDE to be the following:
 \begin{center}
@@ -579,7 +583,8 @@ Then, we define the initial value problem of a neural CDE to be the following:
     $Z_a=g_\theta(X_a), dZ_t=f_\theta(Z(t))dX(t)$ where $t\in(a,b]$.
 \end{center}
 
-From the above CDE, we may conclude that the hidden state $Z_t$ of the recurrent neural network can be updated continuously as the input $X_t$ evolves through time. Thus, neural CDE is a continuous analogue to the recurrent neural network. Finally, let $l_\theta$ be a linear map mapping the hidden states $Z_t$ to the output $Y_t$. The difference between a neural network and a linear map is that a neural network contains an activation function and a linear map doesn't.
+From the above CDE, we may conclude that the hidden state $Z_t$ of the recurrent neural network can be updated continuously as the input $X_t$ evolves through time. Thus, neural CDE is a continuous analogue to the recurrent neural network. Finally, let $l_\theta:\mathbb{R}^w\rightarrow\mathbb{R}^p$ be a linear map mapping the hidden states $Z_t$ to the output $Y_t$, where $p$ is the dimension of the output $Y_t$. The difference between a neural network and a linear map is that a neural network contains an activation function and a linear map doesn't.
+
 
 \pagebreak
 \section{Conclusion}
