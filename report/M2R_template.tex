@@ -2,7 +2,7 @@
 \usepackage[english]{babel}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
-\usepackage[a4paper,top=1in,bottom=1in,left=1in,right=1in,marginparwidth=1.75cm]{geometry}
+\usepackage[a4paper,top=1in,left=1in,right=1in,bottom=1in,marginparwidth=1.75cm]{geometry}
 \usepackage{pgfplots}
 \pgfplotsset{compat=1.18}
 \usepackage{afterpage}
@@ -112,8 +112,27 @@
 
 \section{Introduction}
 
-\section{Basic Neural Networks}
+In recent years, the intersection of machine learning and scientific computing has given rise to a novel field known as scientific machine learning. It takes advantage of the power of both disciplines to address complex problems that might be difficult to solve using conventional methods. A particularly exciting development in this area is the concept of neural differential equations, which integrate neural networks with differential equations to model dynamic systems more accurately and effectively.
 
+The motivation behind neural differential equations stems from the limitations of traditional neural networks, such as their inability to handle continuous time series data. Neural DEs address these issues by providing a continuous-time analogue to discrete-layer architectures like residual neural networks, thereby enabling better models for scientific applications.
+
+In this report, we are first going to describe some foundational notions of neural networks. We begin by reviewing the history and basic structure of neural networks, including key concepts such as layers, activation functions, and training methodologies. We then explore some simple applications to further illustrate these ideas and help us to discover how neural networks work in terms of real-world scenarios, such as regression and classification.
+
+Subsequently, we dive into the formulation and implementation of neural ODEs, highlighting their connection to residual neural networks. Backpropagation and the adjoint method in the context of neural ODEs will be discussed in detail, and we will also show the strengths and limitations of neural ODEs.
+
+Furthermore, we examine the techniques for solving neural ODEs, introducing theories such as loss functions and gradient descent. By an extension of dual numbers, we cover automatic differentiation in higher dimensions. We also present the adjoint sensitivity method as an efficient approach to computing gradients. Lastly, numerical ODE solvers using Euler's method and Runge-Kutta methods will be considered and analysed.
+
+Neural ODEs naturally capture the continuous evolution of market data by embedding neural network architectures within the differential equation solving process. As an application, the continuous dynamics of financial time series data, such as stock prices and market indices, will be thoroughly examined.
+
+Finally, building on the framework of neural ODEs to handle more complex and irregular data streams, we extend our discussion to neural CDEs.
+
+Throughout this report, we will be using the Julia programming language. This is a modern, compiled, high-level, open-source language developed at MIT. It is becoming increasingly important in scientific machine learning and is widely used in high-performance computing and artificial intelligence, including by Astrazeneca, Moderna, and Pfizer in drug development and clinical trial acceleration, IBM for medical diagnosis, MIT for robot locomotion, and elsewhere. Where appropriate, we will supplement suitable Julia code to accompany the ideas.
+
+In conclusion, our aim is to provide a thorough understanding of neural differential equations and their significance in scientific machine learning.
+
+\pagebreak
+\section{Basic Neural Networks}
+\label{sec:neuralnetworks}
 \subsection{History}
 
 Before diving into neural ordinary and control differential equations, we shall first explore the field of \textit{neural network}. Generally speaking, a neural network is a group of units called \textit{neurons} connected by signals called \textit{synapses}.
@@ -126,7 +145,7 @@ Later in 1958, Frank Rosenblatt described an implementation of perceptron in det
 
 \subsubsection{Structure}
 
-A neural network (abbreviated NN) consists of interconnected neurons, each of which can be thought of as a mathematical function. They are typically organised into \textit{layers} consisting of
+\definition{(Neural Network)} A neural network (abbreviated NN) consists of interconnected neurons, each of which can be thought of as a mathematical function. They are typically organised into \textit{layers} consisting of
 
 \begin{itemize}
     \item an \textit{input layer} that receives the data,
@@ -209,7 +228,7 @@ As for the choice of the activation function, the S-shaped \textit{sigmoid funct
 
 \subsubsection{Gradient Descent}
 
-\textit{Gradient descent} is an algorithm that helps to find the local minima of a function. Intuitively speaking, it starts at a given point and proceeds to the opposite direction of the gradient, where the function descends the most, then continues until the gradient vanishes, which is the local minimum. In the context of neural network, it is used to minimise the loss function. To solve the optimisation problem, several algorithms will be used. We will discuss this in more detail in Section 4.
+\textit{Gradient descent} is an algorithm that helps to find the local minima of a function. Intuitively speaking, it starts at a given point and proceeds to the opposite direction of the gradient, where the function descends the most, then continues until the gradient vanishes, which is the local minimum. In the context of neural network, it is used to minimise the loss function. To solve the optimisation problem, several algorithms will be used. We will discuss this in more detail in Section \ref{sec:solvingNODEs}.
 
 \subsection{Example: Regression}
 
@@ -278,15 +297,15 @@ plot!(x, vec(model(x', ret.u, st)[1]), label = "Predicted")
     \caption{Regression of $y = \sin x$.}
 \end{figure}
 
-This is a pretty impressive result!
+This is a pretty impressive result that demonstrates the power of neural networks in terms of regression. In fact, compared to the least squares method, the neural network method is better in terms of flexibility and adaptability. However, one particular disadvantage of neural networks is the model interpretability because understanding the internal workings and the contribution of each feature is difficult.
 
 \subsection{Example: Classification}
 
-Classification is another powerful application of neural networks. It involves using a neural network to assign labels to input data based on some patterns learnt during the training process. A classic example is digit recognition based on the \textit{MNIST database} (Modified National Institute of Standards and Technology database). This database presents a large collection of handwritten digits given in pixels. The task is to learn from the database and classify the digits.
+Classification is another application of neural networks. It involves using a neural network to assign labels to input data based on some patterns learnt during the training process. A classic example is digit recognition based on the \textit{MNIST} (Modified National Institute of Standards and Technology) database. This database presents a large collection of handwritten digits given in pixels. The task is to learn from the database and classify the digits.
 
 We are now going to present an implementation of this neural network in Julia. The idea is taken from \href{https://github.com/piotrek124-1/Simple_MNIST_Julia/tree/main}{here}.
 
-We first need to import some packages for later use. For this task, we introduce another package \verb|Flux|, which is similar to \verb|Lux| but even more powerful. 
+We first need to import some packages for later use. For this task, we introduce another package \verb|Flux|, which is similar to \verb|Lux| mentioned before. 
 
 \begin{verbatim}
 using Flux, MLDatasets
@@ -337,8 +356,9 @@ We might see the test accuracy given as
 sum(Flux.onecold(model(x_test_flat)) .== (y_test .+ 1)) / length(y_test)
 \end{verbatim}
 
-which is normally around $80\%$. That is great but not extremely satisfying. This inspires us to consider a better model, as detailed below. 
+which is normally around $80\%$. That is great, but not extremely satisfactory. This inspires us to consider a better model, as detailed below.
 
+\pagebreak
 \section{Introduction to Neural ODEs}
 
 \subsection{Motivation}
@@ -371,7 +391,7 @@ According to the previous part, we know that the inspiration for neural ODEs ori
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.5\textwidth]{report/figures/ResNetvsODENet.png}
-    \caption{Enter Caption}
+    \caption{ResNet vs ODE Network.}
     \label{fig:enter-label}
 \end{figure}
 
@@ -379,10 +399,11 @@ Note the points on the right graph (ODE network) representing the \textit{observ
 
 Unlike a neural network, where depth refers to the number of layers, in a neural ODE network, depth can be seen as the number of observation points. Our goal is to find an $f$ that is good enough to predict the output given an input. For a neural network, more layers can help the model fit the training dataset better. Similarly, in an ODE network, more observation points can provide a better understanding of the $f$ we are looking for, thus allowing the model to better fit the training set.
 
+\pagebreak
 \section{Solving Neural ODEs}
-
+\label{sec:solvingNODEs}
 \subsection{Solving Steps}
-
+\label{sec:solvingsteps}
 Solving differential equations is a difficult procedure in general, requiring a great deal of effort in existence theorems and techniques. Solving neural ODEs therefore poses a significant challenge in itself. Having defined basic neural network and neural ODE theory, we now turn our attention to the steps required to solve such problems numerically.
 
 Consider a neural ODE defined by neural networks $f_\theta$, such that $f_\theta$, when provided with parameters $\theta$, defines the differential equation of the system $\dot{x} = f_\theta\left(t, x\right)$. In order to solve the neural ODE numerically, we are required to:
@@ -392,21 +413,43 @@ Consider a neural ODE defined by neural networks $f_\theta$, such that $f_\theta
     \item \textit{Solve the ODE Problem.} As most ODEs do not have analytical solutions, we make use of numerical ODE solvers to approximate the solution of the system.
 \end{enumerate}
 
-This section aims to define and discuss the methods and techniques required to perform such numerical analysis on neural ODEs. In particular, the basic ideas of loss functions, gradient descent, and automatic differentiation are introduced here in Section 4.1. Section 4.2 defines and discusses backpropagation as a means to train the neural network, and finally Section 4.4 covers several numerical methods to solve the ODEs after training.
+This section aims to define and discuss the methods and techniques required to perform such numerical analysis on neural ODEs. In particular, the basic ideas of loss functions, gradient descent, and automatic differentiation are introduced here in Section \ref{sec:solvingsteps}. Section \ref{sec:backprop} defines and discusses backpropagation as a means of training the neural network, and finally Section \ref{sec:numODE} covers several numerical methods to solve ODEs after training.
 
 \subsubsection{Loss Functions}
+One of the most fundamental concepts (as introduced in Section \ref{sec:neuralnetworks}) is the loss function $L: \mathbb{R}^n \times \mathbb{R}^n \to [0, +\infty )$. It provides the error between the predicted output $\mathbf{y}$ and the target output $\mathbf{\hat{y}}$ and minimising the value of $L(\mathbf{y}, \mathbf{\hat{y}})$ with respect to parameters $\theta$ is crucial in the machine learning process. 
 
-points to cover:
-\begin{itemize}
-    \item why we need loss functions
-    \item definition of loss function
-    \item how to choose loss functions
-    \item basic examples
-    \item what to do with loss functions?
-\end{itemize}
+Of course, the precise definition of the loss function depends on the optimisation problem. For example, a regression problem would employ a loss function different from a classification problem. Even within the class of optimisation problems, different loss functions provide varying perfomances for convergence. We introduce several common loss functions used in regression and classification problems in Table \ref{tab:lfd}, where we define $\mathbf{y} = \left(y_1, \dots, y_n\right)^T$, $\mathbf{\hat{y}} = \left(\hat{y}_1, \dots, \hat{y}_n\right)^T$, $\epsilon > 0$ for (2).
+\begin{table}[htbp]
+    \centering
+    \begin{tabular}{llll}
+        \toprule
+          & Problem  & Loss Function  &  Definition \\
+        \midrule
+        1 & Regression       & Absolute Value            & $\frac{1}{n}\sum_{i=1}^n |y_i - \hat{y}_i|$      \\
+        2 &Regression       & $\epsilon$-insensitive   & $\sum_{i=1}^n \max{(|y_i - \hat{y}_i| - \epsilon, 0)}$\\
+        3 & Regression/Classification       & $L^2$-norm                   & $\sum_{i=1}^n\left(y_i - \hat{y}_i\right)^2$        \\
+        4 & Classification  & Hinge                     & $\sum_{i=1}^n\max{(1-y_i\hat{y}_i, 0)}$ \\
+        5 & Classification  & Logistic                  & $\sum_{i=1}^n \left(\ln 2\right)^{-1}\ln(1 + e^{-y_i\hat{y}_i})$ \\
+        6 & Classification  & Cross-Entropy             & $- \frac{1}{n} \sum_{i=1}^n y_i\ln \hat{y}_i$\\ 
+        \bottomrule
+    \end{tabular}
+    \caption{Commonly used loss functions $L(\mathbf{y}, \mathbf{\hat{y}})$ for regression and classification problems.}
+    \label{tab:lfd}
+\end{table}
+
+These loss functions are dependent on $\hat{y}_i$ which in turn is dependent on $\theta$. Given the context of optimisation problems, we want to find $\hat{\theta}$ that produces $\hat{y}_i$, giving the global minimum of $L(\mathbf{y}, \mathbf{\hat{y}})$. Thus, choosing a loss function that can produce convergence to the global minimum efficiently is of utmost importance. This means that convex functions (which, by definition, can only have one minimum, the global minimum) are generally favoured over non-convex functions, which have multiple (local) minima that an algorithm might get stuck in. We note that only (6) from Table \ref{tab:lfd} is non-convex, which will require more sophisticated methods to more efficiently locate the global minimum. Such methods are discussed in Section \ref{sec:gd}.
+
+Studies have been conducted to consider the theoretical performances of each of these commonly used loss functions, namely the upper bounds of their rates of convergence (which imply their efficiency) \textcolor{red}{insert citation, Are all Loss Functions the same?}. We note that the $L^2$-norm (or square loss function) actually has a much slower convergence (measured by $\eta$ in Figure \ref{fig:lfe}) in both regression and classification problems compared to other convex loss functions discussed.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=1.0\textwidth]{report/figures/LossFunction.jpg}
+    \caption{Convergence Rates of Different Loss Functions used for A: Regression and B: Classification}
+    \label{fig:lfe}
+\end{figure}
 
 \subsubsection{Gradient Descent and Applications}
-
+\label{sec:gd}
 points to cover:
 \begin{itemize}
     \item motivation for gradient descent
@@ -417,6 +460,9 @@ points to cover:
 \end{itemize}
 
 \subsubsection{Automatic Differentiation}
+\label{sec:ad}
+Having discussed the importance of deriving the global minimum of loss functions through gradient descent, it becomes imperative to use algorithms that derive gradients and derivatives efficiently. 
+There are a number of methods that do so with varying computational costs. The conventional ideas brought forward by divided differences tend to incur large errors in computation, making gradient calculations inaccurate and thus unreliable. Calculating symbolic expressions of gradients, on the other hand, tends to be rather memory and time consuming. The computational cost of such a method is further compounded by the fact that functions derived from neural networks tend to be rather complicated in nature. A method that has proven to be time and (relatively) memory efficient is through \textit{automatic differentiation} (AD). On
 
 points to cover:
 \begin{itemize}
@@ -429,8 +475,8 @@ points to cover:
 \end{itemize}
 
 \subsection{Backpropagation}
-
-Similar to classical neural networks, we aim to optimise the parameters in the neural ODE model to better fit the real data. We achieve this by minimising the cost function. Considering our approximation process as a vector field, for an input
+\label{sec:backprop}
+Similar to classical neural networks, our objective is to optimise the parameters in the neural ODE model to better fit the real data. We achieve this by minimising the cost function. Considering our approximation process as a vector field, for an input
 $z(t_0)$, the output produced by this model is $z(t_i)_{i=1,\dots,N}$, with:
 $$z(t_i)=\mathrm{ODESolve}(z(t_0),f,\theta(t),t_0,t_i), i=1,\dots,N$$
 So the cost function would be applied to all observation points $z(t_i)_{i=1,\dots,N}$, which means the cost of the model is $\mathcal{L}(z_1,\dots,z_N)$. The next step is to develop a method to update the parameters. It is equivalent to calculate the gradient of the cost function with respect to different parameters in the model, so we can use the gradient to minimise the cost function. For classical neural networks, the computational cost of backpropagation increases as the number of layers increases. In the case of neural ODEs, if we want to perform backpropagation, we use the same method as we do for residual networks; this would be very computationally expensive. Backpropagating through an ODE solver would be very inefficient. This motivates us to use a method to calculate the gradient without needing the explicit solution.
@@ -438,7 +484,7 @@ So the cost function would be applied to all observation points $z(t_i)_{i=1,\do
 \subsubsection{Adjoint Sensitivity Method}
 
 \subsection{Numerical ODE Solvers}
-
+\label{sec:numODE}
 Upon completion of the neural network training (where we have derived the learnt parameters $\theta$), all that remains is to solve the subsequent ODE numerically. This can be done in a number of methods, which are generally known as the \textit{Runge-Kutta} methods.
 
 \subsubsection{Euler's Method}
@@ -462,8 +508,10 @@ points to cover:
     \item a short comment on what makes a good method for solving ODEs
 \end{itemize}
 
+\pagebreak
 \section{Application (Jiankuan Liu's Part)}
 
+\pagebreak
 \section{Extension: Neural Controlled Differential Equations}
 
 \subsection{Motivation}
@@ -503,16 +551,21 @@ From now on, $y(t)$ will be referred to as $y_t$, which is a notation commonly u
 
 \subsection{Neural Controlled Differential Equations}
 
+\pagebreak
 \section{Conclusion}
 
+\pagebreak
 \section*{Acknowledgments}
 \addcontentsline{toc}{section}{Acknowledgement}
 
 \appendix
 
+\pagebreak
 \section{First appendix}
 
+\pagebreak
 \section{Second appendix}
 
+\pagebreak
 \bibliography{bibliography.bib}
 \end{document}
