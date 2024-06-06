@@ -404,22 +404,34 @@ Unlike a neural network, where depth refers to the number of layers, in a neural
 \section{Solving Neural ODEs}
 \label{sec:solvingNODEs}
 
-\subsection{Solving Steps}
-\label{sec:solvingsteps}
-
 Solving differential equations is a difficult procedure in general, requiring a great deal of effort in existence theorems and techniques. Solving neural ODEs therefore poses a significant challenge in itself. Having defined basic neural network and neural ODE theory, we now turn our attention to the steps required to solve such problems numerically.
 
-Consider a neural ODE defined by neural networks $f_\theta$, such that $f_\theta$, when provided with parameters $\theta$, defines the differential equation of the system $\dot{x} = f_\theta\left(t, x\right)$. In order to solve the neural ODE numerically, we are required to:
+Consider a neural ODE defined by neural networks $f_\theta$, such that $f_\theta$, when provided with parameters $\theta$, defines the differential equation of the system $\dot{x} = f_\theta\left(t, x\right)$. There are two predominant methods to solve Neural ODEs, known as Discretise-then-Optimise (DO) and Optimise-then-Discretise (OD). These methods will be clearly defined later on.
 
-\begin{enumerate}
-    \item \textit{Train $f_\theta$ to provide the parameters of the neural ODE.} This requires the use of a loss function to train the neural network $f_\theta$, providing the parameters required to accurately state the specific ODE in question. Once the parameters have been approximated, we are left with a standard ODE problem.
-    \item \textit{Solve the ODE Problem.} As most ODEs do not have analytical solutions, we make use of numerical ODE solvers to approximate the solution of the system.
-\end{enumerate}
+For now, we introduce the ideas of discretising and optimising to provide a general understanding of the techniques required. Discretisation (of the neural ODE) involves solving the ODE numerically. These involve breaking the (continuous) differential equation into discrete time steps and employing numerical methods to calculate the solution at each time step. Optimisation, on the other hand, involves deriving the parameters $\theta$ that minimises some loss function of our choice. 
 
-This section aims to define and discuss the methods and techniques required to perform such numerical analysis on neural ODEs. In particular, the basic ideas of loss functions, gradient descent, and automatic differentiation are introduced here in Section \ref{sec:solvingsteps}. Section \ref{sec:backprop} defines and discusses backpropagation as a means of training the neural network, and finally Section \ref{sec:numODE} covers several numerical methods to solve ODEs after training.
+As such, the two methods to solve Neural ODEs require similar numerical methods, albeit used in different contexts. Section \ref{sec:nummethods} aims to introduce these ideas, before Sections \ref{sec:do} and \ref{sec:od} discusses their applications DO and OD respectively.
+
+\subsection{Numerical Methods}
+\label{sec:nummethods}
+
+\subsubsection{Euler's Method and Runge Kutta Methods}
+\label{sec:rungekutta}
+
+points to cover:
+\begin{itemize}
+    \item motivation for euler's method
+    \item definition of euler's method
+    \item proof of euler's method
+    \item limitations of euler's method
+    \item general runge-kutta methods definition (including matrix representation)
+    \item euler's method is a runge-kutta method (1st order)
+    \item an example: RK4 (basic? proof and full extension of definition)
+    \item actual runge-kutta methods used in julia packages - 5th orders and above  
+    \item a short comment on what makes a good method for solving ODEs
+\end{itemize}
 
 \subsubsection{Loss Functions}
-
 One of the most fundamental concepts (as introduced in Section \ref{sec:neuralnetworks}) is the loss function $L: \mathbb{R}^n \times \mathbb{R}^n \to [0, +\infty )$. It provides the error between the predicted output $\mathbf{y}$ and the target output $\mathbf{\hat{y}}$ and minimising the value of $L(\mathbf{y}, \mathbf{\hat{y}})$ with respect to parameters $\theta$ is crucial in the machine learning process. 
 
 Of course, the precise definition of the loss function depends on the optimisation problem. For example, a regression problem would employ a loss function different from a classification problem. Even within the class of optimisation problems, different loss functions provide varying perfomances for convergence. We introduce several common loss functions used in regression and classification problems in Table \ref{tab:lfd}, where we define $\mathbf{y} = \left(y_1, \dots, y_n\right)^T$, $\mathbf{\hat{y}} = \left(\hat{y}_1, \dots, \hat{y}_n\right)^T$, $\epsilon > 0$ for (2).
@@ -464,11 +476,21 @@ points to cover:
     \item when to use what method for training
 \end{itemize}
 
+\subsection{Discretise-then-Optimise (DO)}
+\label{sec:do}
+
+The Discretise-then-Optimise (DO) method can be described in the following steps:
+\begin{enumerate}
+    \item \textit{Solve the Neural ODE numerically with starting parameters.} This involves choosing an initial 'guess' of parameters $\theta$ and solving the neural ODE with the guessed parameters. The Runge-Kutta methods, typically the RK4 or DOPRI method as described in Section \ref{sec:rungekutta} are most commonly used to achieve this.
+    \item \textit{Compute the Loss Function based on }
+\end{enumerate}
+
 \subsubsection{Automatic Differentiation}
 \label{sec:ad}
 
 Having discussed the importance of deriving the global minimum of loss functions through gradient descent, it becomes imperative to use algorithms that derive gradients and derivatives efficiently. 
-There are a number of methods that do so with varying computational costs. The conventional ideas brought forward by divided differences tend to incur large errors in computation, making gradient calculations inaccurate and thus unreliable. Calculating symbolic expressions of gradients, on the other hand, tends to be rather memory and time consuming. The computational cost of such a method is further compounded by the fact that functions derived from neural networks tend to be rather complicated in nature. A method that has proven to be time and (relatively) memory efficient is through \textit{automatic differentiation} (AD). On
+
+There are a number of methods that do so with varying computational costs. The conventional ideas brought forward by divided differences tend to incur large errors in computation, making gradient calculations inaccurate and thus unreliable. Calculating symbolic expressions of gradients, on the other hand, tends to be rather memory and time consuming. The computational cost of such a method is further compounded by the fact that functions derived from neural networks tend to be rather complicated in nature. A method that has proven to be time and (relatively) memory efficient is \textit{automatic differentiation} (AD). 
 
 points to cover:
 \begin{itemize}
@@ -480,41 +502,20 @@ points to cover:
     \item julia packages implementing AD
 \end{itemize}
 
-\subsection{Backpropagation}
-\label{sec:backprop}
+\subsection{Optimise-then-Discretise (OD)}
+\label{sec:od}
 
+\begin{enumerate}
+    \item \textit{Train $f_\theta$ to provide the parameters of the neural ODE.} This requires the use of a loss function to train the neural network $f_\theta$, providing the parameters required to accurately state the specific ODE in question. Once the parameters have been approximated, we are left with a standard ODE problem.
+    \item \textit{Solve the ODE Problem.} As most ODEs do not have analytical solutions, we make use of numerical ODE solvers to approximate the solution of the system.
+\end{enumerate}
 Similar to classical neural networks, our objective is to optimise the parameters in the neural ODE model to better fit the real data. We achieve this by minimising the cost function. Considering our approximation process as a vector field, for an input
 $z(t_0)$, the output produced by this model is $z(t_i)_{i=1,\dots,N}$, with:
 $$z(t_i)=\mathrm{ODESolve}(z(t_0),f,\theta(t),t_0,t_i), i=1,\dots,N$$
 So the cost function would be applied to all observation points $z(t_i)_{i=1,\dots,N}$, which means the cost of the model is $\mathcal{L}(z_1,\dots,z_N)$. The next step is to develop a method to update the parameters. It is equivalent to calculate the gradient of the cost function with respect to different parameters in the model, so we can use the gradient to minimise the cost function. For classical neural networks, the computational cost of backpropagation increases as the number of layers increases. In the case of neural ODEs, if we want to perform backpropagation, we use the same method as we do for residual networks; this would be very computationally expensive. Backpropagating through an ODE solver would be very inefficient. This motivates us to use a method to calculate the gradient without needing the explicit solution.
 
 \subsubsection{Adjoint Sensitivity Method}
-
-\subsection{Numerical ODE Solvers}
-\label{sec:numODE}
-
-Upon completion of the neural network training (where we have derived the learnt parameters $\theta$), all that remains is to solve the subsequent ODE numerically. This can be done in a number of methods, which are generally known as the \textit{Runge-Kutta} methods.
-
-\subsubsection{Euler's Method}
-
-points to cover:
-\begin{itemize}
-    \item motivation for euler's method
-    \item definition of euler's method
-    \item proof of euler's method
-    \item limitations of euler's method
-\end{itemize}
-
-\subsubsection{Runge-Kutta Methods}
-
-points to cover:
-\begin{itemize}
-    \item general runge-kutta methods definition (including matrix representation)
-    \item euler's method is a runge-kutta method (1st order)
-    \item an example: RK4 (basic? proof and full extension of definition)
-    \item actual runge-kutta methods used in julia packages - 5th orders and above  
-    \item a short comment on what makes a good method for solving ODEs
-\end{itemize}
+The adjoint sensitivity method was first proposed by Pontryagin in 1962. This method provides a way to find the desired gradients by solving another ODE. Consequently, we do not need to store all the activated states for backpropagation, which helps reduce the computational cost. (One important point to note is that in the adjoint method, we treat \$\textbackslash{}theta\$ as a constant, meaning it does not change over time. Consequently, this method can only be used to solve specific classes of neural ODEs.)
 
 \pagebreak
 \section{Application (Jiankuan Liu's Part)}
@@ -547,17 +548,38 @@ Then $f$ is a function of bounded variation iff $V_a^b(f)<\infty$.
 \definition{(Controlled differential equations (CDE))}
 Let $a,b\in\mathbb{R}$ with $a<b$ and let $v,w\in\mathbb{N}$. Let $x:[a,b]\rightarrow\mathbb{R}^v$ be a continuous function of bounded variation. Let $f:\mathbb{R}^w\rightarrow\mathbb{R}^{w\times v}$ be Lipschitz continuous. Let $y_a\in\mathbb{R}^w$.
 
-A continuous function $y:[a,b]\rightarrow\mathbb{R}^w$ is a solution of the following initial value problem:
+A continuous function $y:[a,b]\rightarrow\mathbb{R}^w$ is said to be a solution of the following initial value problem:
 $$y(a)=y_a, y(t)=y(a)+\int_a^bf(y(s))dx(s),$$
 where $t\in(a,b].$
 
-In the above controlled differential equation, $\int_a^bf(y(s))dx(s)$ is a Riemann–Stieltjes integral, and $f(y(s))dx(s)$ is a matrix vector multiplication.
+In the above controlled integral equation, $\int_a^bf(y(s))dx(s)$ is a Riemann–Stieltjes integral, and $f(y(s))dx(s)$ is a matrix vector multiplication.
 
-Note that the continuity of $f$ and the bounded variation of $x$ guarantee the existence of the Riemann–Stieltjes integral, and the Lipschitz continuity of $f$ satisfies the condition of the Picard–Lindelöf theorem for controlled differential equations. Hence, the solution to this initial value problem is unique. The existence of the integral and the uniqueness of the solution will not be investigated in detail.
+We can rewrite the above control integral equation as the following control differential equation:
 
-From now on, $y(t)$ will be referred to as $y_t$, which is a notation commonly used to describe CDEs.
+\begin{center}
+    $y(a)=y_a, dy(t) = f(y(t))dx(t)$
+\end{center}
+
+Note that the continuity of $f$ and the bounded variation of $x$ guarantee the existence of the Riemann–Stieltjes integral, and the Lipschitz continuity of $f$ satisfies the condition of the Picard–Lindelöf theorem for controlled differential equations. Hence, the solution to this initial value problem is unique. The existence of the integral and the uniqueness of the solution will not be investigated in detail. For interested readers, read a and b for details.
+
+From now on, controlled differential equations will be referred to as CDEs, and $y(t)$ will be referred to as $y_t$, which is a notation commonly used to describe CDEs.
 
 \subsection{Neural CDEs}
+
+One fundamental assumption of neural CDEs is that the data we observed should form a continuous path $X:[a,b]\rightarrow\mathbb{R}^v$ with bounded variation. This assumption is made simply for theoretical purposes, i.e. the continuous data corresponds to an evolutionary process or control path in the neural CDE. However, it is worthwhile to note that it is highly unlikely to observe data in such form in real life applications, and thus a trick that converts discrete observations to a continuous control path would be introduced in later parts. Let's now formulate the definition of neural CDEs rigorously, and then it will be clear that neural CDE is the continuous analogue to the recurrent neural network.
+
+\definition{(Neural CDEs)}
+Let $f_\theta:\mathbb{R}^w\rightarrow\mathbb{R}^{w\times v}$ be an arbitrary neural network with parameters $\theta$ that represents the dynamics between the hidden states. Note that $v$ represents the dimension of the input, and $w$ represents the dimension of the hidden states. Let $g_\theta$ be a neural network mapping the input $X_t$ to the hidden states $Z_t$.
+
+Then, we define the initial value problem of a neural CDE to be the following:
+\begin{center}
+    $Z_a=g_\theta(X_a), Z_t=Z_a+\int_a^tf_\theta(Z(s))dX(s)$ where $t\in(a,b]$.
+\end{center}, or in the differential form:
+\begin{center}
+    $Z_a=g_\theta(X_a), dZ_t=f_\theta(Z(t))dX(t)$ where $t\in(a,b]$.
+\end{center}
+
+From the above CDE, we may conclude that the hidden state $Z_t$ of the recurrent neural network can be updated continuously as the input $X_t$ evolves through time. Thus, neural CDE is a continuous analogue to the recurrent neural network. Finally, let $l_\theta$ be a linear map mapping the hidden states $Z_t$ to the output $Y_t$. The difference between a neural network and a linear map is that a neural network contains an activation function and a linear map doesn't.
 
 \pagebreak
 \section{Conclusion}
