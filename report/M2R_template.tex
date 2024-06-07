@@ -406,7 +406,7 @@ Unlike a neural network, where depth refers to the number of layers, in a neural
 
 Solving differential equations is a difficult procedure in general, requiring a great deal of effort in existence theorems and techniques. Solving neural ODEs therefore poses a significant challenge in itself. Having defined basic neural network and neural ODE theory, we now turn our attention to the steps required to solve such problems numerically.
 
-Consider a neural ODE defined by neural networks $f_\theta$, such that $f_\theta$, when provided with parameters $\theta$, defines the differential equation of the system $\dot{x} = f_\theta\left(t, x\right)$. There are two predominant methods to solve Neural ODEs, known as Discretise-then-Optimise (DO) and Optimise-then-Discretise (OD). These methods will be clearly defined later on.
+Consider a neural ODE defined by neural networks $f_\theta$, such that $f_\theta$, when provided with parameters $\theta$, defines the differential equation of the system $\dot{x} = f_\theta\left(t, x\right)$. There are two predominant methods to solve Neural ODEs, known as Discretise-then-Optimise (DO) and Optimise-then-Discretise (OD). These methods will be elaborately described later on.
 
 For now, we introduce the ideas of discretising and optimising to provide a general understanding of the techniques required. Discretisation (of the neural ODE) involves solving the ODE numerically. These involve breaking the (continuous) differential equation into discrete time steps and employing numerical methods to calculate the solution at each time step. Optimisation, on the other hand, involves deriving the parameters $\theta$ that minimises some loss function of our choice. 
 
@@ -415,20 +415,18 @@ As such, the two methods to solve Neural ODEs require similar numerical methods,
 \subsection{Numerical Methods}
 \label{sec:nummethods}
 
-\subsubsection{Euler's Method and Runge Kutta Methods}
+\subsubsection{Runge Kutta Methods}
 \label{sec:rungekutta}
-
+The first numerical method deals with solving 
 points to cover:
 \begin{itemize}
     \item motivation for euler's method
     \item definition of euler's method
-    \item proof of euler's method
     \item limitations of euler's method
-    \item general runge-kutta methods definition (including matrix representation)
-    \item euler's method is a runge-kutta method (1st order)
+    \item general runge-kutta methods definition (including butcher's tableau)
     \item an example: RK4 (basic? proof and full extension of definition)
-    \item actual runge-kutta methods used in julia packages - 5th orders and above  
-    \item a short comment on what makes a good method for solving ODEs
+    \item actual runge-kutta methods used in julia packages - 5th orders and above 
+    \item a short comment on what makes a good method for solving ODEs - discuss implicit runge-kutta methods
 \end{itemize}
 
 \subsubsection{Loss Functions}
@@ -455,7 +453,7 @@ Of course, the precise definition of the loss function depends on the optimisati
 
 These loss functions are dependent on $\hat{y}_i$ which in turn is dependent on $\theta$. Given the context of optimisation problems, we want to find $\hat{\theta}$ that produces $\hat{y}_i$, giving the global minimum of $L(\mathbf{y}, \mathbf{\hat{y}})$. Thus, choosing a loss function that can produce convergence to the global minimum efficiently is of utmost importance. This means that convex functions (which, by definition, can only have one minimum, the global minimum) are generally favoured over non-convex functions, which have multiple (local) minima that an algorithm might get stuck in. We note that only (6) from Table \ref{tab:lfd} is non-convex, which will require more sophisticated methods to more efficiently locate the global minimum. Such methods are discussed in Section \ref{sec:gd}.
 
-Studies have been conducted to consider the theoretical performances of each of these commonly used loss functions, namely the upper bounds of their rates of convergence (which imply their efficiency) \textcolor{red}{insert citation, Are all Loss Functions the same?}. We note that the $L^2$-norm (or square loss function) actually has a much slower convergence (measured by $\eta$) in both regression and classification problems compared to other convex loss functions discussed.
+Studies have been conducted to consider the theoretical performances of each of these commonly used loss functions, namely the upper bounds of their rates of convergence (which imply their efficiency) \textcolor{red}{insert citation, Are all Loss Functions the same?}. We note that the $L^2$-norm actually has a much slower convergence in both regression and classification problems compared to other convex loss functions discussed.
 
 \subsubsection{Gradient Descent and Applications}
 \label{sec:gd}
