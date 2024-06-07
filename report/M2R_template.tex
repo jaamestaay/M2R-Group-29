@@ -518,7 +518,7 @@ Of course, the precise definition of the loss function depends on the optimisati
         6 & Classification  & Cross-Entropy             & $- \frac{1}{n} \sum_{i=1}^n y_i\ln \hat{y}_i$\\ 
         \bottomrule
     \end{tabular}
-    \caption{Commonly used loss functions $L(\mathbf{y}, \mathbf{\hat{y}})$ for regression and classification problems.}
+    \caption{Commonly used loss functions $\mathcal{L}(\mathbf{y}, \mathbf{\hat{y}})$ for regression and classification problems.}
     \label{tab:lfd}
 \end{table}
 
@@ -628,7 +628,7 @@ $$
 
 One can then compute
 $$
-\frac{\mathrm{d}\mathcal{L}}{\mathrm{d}z(t_{i-1})} =a(t_i)- \int_{t_i}^{t_{i-1}}a(s)\frac{\partial f(z(s),\theta,s)}{\partial z(s)}\,ds,\quad i=1,\dots,N.
+\frac{\mathrm{d}\mathcal{L}}{\mathrm{d}z(t_{i-1})} =a(t_i)- \int_{t_i}^{t_{i-1}}a(s)\frac{\partial f(z(s),\theta,s)}{\partial z(s)}\mathrm{d}s,\quad i=1,\dots,N.
 $$
 
 \subsubsection{Gradient wrt. $\theta$ and $t$}
