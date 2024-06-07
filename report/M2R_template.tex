@@ -410,7 +410,8 @@ Note the points on the right graph (ODE network) representing the \textit{observ
 
 Unlike a neural network, where depth refers to the number of layers, in a neural ODE network, depth can be seen as the number of observation points. Our goal is to find an $f$ that is good enough to predict the output given an input. For a neural network, more layers can help the model fit the training dataset better. Similarly, in an ODE network, more observation points can provide a better understanding of the $f$ we are looking for, thus allowing the model to better fit the training set.
 
-\subsection{Evaluating Neural ODEs}
+\subsection{}
+
 \subsubsection{Strengths}
 
 \subsubsection{Limitations}
@@ -432,6 +433,7 @@ As such, the two methods for solving neural ODEs require similar numerical metho
 
 \subsubsection{Runge-Kutta Methods}
 \label{sec:rungekutta}
+
 Perhaps the most straightforward approach to numerically approximate a solution of ODE $\dot{z}= f(z(t), \theta,t)$, on some interval $\left[a, b\right]$, is to look at the Taylor series expansion of $h$. We first discretise the system and consider the points $t_i = a + ih \in \left[a, b\right]$, where $i = 0, 1, \dots, N - 1$ and $h = \frac{b-a}{N}$. We can therefore use the Taylor series expansion iteratively, centred at each point $t_i$, to find the value of the next point $t_{i + 1}$. This is known as \textit{Euler's method}.
 
 \begin{definition}[Euler's method]
@@ -764,11 +766,26 @@ One fundamental assumption of neural CDEs is that the data we observe should for
 Let $f_\theta:\mathbb{R}^w\rightarrow\mathbb{R}^{w\times v}$ be an arbitrary neural network with parameters $\theta$ that represents the dynamics between the hidden states. Note that $v$ represents the dimension of the input $X_t$, and $w$ represents the dimension of the hidden states $Z_t$. Let $g_\theta:\mathbb{R}^v\rightarrow\mathbb{R}^w$ be a neural network that maps the input $X_t$ to hidden states $Z_t$.
 
 Then, we define the initial value problem of a neural CDE to be the following
-$$Z_a=g_\theta(X_a), Z_t=Z_a+\int_a^tf_\theta(Z(s))\mathrm{d}X(s),$$ where $t\in(a,b],$
+$$Z_a=g_\theta(X_a), Z_t=Z_a+\int_a^tf_\theta(Z_s)\mathrm{d}X_s,$$ where $t\in(a,b],$
 or in the differential form
-$$Z_a=g_\theta(X_a), \mathrm{d}Z_t=f_\theta(Z(t))\mathrm{d}X(t),$$ where $t\in(a,b].$
+$$Z_a=g_\theta(X_a), \mathrm{d}Z_t=f_\theta(Z_t)\mathrm{d}X_t,$$ where $t\in(a,b].$
 
 From the above CDE, we may conclude that the hidden state $Z_t$ of the recurrent neural network can be continuously updated as the input $X_t$ evolves over time. Thus, neural CDE is a continuous analogue of the recurrent neural network. Finally, let $l_\theta:\mathbb{R}^w\rightarrow\mathbb{R}^p$ be a linear map mapping the hidden states $Z_t$ to the output $Y_t$, where $p$ is the dimension of the output $Y_t$. The difference between a neural network and a linear map is that a neural network contains an activation function and a linear map does not.
+
+\subsection{Methods to solve CDEs}
+It is theoretically possible to directly solve a CDE $\mathrm{d}y_t = f(y_t)\mathrm{d}x_t$ with a given initial condition by discretisation. In particular, one could use the following modification of the Euler method to obtain a numerical solution: $y_{i+1}=y_i+f_\theta(y_i)(x(t_{i+1})-x(t_j))$.
+
+CDEs are much harder to solve than ODEs since there is a control term introduced in the equation. For the general case, we don't know whether the control path $x_t$ is differentiable or not. Using powerful tools from rough path theory, one can derive an elegant result called the \textit{log-ODE method}, which approximates the CDE by an ODE containing the log-signature of the control path. The details of the log-ODE method are omitted, as the statement and proof of this result would take up too much space in this report. For interested readers, see c for details.
+
+Despite the fact that the log-ODE method can be used to solve CDEs under any circumstances, the log-ODE method is quite complicated to implement numerically. Fortunately, it can be cleverly avoided in terms of applications. By a standard treatment common in numerical analysis, we can guarantee that the control path $x_t$ is continuously differentiable. We defer the discussion of this technique to later parts of this report. In this case, the CDE can be shown to be equivalent to the following non-autonomous ODE: $\mathrm{d}y_t=g(t,y_t)\mathrm{d}t$, where $g(t,y_t)=f(y_t)\frac{\mathrm{d}x_t}{\mathrm{d}t}$. Then, we can solve this ODE using methods explained in Section 4 of this report.
+
+Also, note that the backpropagation through CDE is similar to that of ODE. In particular, the discretise-then-optimise method is exactly the same as that of ODE, and the optimise-then-discretise method is similar to that of ODE. Since the proofs are very similar, we omit the proof here.
+
+\subsection{Applications}
+
+Given a
+
+To do so, we need to employ a standard technique from numerical analysis, called \textit{cubic spline}. The only thing that we need to know is that cubic splines are continuously differentiable.
 
 \pagebreak
 \section{Conclusion}
