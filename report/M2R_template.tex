@@ -14,7 +14,7 @@
 \usepackage{booktabs}
 \usepackage{listings}
 \lstset{
-    frame = single, 
+    frame=single, 
     framexleftmargin=15pt
 }
 \usepackage{caption}
@@ -455,14 +455,7 @@ Of course, the precise definition of the loss function depends on the optimisati
 
 These loss functions are dependent on $\hat{y}_i$ which in turn is dependent on $\theta$. Given the context of optimisation problems, we want to find $\hat{\theta}$ that produces $\hat{y}_i$, giving the global minimum of $L(\mathbf{y}, \mathbf{\hat{y}})$. Thus, choosing a loss function that can produce convergence to the global minimum efficiently is of utmost importance. This means that convex functions (which, by definition, can only have one minimum, the global minimum) are generally favoured over non-convex functions, which have multiple (local) minima that an algorithm might get stuck in. We note that only (6) from Table \ref{tab:lfd} is non-convex, which will require more sophisticated methods to more efficiently locate the global minimum. Such methods are discussed in Section \ref{sec:gd}.
 
-Studies have been conducted to consider the theoretical performances of each of these commonly used loss functions, namely the upper bounds of their rates of convergence (which imply their efficiency) \textcolor{red}{insert citation, Are all Loss Functions the same?}. We note that the $L^2$-norm (or square loss function) actually has a much slower convergence (measured by $\eta$ in Figure \ref{fig:lfe}) in both regression and classification problems compared to other convex loss functions discussed.
-
-\begin{figure}
-    \centering
-    \includegraphics[width=1.0\textwidth]{report/figures/LossFunction.jpg}
-    \caption{Convergence Rates of Different Loss Functions used for A: Regression and B: Classification}
-    \label{fig:lfe}
-\end{figure}
+Studies have been conducted to consider the theoretical performances of each of these commonly used loss functions, namely the upper bounds of their rates of convergence (which imply their efficiency) \textcolor{red}{insert citation, Are all Loss Functions the same?}. We note that the $L^2$-norm (or square loss function) actually has a much slower convergence (measured by $\eta$) in both regression and classification problems compared to other convex loss functions discussed.
 
 \subsubsection{Gradient Descent and Applications}
 \label{sec:gd}
