@@ -44,6 +44,11 @@
 \setlength{\marginparwidth}{2cm}
 \usepackage[colorinlistoftodos]{todonotes}
 \usepackage[colorlinks=true, allcolors=blue]{hyperref}
+\pdfstringdefDisableCommands{%
+  \def\({}%
+  \def\){}%
+  \def\theta{theta}%
+}
 \renewcommand*{\rmdefault}{bch}
 \renewcommand*{\ttdefault}{lmtt}
 \newcommand{\citationneeded}{\textcolor{red}{[citation-needed]}}
@@ -68,7 +73,10 @@
 \begin{document}
 \begin{titlepage}
 \newcommand{\HRule}{\rule{\linewidth}{0.5mm}}
-\includegraphics[width=8cm]{figures/Imperial_logo.png}\\[1cm]
+\begin{figure}[h]
+  \includegraphics[width=8cm]{figures/Imperial_logo.png}
+  \vspace{1cm}
+\end{figure}
 \center
 \textsc{\LARGE Imperial College London}\\[0.5cm] 
 \textsc{\Large Department of Mathematics}\\[1.5cm] 
@@ -629,7 +637,7 @@ $$
 \frac{\mathrm{d}\mathcal{L}}{\mathrm{d}z(t_{i-1})} =a(t_i)- \int_{t_i}^{t_{i-1}}a(s)\frac{\partial f(z(s),\theta,s)}{\partial z(s)}\mathrm{d}s,\quad i=1,\dots,N.
 $$
 
-\subsubsection{Gradient wrt. $\theta$ and $t$}
+\subsubsection{Gradient wrt. \(\theta\) and \(t\)}
 
 For this part of the proof, we assume that the loss function depends only on the final time point $t_N$. If the loss function also depends on intermediate time points $t_1,\dots,t_{N-1}$, we can simply apply the backpropagation using the adjoint method for each interval $[t_{N-1},t_N],\dots,[t_1,t_0]$ in reverse order and sum up the gradients. 
 
