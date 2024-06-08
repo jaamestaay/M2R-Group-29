@@ -126,7 +126,7 @@ Later in 1958, Frank Rosenblatt described an implementation of perceptron in det
 
 \subsubsection{Structure}
 
-\definition{(Neural network)} A neural network (abbreviated NN) consists of interconnected neurons, each of which can be thought of as a mathematical function. They are typically organised into \textit{layers} consisting of
+A \textit{neural network} (abbreviated NN) consists of interconnected neurons, each of which can be thought of as a mathematical function. They are typically organised into \textit{layers} consisting of
 
 \begin{itemize}
     \item an \textit{input layer} that receives the data,
@@ -787,6 +787,10 @@ Given a sample of $k+1$ data points
 $(t_0,x_0), (t_1,x_1), \\\dots, (t_k,x_k)$, the \textit{Newton basis polynomials} corresponding to this sample are defined as $n_0(t)=1$ and $\forall j=1,...,k, n_j(t)=\prod_{i=0}^{j-1}(t-t_i)$.
 
 \definition{(Newton polynomials)}
+Using the same setting as above, we define the Newton polynomial that interpolates the sample of data points to be $p_k(t)=\sum_{i=0}^ka_in_i(t)$.
+
+As the Newton polynomial passes through $(t_0,x_0), (t_1,x_1), \dots, (t_k,x_k)$, the coefficients of the Newton polynomial can be uniquely determined by solving a system of linear equations. The details of this computation are left for the interested readers to check.
+
 
 \pagebreak
 \section{Conclusion}
