@@ -13,47 +13,24 @@
 \usepackage{graphicx}
 \usepackage{booktabs}
 \usepackage{listings}
-\lstset{
-    frame=single, 
-    framexleftmargin=15pt
-}
+\lstset{frame=single,framexleftmargin=15pt}
 \usepackage{caption}
 \captionsetup[figure]{labelfont={bf},labelsep=quad}
 \usepackage[ruled,vlined]{algorithm2e}
 \makeatletter
-\renewcommand{\SetKwInOut}[2]{%
-  \sbox\algocf@inoutbox{\KwSty{#2}\algocf@typo:}%
-  \expandafter\ifx\csname InOutSizeDefined\endcsname\relax% if first time used
-    \newcommand\InOutSizeDefined{}\setlength{\inoutsize}{\wd\algocf@inoutbox}%
-    \sbox\algocf@inoutbox{\parbox[t]{\inoutsize}{\KwSty{#2}\algocf@typo:\hfill}~}\setlength{\inoutindent}{\wd\algocf@inoutbox}%
-  \else% else keep the larger dimension
-    \ifdim\wd\algocf@inoutbox>\inoutsize%
-    \setlength{\inoutsize}{\wd\algocf@inoutbox}%
-    \sbox\algocf@inoutbox{\parbox[t]{\inoutsize}{\KwSty{#2}\algocf@typo:\hfill}~}\setlength{\inoutindent}{\wd\algocf@inoutbox}%
-    \fi%
-  \fi% the dimension of the box is now defined.
-  \algocf@newcommand{#1}[1]{%
-    \ifthenelse{\boolean{algocf@inoutnumbered}}{\relax}{\everypar={\relax}}%
-%     {\let\\\algocf@newinout\hangindent=\wd\algocf@inoutbox\hangafter=1\parbox[t]{\inoutsize}{\KwSty{#2}\algocf@typo\hfill:}~##1\par}%
-    {\let\\\algocf@newinout\hangindent=\inoutindent\hangafter=1\parbox[t]{\inoutsize}{\KwSty{#2}\algocf@typo:\hfill}~##1\par}%
-    \algocf@linesnumbered% reset the numbering of the lines
-  }}%
+\renewcommand{\SetKwInOut}[2]{\sbox\algocf@inoutbox{\KwSty{#2}\algocf@typo:}\expandafter\ifx\csname InOutSizeDefined\endcsname\relax\newcommand\InOutSizeDefined{}\setlength{\inoutsize}{\wd\algocf@inoutbox}\sbox\algocf@inoutbox{\parbox[t]{\inoutsize}{\KwSty{#2}\algocf@typo:\hfill}~}\setlength{\inoutindent}{\wd\algocf@inoutbox}\else\ifdim\wd\algocf@inoutbox>\inoutsize\setlength{\inoutsize}{\wd\algocf@inoutbox}\sbox\algocf@inoutbox{\parbox[t]{\inoutsize}{\KwSty{#2}\algocf@typo:\hfill}~}\setlength{\inoutindent}{\wd\algocf@inoutbox}\fi\fi\algocf@newcommand{#1}[1]{\ifthenelse{\boolean{algocf@inoutnumbered}}{\relax}{\everypar={\relax}}{\let\\\algocf@newinout\hangindent=\inoutindent\hangafter=1\parbox[t]{\inoutsize}{\KwSty{#2}\algocf@typo:\hfill}~##1\par}\algocf@linesnumbered}}
 \makeatother
 \usepackage{bm}
 \usepackage[normalem]{ulem}
 \setlength{\marginparwidth}{2cm}
 \usepackage[colorinlistoftodos]{todonotes}
 \usepackage[colorlinks=true, allcolors=blue]{hyperref}
-\pdfstringdefDisableCommands{%
-  \def\({}%
-  \def\){}%
-  \def\theta{theta}%
-}
+\pdfstringdefDisableCommands{\def\({}\def\){}\def\theta{theta}}
 \renewcommand*{\rmdefault}{bch}
 \renewcommand*{\ttdefault}{lmtt}
 \newcommand{\citationneeded}{\textcolor{red}{[citation-needed]}}
 \setlength{\parskip}{0.5em}
-\usepackage[numbers, comma, square, sort&compress]{natbib}
+\usepackage[numbers,comma,square,sort&compress]{natbib}
 \bibliographystyle{abbrvunsrtnat.bst}
 \theoremstyle{definition}
 \newtheorem{definition}{Definition}[section]
@@ -82,30 +59,29 @@
 \textsc{\Large Department of Mathematics}\\[1.5cm] 
 \textsc{\Large Second-year Group Research Project}\\[0.5cm]
 \makeatletter
-\HRule \\[0.6cm]
-{\huge \bfseries \reporttitle}\\[0.6cm]
-\HRule \\[1.5cm]
+\HRule\\[0.6cm]
+{\huge\bfseries\reporttitle}\\[0.6cm]
+\HRule\\[1.5cm]
 \begin{minipage}{0.4\textwidth}
-\begin{flushleft} \large
+\begin{flushleft}\large
 \emph{Authors:}\\
-\reportauthorA \\
-\reportauthorB \\
-\reportauthorC \\
-\reportauthorD \\
+\reportauthorA\\
+\reportauthorB\\
+\reportauthorC\\
+\reportauthorD\\
 \reportauthorE
 \end{flushleft}
 \end{minipage}
-~
 \begin{minipage}{0.4\textwidth}
-\begin{flushright} \large
-\emph{Supervisor:} \\
+\begin{flushright}\large
+\emph{Supervisor:}\\
 \supervisor
 \end{flushright}
 \end{minipage}\\[2cm]
 \makeatother
 \vfill
 \makeatletter
-{\large \today}\\[2cm]
+{\large\today}\\[2cm]
 \makeatother
 \end{titlepage}
 
@@ -128,7 +104,7 @@ Subsequently, we dive into the formulation and implementation of neural ODEs and
 
 Furthermore, we examine the techniques for solving neural ODEs, introducing theories such as loss functions and gradient descent. By an extension of dual numbers, we cover automatic differentiation in higher dimensions. We also present and analyse numerical ODE solvers, including Euler's method and Runge-Kutta methods.
 
-As an application, [Jiankuan Liu's Part].
+As an application,
 
 Finally, building on the framework of neural ODEs to handle more complex and irregular data streams, we extend our discussion to neural CDEs.
 
@@ -142,7 +118,7 @@ Throughout this report, we will be using the Julia programming language. This is
 
 Before diving into neural ordinary and control differential equations, we shall first explore the field of \textit{neural network}. Generally speaking, a neural network is a group of units called \textit{neurons} connected by signals called \textit{synapses}.
 
-In 1943, Warren McCulloch and Walter Pitts published a seminal paper \cite{McCulloch1943}, in which they proposed the first mathematical model of an \textit{artificial neural network}, inspired by biological neural networks in animal brains. This model was named the McCulloch–Pitts neuron, or \textit{perceptron}. In some sense, it could ‘learn’ from given data and make decisions or predictions based on some parameters. The process of optimising the choice of such parameters is called \textit{training} the neural network.
+In 1943, Warren McCulloch and Walter Pitts published a seminal paper \cite{McCulloch1943}, in which they proposed the first mathematical model of an \textit{artificial neural network}, inspired by biological neural networks in animal brains. This model was named the McCulloch-Pitts neuron, or \textit{perceptron}. In some sense, it could ‘learn’ from given data and make decisions or predictions based on some parameters. The process of optimising the choice of such parameters is called \textit{training} the neural network.
 
 Later in 1958, Frank Rosenblatt described an implementation of perceptron in detail \cite{Rosenblatt1958}. The field of neural network expanded quickly, and nowadays, it is extensively used in various fields such as machine learning and artificial intelligence. We shall explore some simple applications later.
 
@@ -186,7 +162,7 @@ As for the choice of the activation function, the S-shaped \textit{sigmoid funct
                 \addplot[blue, thick, samples=200] {1 / (1 + exp(-x))};
             \end{axis}
         \end{tikzpicture}
-    \end{minipage}%
+    \end{minipage}
     \hfill
     \begin{minipage}{0.32\textwidth}
         \centering
@@ -204,7 +180,7 @@ As for the choice of the activation function, the S-shaped \textit{sigmoid funct
                 \addplot[red, thick, samples=200] {tanh(x)};
             \end{axis}
         \end{tikzpicture}
-    \end{minipage}%
+    \end{minipage}
     \hfill
     \begin{minipage}{0.32\textwidth}
         \centering
@@ -395,7 +371,11 @@ $$\dot{z}=f(z(t),\theta,t).$$
 
 \subsection{Comparing Neural ODEs with ResNet}
 
-According to the previous part, we know that the inspiration for neural ODEs originates from ResNet, where it transforms a discrete function into a continuous one. In ResNet, with $L$ layers, the transition between states from one layer to the next is discrete, and each layer has its own function to alter the current state. However, in an ODE network, it defines a continuous vector field, which essentially represents a neural network with infinitely many layers. The state change can be interpreted as a flow within this vector field.
+According to the previous part, we know that the inspiration for neural ODEs originates from ResNet, where it transforms a discrete function into a continuous one. In a ResNet with $L$ layers, the transition between states from one layer to the next is discrete, and each layer has its own function to alter the current state. However, in an ODE network, it defines a continuous vector field which essentially represents a neural network with infinitely many layers. The state change can be interpreted as a flow within this vector field.
+
+For neural ODE, we want to solve a problem like this: 
+
+We know (or assume) that our data follow an unknown ODE $\dot{z}=f(z(t),t).$, and we are given some observations $(z(t_0),t_0),(z(t_1),t_1),\dots,(z(t_N),t_N)$ along the trajectory; we want to find an approximation $\hat{f}(z(t),\theta,t)$ of the real $f(z(t),t)$. \citationneeded
 
 \begin{figure}[htbp]
     \centering
@@ -404,9 +384,9 @@ According to the previous part, we know that the inspiration for neural ODEs ori
     \label{fig:enter-label}
 \end{figure}
 
-Note that the points in the graph on the right-hand side (ODE network) represent the \textit{observation points}. Observation points are specific points that become the output of the model, usually defined by a sequence of different time steps within the model's time span. This means that if we want the model to have $N$ outputs, we need to have an increasing time sequence $(t_i)_{i=1,\dots ,N}$ within the time span $[t_1,t_N]$. For a vector fed into the neural ODE layer, there would be $N$ outputs from this layer. The output corresponding to time $t_i$ is the value of $z$ at that time. Since all these points are in the same space, each output has the same dimension as the input vector.
+Note that the points in the graph on the right-hand side (ODE network) represent the approximated observation points. They are specific points that become the output of the model; these points can be defined by a sequence of different time stamps. This means that for each example we provide to the model, if we have $N$ observation data points (in the form of $(z(t_i),t_i)$), we want our model to also give $N$ outputs at the corresponding time stamps. This allows us to evaluate our model using all the input training data by calculating the loss function. Those $N$ outputs can be found by first collecting the time sequence $(t_i)_{i=0,\dots,N}$ from the input data, ensuring that it forms an increasing sequence. Then the outputs of the model are $\mathrm{ODESolve}(z(t_0),f,t_0,t_i)_{i=0,\dots ,N}$. Also, the time span for defining a neural ODE would be $[t_0,t_N]$. Since all these points are in the same space, each output has the same dimension as the input vector.
 
-Unlike a neural network, where depth refers to the number of layers, in a neural ODE network, depth can be seen as the number of observation points. Our goal is to find an $f$ that is good enough to predict the output given an input. For a neural network, more layers can help the model fit the training dataset better. Similarly, in an ODE network, more observation points can provide a better understanding of the $f$ we are looking for, allowing the model to better fit the training set.
+Unlike a neural network, where depth refers to the number of layers, in a neural ODE network, depth can be seen as the number of observation points. For a neural network, more layers can help the model fit the training dataset better. Similarly, in an ODE network, more observation points can provide a better understanding of the $f$ we are looking for, allowing the model to fit the training set better.
 
 \subsection{Various Neural ODE Models}
 
@@ -487,7 +467,7 @@ The Runge-Kutta methods can be categorised into two types: \textit{explicit}, wh
     \end{array}
 \end{equation*}
 
-The characteristics specified above make the RK4 method a much stronger algorithm than Euler's method. Given a fixed $h$, while more stages need to be calculated at each iterative step, we note a much better approximation of the solution. Of course, many more sophisticated numerical methods have been developed (such as \texttt{Vern9} \cite{verner2010}) to tackle the approximation of such solutions accurately. These methods give differing levels of accuracy, as seen in Figure \ref{fig:odesolver} (the code for which can be found in Appendix A \textcolor{red}{edit this}), with higher-order approximations clearly giving better approximations. Many of these algorithms can be implemented via packages such as \texttt{DifferentialEquations.jl} in Julia.
+The characteristics specified above make the RK4 method a much stronger algorithm than Euler's method. Given a fixed $h$, while more stages need to be calculated at each iterative step, we note a much better approximation of the solution. Of course, many more sophisticated numerical methods have been developed (such as \texttt{Vern9} \cite{verner2010}) to tackle the approximation of such solutions accurately. These methods give differing levels of accuracy, as seen in Figure \ref{fig:odesolver} (the code for which can be found in Appendix A \citationneeded), with higher order approximations clearly giving better approximations. Many of these algorithms can be implemented via packages such as \texttt{DifferentialEquations.jl} in Julia.
 
 \begin{figure}
     \centering
@@ -575,11 +555,12 @@ points to cover:
     \item \textit{Solve the ODE Problem.} As most ODEs do not have analytical solutions, we make use of numerical ODE solvers to approximate the solution of the system.
 \end{enumerate}
 
-Similar to classical neural networks, our objective is to optimise the parameters in the neural ODE model to better fit the real data. We achieve this by minimising the loss function. Considering our approximation process as a vector field, for an input
-$z(t_0)$, the output produced by this model is $z(t_i)_{i=1,\dots,N}$, with:
-$$z(t_i)=\mathrm{ODESolve}(z(t_0),f,\theta(t),t_0,t_i),\quad i=1,\dots,N$$
+Similar to classical neural networks, our objective is to optimise the parameters in the neural ODE model to better fit the real data. We achieve this by minimising the loss function. Considering our approximation process as a vector field, for an training dataset of form
+$(z(t_0),t_0),(z(t_1),t_1),\dots,(z(t_N),t_N)$, the outputs produced by neural ODE model are $\hat{z}(t_i)_{i=1,\dots,N}$, with:
+$$\hat{z}(t_i)=\mathrm{ODESolve}(z(t_0),f,\theta(t_0),t_0,t_i),\quad i=0,\dots,N$$
 
-So the loss function would be applied to all observation points $z(t_i)_{i=1,\dots,N}$, which means the cost of the model is $\mathcal{L}(z_1,\dots,z_N)$. The next step is to develop a method to update the parameters. It is equivalent to calculate the gradient of the loss function with respect to different parameters in the model, so we can use the gradient to minimise the loss function. For classical neural networks, the computational cost of backpropagation increases as the number of layers increases. In the case of neural ODEs, if we want to perform backpropagation, we use the same method as we do for residual networks; this would be very computationally expensive. Backpropagating through an ODE solver would be very inefficient. This motivates us to use a method to calculate the gradient without needing the explicit solution.
+The loss function would be applied to all observation points $z(t_i)_{i=0,\dots,N}$, which means the cost of the model is $\mathcal{L}(\hat{z}(t_0),\hat{z}(t_1),\dots,\hat{z}(t_N))$. The next step is to develop a method to update the parameters in neural 
+ODE model. It is equivalent to calculate the gradient of the loss function with respect to different parameters, then we can use the gradient to minimise the loss function. For classical neural networks, the computational cost of backpropagation increases as the number of layers increases. In the case of neural ODEs, if we want to perform backpropagation, if we use the same method as we do for residual networks, this would be very computationally expensive. Backpropagating through an ODE solver would also be very inefficient. This motivates us to use a method to calculate the gradient without needing the explicit solution.
 
 \subsubsection{Introduction to the Adjoint Sensitivity Method}
 
@@ -657,7 +638,7 @@ Then we have
 
 So we have shown that $a_{\theta}$ is also a function of $t$ such that $$\frac{\mathrm{d}a_{\theta}(t)}{\mathrm{d}t} = -a(t)\frac{\partial f}{\partial \theta}.$$
 
-Then the first IVP is 
+Then the first initial value problem is 
 $$a_\theta(t_N)=0$$
 \begin{equation}\label{eq6}
     \frac{\mathrm{d}a_{\theta}(t)}{\mathrm{d}t} = -a(t)\frac{\partial f}{\partial \theta}.\tag{6}
@@ -673,7 +654,7 @@ $$
 &=-a(t)\frac{\partial f}{\partial t}.\notag
 \end{align}
 
-So the second IVP is 
+So the second initial value problem is 
 $$a_t(t_N)=-a(t)f(z(t),\theta,t)$$
 \begin{equation}\label{eq7}
     \frac{\mathrm{d}a_t(t)}{\mathrm{d}t} = -a(t)\frac{\partial f}{\partial t}.\tag{7}
@@ -702,37 +683,7 @@ $$
 Thus, we only need to solve this initial value problem. By calling the ODE solver on the augmented adjoint once, we are able to calculate all the necessary gradients with respect to $z(t_0)$, $\theta$, $t_0$ and $t_N$.
 
 \pagebreak
-\section{Application: Continuous Dynamics of Financial Time Series Data}
-
-Financial time series data, such as stock prices and market indices, exhibit continuous dynamics that can be challenging to model accurately. Traditional machine learning models often struggle to capture these dynamics due to their discrete nature. Neural ODEs provide a powerful framework for modelling the continuous evolution of market data by integrating neural network architectures within differential equation solvers. This approach takes advantage of the flexibility of neural networks to capture complex patterns while maintaining the mathematical rigour of differential equations.
-
-\subsection{Neural ODEs and Financial Time Series}
-
-Neural ODEs model the evolution of hidden states \(z(t)\) using differential equations of the form
-$$
-\dot{z} = f\left(z(t), \theta, t\right).
-$$
-
-Here, \(f\) is a neural network with parameters \(\theta\), which captures the underlying dynamics of financial time series data. By embedding the neural network within the ODE framework, neural ODEs can naturally handle the continuous evolution of market data. This is particularly advantageous for modelling financial time series, where capturing the precise timing and value of price changes is crucial.
-
-\subsection{Numerical Methods for Solving ODEs}
-
-Runge-Kutta methods are numerical techniques used to solve ordinary differential equations. These methods (especially RK4) are widely used due to their balance of accuracy and computational efficiency. In the context of neural ODEs, Runge-Kutta methods help in approximating the continuous evolution of hidden states over time. By discretising the time domain and iteratively updating the state variables, these methods ensure stable and accurate solutions, which are essential for reliable financial modelling.
-
-\begin{verbatim}
-using DifferentialEquations, Flux, Optimization, Zygote
-
-# Define the ODE function as a neural network
-function neural_ode_function(du, u, p, t)
-    du .= Flux.dense(p)(u)
-end
-\end{verbatim}
-
-\subsection{Loss Functions and Optimisation}
-
-The loss function in machine learning quantifies the difference between predicted values and actual market data. For financial time series, common choices include mean squared error (MSE) or more sophisticated loss functions that account for financial risk metrics. The loss function drives the optimisation process, guiding the model to learn accurate representations of market dynamics. Gradient descent is the optimisation algorithm used to minimise the loss function. In neural ODEs, the adjoint sensitivity method is employed to efficiently compute gradients with respect to the model parameters, facilitating back-propagation through the ODE solver. Gradient descent updates the parameters \(\theta\) to reduce the loss, iteratively improving the performance of the model.
-
-\subsection{Approaches to Optimisation}
+\section{Application: A Better Digit Classifier}
 
 \pagebreak
 \section{Extension: Neural CDEs}
@@ -743,16 +694,16 @@ As we have seen before, neural networks and differential equations seem to be ir
 
 \subsection{Controlled Differential Equations}
 
-Before defining neural CDEs, it is essential to understand the definition of CDEs. To formally introduce it, we need to introduce a new notion of integration called the Riemann–Stieltjes integral, and a new concept of real functions called bounded variation.
+Before defining neural CDEs, it is essential to understand the definition of CDEs. To formally introduce it, we need to introduce a new notion of integration called the Riemann-Stieltjes integral, and a new concept of real functions called bounded variation.
 
-\definition{(Riemann–Stieltjes integral)}
+\definition{(Riemann-Stieltjes integral)}
 Let $f$ and $g$ be two bounded and real functions defined on $[a,b]$, and let $P=\{a=t_0<t_1<...<t_n=b\}$ be an arbitrary partition on $[a,b]$. $\forall i = 1,...,n$, let $\Delta g_i = g(t_i) - g(t_{i-1})$, $M_i=\mathrm{sup}f(t)$, $m_i=\mathrm{inf}f(t)$, where $t\in[t_{i-1},t_i]$.
 
 We now define the upper and lower ‘Darboux sums’ similar to those in the construction of Riemann integrals as $U(P,f,g)=\Sigma M_i\Delta g_i$ and $L(P,f,g)=\Sigma m_i\Delta g_i$.
 
-If $\mathrm{sup}L(P,f,g)$ and $\mathrm{inf}U(P,f,g)$ exist and they are equal, then denote their common value by $\int^b_af\mathrm{d}g$, or $\int^b_af(t)\mathrm{d}g(t)$, which is the Riemann–Stieltjes integral of $f$ with respect to $g$ on $[a,b]$.
+If $\mathrm{sup}L(P,f,g)$ and $\mathrm{inf}U(P,f,g)$ exist and they are equal, then denote their common value by $\int^b_af\mathrm{d}g$, or $\int^b_af(t)\mathrm{d}g(t)$, which is the Riemann-Stieltjes integral of $f$ with respect to $g$ on $[a,b]$.
 
-In short, the Riemann–Stieltjes integral is just a simple extension of the Riemann integral.
+In short, the Riemann-Stieltjes integral is just a simple extension of the Riemann integral.
 
 \definition{(Bounded variation)}
 The total variation of a real-valued function $f$ on an interval $[a,b]$, denoted by $V_a^b(f)$, is defined as $\mathrm{sup}_{P\in\mathbb{P}}\Sigma_{i=0}^{n_P-1}|f(t_{i+1})-f(t_i)|$, where $\mathbb{P}=\{P=\{a=t_0<t_1<...<t_{n_P}=b\}\}$, the set of all partitions on $[a,b]$.
@@ -766,7 +717,7 @@ A continuous function $y:[a,b]\rightarrow\mathbb{R}^w$ is said to be a solution 
 $$y(a)=y_a, y(t)=y(a)+\int_a^bf(y(s))\mathrm{d}x(s),$$
 where $t\in(a,b].$
 
-In the above controlled integral equation, $\int_a^bf(y(s))\mathrm{d}x(s)$ is a Riemann–Stieltjes integral, and $f(y(s))\mathrm{d}x(s)$ is a matrix vector multiplication.
+In the above controlled integral equation, $\int_a^bf(y(s))\mathrm{d}x(s)$ is a Riemann-Stieltjes integral, and $f(y(s))\mathrm{d}x(s)$ is a matrix vector multiplication.
 
 We can rewrite the above control integral equation as the following control differential equation:
 
@@ -774,7 +725,7 @@ We can rewrite the above control integral equation as the following control diff
     $y(a)=y_a, \mathrm{d}y(t) = f(y(t))\mathrm{d}x(t)$
 \end{center}
 
-Note that the continuity of $f$ and the bounded variation of $x$ guarantee the existence of the Riemann–Stieltjes integral, and the Lipschitz continuity of $f$ satisfies the condition of the Picard–Lindelöf theorem for controlled differential equations. Hence, the solution to this initial value problem is unique. The existence of the integral and the uniqueness of the solution will not be investigated in detail. For interested readers, see a and b for details.
+Note that the continuity of $f$ and the bounded variation of $x$ guarantee the existence of the Riemann-Stieltjes integral, and the Lipschitz continuity of $f$ satisfies the condition of the Picard-Lindelöf theorem for controlled differential equations. Hence, the solution to this initial value problem is unique. The existence of the integral and the uniqueness of the solution will not be investigated in detail. For interested readers, see a and b for details.
 
 From now on, controlled differential equations will be referred to as CDEs and $y(t)$ will be referred to as $y_t$, which is a notation commonly used to describe CDEs.
 
