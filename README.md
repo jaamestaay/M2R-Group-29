@@ -30,7 +30,7 @@ This is the GitHub repository for the MATH50002 Group Research Project (M2R) on 
 3.3 Various Neural ODE Models
 
 - Augmented Neural ODEs
-- Neural ODE with Scientific Machine Learning
+- Neural ODEs with Scientific Machine Learning
 
 ### 4. Solving Neural ODEs (Xinyan, James)
 
@@ -58,11 +58,11 @@ This is the GitHub repository for the MATH50002 Group Research Project (M2R) on 
 
 6.2 Controlled Differential Equations
 
-6.3 Neural CDEs
+6.3 Introduction to Neural CDEs
 
 6.4 Solving Neural CDEs
 
-6.5 Applications
+6.5 Application
 
 ### 7. Conclusion
 

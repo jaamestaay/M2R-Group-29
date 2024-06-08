@@ -394,7 +394,7 @@ Unlike a neural network, where depth refers to the number of layers, in a neural
 
 According to the previous section, 
 
-\subsubsection{Neural ODE with Scientific Machine Learning}
+\subsubsection{Neural ODEs with Scientific Machine Learning}
 
 \pagebreak
 \section{Solving Neural ODEs}
@@ -694,7 +694,7 @@ As we have seen before, neural networks and differential equations seem to be ir
 
 \subsection{Controlled Differential Equations}
 
-Before defining neural CDEs, it is essential to understand the definition of CDEs. To formally introduce it, we need to introduce a new notion of integration called the Riemann-Stieltjes integral, and a new concept of real functions called bounded variation.
+Before defining neural CDEs, it is essential to understand the definition of CDEs. To formally introduce it, we need to introduce a new notion of integration called the Riemann-Stieltjes integral and a new concept of real functions called bounded variation.
 
 \definition{(Riemann-Stieltjes integral)}
 Let $f$ and $g$ be two bounded and real functions defined on $[a,b]$, and let $P=\{a=t_0<t_1<...<t_n=b\}$ be an arbitrary partition on $[a,b]$. $\forall i = 1,...,n$, let $\Delta g_i = g(t_i) - g(t_{i-1})$, $M_i=\mathrm{sup}f(t)$, $m_i=\mathrm{inf}f(t)$, where $t\in[t_{i-1},t_i]$.
@@ -729,7 +729,7 @@ Note that the continuity of $f$ and the bounded variation of $x$ guarantee the e
 
 From now on, controlled differential equations will be referred to as CDEs and $y(t)$ will be referred to as $y_t$, which is a notation commonly used to describe CDEs.
 
-\subsection{Neural CDEs}
+\subsection{Introduction to Neural CDEs}
 
 One fundamental assumption of neural CDEs is that the data we observe should form a continuous path $X:[a,b]\rightarrow\mathbb{R}^v$ with bounded variation. This assumption is made simply for theoretical purposes, i.e. the continuous data correspond to an evolutionary process or control path in the neural CDE. However, it is worthwhile to note that it is highly unlikely to observe data in such a form in real-life applications, and thus a trick that converts discrete observations to a continuous control path would be introduced in later parts. Let us now formulate the definition of neural CDEs rigorously, and then it will be clear that neural CDE is the continuous analogue to the recurrent neural network.
 
@@ -745,7 +745,7 @@ From the above CDE, we may conclude that the hidden state $Z_t$ of the recurrent
 
 \subsection{Solving Neural CDEs}
 
-It is theoretically possible to directly solve a CDE $\mathrm{d}y_t = f(y_t)\mathrm{d}x_t$ with a given initial condition by discretisation. In particular, one could use the following modification of the Euler method to obtain a numerical solution: $y_{i+1}=y_i+f_\theta(y_i)(x(t_{i+1})-x(t_j))$.
+It is theoretically possible to directly solve a CDE $\mathrm{d}y_t = f(y_t)\mathrm{d}x_t$ with a given initial condition by discretisation. In particular, one could use the following modification of the Euler's method to obtain a numerical solution: $y_{i+1}=y_i+f_\theta(y_i)(x(t_{i+1})-x(t_j))$.
 
 CDEs are much harder to solve than ODEs since there is a control term introduced in the equation. For the general case, we do not know whether the control path $x_t$ is differentiable or not. Using powerful tools from rough path theory, one can derive an elegant result called the \textit{log-ODE method}, which approximates the CDE by an ODE containing the log-signature of the control path. The details of the log-ODE method are omitted, since the statement and proof of this result would take up too much space in this report. For interested readers, see c for details.
 
@@ -753,7 +753,7 @@ Despite the fact that the log-ODE method can be used to solve CDEs under any cir
 
 Also, note that the backpropagation through CDE is similar to that of ODE. In particular, the discretise-then-optimise method is exactly the same as that of ODE, and the optimise-then-discretise method is similar to that of ODE. Since the proofs are very similar, we omit them here.
 
-\subsection{Applications}
+\subsection{Application}
 
 It is possible to use neural ODEs to model time series data. However, neural ODEs become less useful when it comes to irregularly sampled time series data. In this final subsection, we propose a naive version using neural CDEs to model financial time series data.
 
