@@ -704,19 +704,20 @@ Thus, we only need to solve this initial value problem. By calling the ODE solve
 
 \pagebreak
 \section{Application: Continuous Dynamics of Financial Time Series Data}
-Financial time series data, such as stock prices and market indices, exhibit continuous dynamics that can be challenging to model accurately. Traditional machine learning models often struggle to capture these dynamics due to their discrete nature. Neural Ordinary Differential Equations (Neural ODEs) provide a powerful framework for modeling the continuous evolution of market data by integrating neural network architectures within differential equation solvers. This approach leverages the flexibility of neural networks to capture complex patterns while maintaining the mathematical rigor of differential equations.
 
+Financial time series data, such as stock prices and market indices, exhibit continuous dynamics that can be challenging to model accurately. Traditional machine learning models often struggle to capture these dynamics due to their discrete nature. Neural ODEs provide a powerful framework for modelling the continuous evolution of market data by integrating neural network architectures within differential equation solvers. This approach takes advantage of the flexibility of neural networks to capture complex patterns while maintaining the mathematical rigour of differential equations.
 
 \subsection{Neural ODEs and Financial Time Series}
+
 Neural ODEs model the evolution of hidden states \(z(t)\) using differential equations of the form:
 \[
-\frac{dz(t)}{dt} = f(z(t), \theta, t)
+\frac{\mathrm{d}z(t)}{\mathrm{d}t} = f(z(t), \theta, t)
 \]
-Here, \(f\) is a neural network with parameters \(\theta\), which captures the underlying dynamics of the financial time series data. By embedding the neural network within the ODE framework, Neural ODEs can naturally handle the continuous evolution of market data. This is particularly advantageous for modeling financial time series, where capturing the precise timing and value of price changes is crucial.
+Here, \(f\) is a neural network with parameters \(\theta\), which captures the underlying dynamics of financial time series data. By embedding the neural network within the ODE framework, neural ODEs can naturally handle the continuous evolution of market data. This is particularly advantageous for modelling financial time series, where capturing the precise timing and value of price changes is crucial.
 
 \subsection{Numerical Methods for Solving ODEs}
-Runge-Kutta methods are numerical techniques used to solve ordinary differential equations (ODEs). These methods (especially RK4) are widely used due to their balance of accuracy and computational efficiency. In the context of Neural ODEs, Runge-Kutta methods help in approximating the continuous evolution of the hidden states over time. By discretizing the time domain and iteratively updating the state variables, these methods ensure stable and accurate solutions, which are essential for reliable financial modeling.
 
+Runge-Kutta methods are numerical techniques used to solve ordinary differential equations. These methods (especially RK4) are widely used due to their balance of accuracy and computational efficiency. In the context of neural ODEs, Runge-Kutta methods help in approximating the continuous evolution of hidden states over time. By discretising the time domain and iteratively updating the state variables, these methods ensure stable and accurate solutions, which are essential for reliable financial modelling.
 
 \begin{verbatim}
 using DifferentialEquations, Flux, Optim, Zygote
@@ -727,12 +728,11 @@ function neural_ode_function(du, u, p, t)
 end
 \end{verbatim}
 
+\subsection{Loss Functions and Optimisation}
 
-\subsection{Loss Functions and Optimization}
-The loss function in machine learning quantifies the difference between the predicted values and the actual market data. For financial time series, common choices include Mean Squared Error (MSE) or more sophisticated loss functions that account for financial risk metrics. The loss function drives the optimization process, guiding the model to learn accurate representations of the market dynamics. Gradient descent is the optimization algorithm used to minimize the loss function. In Neural ODEs, the adjoint sensitivity method is employed to efficiently compute gradients with respect to the model parameters, facilitating back-propagation through the ODE solver. Gradient descent updates the parameters \(\theta\) to reduce the loss, iteratively improving the model's performance.
+The loss function in machine learning quantifies the difference between predicted values and actual market data. For financial time series, common choices include Mean Squared Error (MSE) or more sophisticated loss functions that account for financial risk metrics. The loss function drives the optimisation process, guiding the model to learn accurate representations of market dynamics. Gradient descent is the optimisation algorithm used to minimise the loss function. In neural ODEs, the adjoint sensitivity method is employed to efficiently compute gradients with respect to the model parameters, facilitating back-propagation through the ODE solver. Gradient descent updates the parameters \(\theta\) to reduce the loss, iteratively improving the performance of the model.
 
-
-\subsection{Approaches to Optimization}
+\subsection{Approaches to Optimisation}
 
 \pagebreak
 \section{Extension: Neural CDEs}
@@ -800,7 +800,7 @@ CDEs are much harder to solve than ODEs since there is a control term introduced
 
 Despite the fact that the log-ODE method can be used to solve CDEs under any circumstances, the log-ODE method is quite complicated to implement numerically. Fortunately, it can be cleverly avoided in terms of applications. By a standard treatment common in numerical analysis, we can guarantee that the control path $x_t$ is continuously differentiable. We defer the discussion of this technique to later parts of this report. In this case, the CDE can be shown to be equivalent to the following non-autonomous ODE: $\mathrm{d}y_t=g(t,y_t)\mathrm{d}t$, where $g(t,y_t)=f(y_t)\frac{\mathrm{d}x_t}{\mathrm{d}t}$. Then, we can solve this ODE using methods explained in Section 4 of this report.
 
-Also, note that the backpropagation through CDE is similar to that of ODE. In particular, the discretise-then-optimise method is exactly the same as that of ODE, and the optimise-then-discretise method is similar to that of ODE. Since the proofs are very similar, we omit the proof here.
+Also, note that the backpropagation through CDE is similar to that of ODE. In particular, the discretise-then-optimise method is exactly the same as that of ODE, and the optimise-then-discretise method is similar to that of ODE. Since the proofs are very similar, we omit them here.
 
 \subsection{Applications}
 
@@ -808,7 +808,7 @@ It is possible to use neural ODEs to model time series data. However, neural ODE
 
 In the context of financial time series, the input data consists of a sequence of discrete data points $(t_i,x_i)$. As mentioned in the previous subsection, it is possible to construct a continuous control path based on these discrete data points. To do so, we need to employ a standard technique from numerical analysis, called \textit{cubic spline}.
 
-\definition{Cubic splines}
+\definition{(Cubic spline)}
 
 \pagebreak
 \section{Conclusion}
