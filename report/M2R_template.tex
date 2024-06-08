@@ -281,6 +281,7 @@ plot!(x, vec(model(x', ret.u, st)[1]), label = "Predicted")
 This is a pretty impressive result that demonstrates the power of neural networks in terms of regression. In fact, compared to the least squares method, the neural network method is better in terms of flexibility and adaptability. However, one particular disadvantage of neural networks is the model interpretability because understanding the internal workings and the contribution of each feature is difficult.
 
 \subsection{Example: Classification}
+\label{sec:cla}
 
 Classification is another application of neural networks. It involves using a neural network to assign labels to input data based on some patterns learnt during the training process. A classic example is digit recognition based on the \textit{MNIST} (Modified National Institute of Standards and Technology) database. This database presents a large collection of handwritten digits given in pixels. The task is to learn from the database and classify the digits.
 
@@ -685,6 +686,8 @@ Thus, we only need to solve this initial value problem. By calling the ODE solve
 \section{Application: A Better Digit Classifier}
 \label{sec:app}
 
+In this section, we return our attention to the example we considered in Section \ref{sec:cla}, in which we implemented a digit classifier with around $80\%$ accuracy using classic neural networks. With the help of neural ODEs, we shall implement a better version of this. The idea is largely taken from Lab 6 of the SciMLSANUM2024 workshop \hyperlink{https://github.com/dlfivefifty/SciMLSANUM2024/blob/main/labs/lab6s.ipynb}{here}.
+
 \pagebreak
 \section{Extension: Neural CDEs}
 
@@ -759,7 +762,7 @@ It is possible to use neural ODEs to model time series data. However, neural ODE
 
 In the context of financial time series, the input data consists of a sequence of discrete data points $\left(t_i,x_i\right)$. As mentioned in the previous subsection, it is possible to construct a continuous control path based on these discrete data points. To do so, we need to employ a standard technique from numerical analysis, called \textit{cubic spline}. 
 
-\subsubsection{Introduction to Cubic Splines}
+\subsubsection{Cubic Splines}
 
 In the second-year numerical analysis course, we have learnt about Lagrange basis polynomials and how they can be used to interpolate data. However, when an additional data point is added to the original set of data points, the existing Lagrange polynomials would have to be recalculated. This makes Lagrange basis polynomials computationally inefficient. We seek an alternative set of basis polynomials for interpolation, called \textit{Newton basis polynomials}.
 
