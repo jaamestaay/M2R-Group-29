@@ -6,61 +6,66 @@ This is the GitHub repository for the MATH50002 Group Research Project (M2R) on 
 
 ### 1. Introduction
 
-### 2. Basic Neural Network Theory
+### 2. Basic Neural Networks (Jiaru)
 
-2.1 Definition and Implementation of Basic Neural Networks (Jiaru)
+2.1 History
 
-- History
-- Basic Concepts
-- Basic Applications (Regression, Classification)
+2.2 Concepts
 
-### 3. Introduction to Neural ODEs/CDEs
+- Structure
+- Activation Function
+- Types
+- Gradient Descent
 
-3.1 Definition of Neural ODEs (Xinyan)
+2.3 Example: Regression
 
-- Construction of Neural ODEs
-- Why Neural ODEs may be advantageous compared to other formulations
+2.4 Example: Classification
 
-### 4. Solving Neural ODEs
+### 3. Introduction to Neural ODEs (Xinyan)
 
-4.1 An elaboration of the steps taken to train and solve a Neural ODE (James)
+3.1 Motivation
 
-- Loss Functions and Minima
+3.2 Comparing Neural ODEs with ResNet
+
+3.3 Various Neural ODE Models
+
+- Augmented Neural ODEs
+- Neural ODE with Scientific Machine Learning
+
+### 4. Solving Neural ODEs (Xinyan, James)
+
+4.1 Numerical Methods
+
+- Runge-Kutta Methods
+- Loss Functions
+- Gradient Descent and Applications
+
+4.2 Discretise-then-Optimise (DO)
+
 - Automatic Differentiation
-- Gradient Descent and its Applications in Neural ODEs
 
-4.2 Back-propagation
+4.3 Optimise-then-Discretise (OD)
 
-- Discretise-then-optimise (James)
-- Optimise-then-discretise: Adjoint Equation (Xinyan)
+- Introduction to the Adjoint Sensitivity Method
+- Continuous Backpropagation
+- Gradient wrt. $\theta$ and $t$
 
-4.3 Numerical Solvers (James)
-
-- Implicit Solvers (and why we don't use them)
-- Euler's Method and Runge-Kutta Methods
-- Heun's Method
-- Other methods if time permits
-
-### 5. An Application: Time Series Analysis
+### 5. Application: A Better Digit Classifier (Jiankuan, Jiaru)
 
 ### 6. Extension: Neural CDEs (Tianshi)
 
-6.1 Definition and Formulation
+6.1 Motivation
 
-- Motivation for Neural CDEs
-- Neural ODEs vs CDEs: Advantages and Disadvantages
-- Why Neural CDEs may be advantageous compared to other formulations for problems
-- Natural cubic splines for continuous path $X_t$
+6.2 Controlled Differential Equations
 
-6.2 Solving Neural CDEs
+6.3 Neural CDEs
 
-- Optimise-then-discretise: Adjoint Equation for CDE (proof)
-- log ODE Method (no proof, just statement)
-- State it for completeness
-- Mention that it can be cleverly avoided provided that we choose a continuously differentiable control path
+6.4 Solving Neural CDEs
 
-6.3 Applications
-
-- Time Series (Part of it might be a rough sketch of pseudocode/algorithm)
+6.5 Applications
 
 ### 7. Conclusion
+
+### Acknowledgement
+
+### Appendix
