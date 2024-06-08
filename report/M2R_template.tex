@@ -422,9 +422,7 @@ Unlike a neural network, where depth refers to the number of layers, in a neural
 
 Solving differential equations is a difficult procedure in general, requiring a great deal of effort in existence theorems and techniques. Solving neural ODEs therefore poses a significant challenge in itself. Having defined basic neural network and neural ODE theory, we now turn our attention to the steps required to solve such problems numerically.
 
-Consider a neural ODE defined by a neural network $f$. This gives us the differential equation of the system $\dot{z}=f(z(t),\theta,t)$. There are two predominant methods for solving neural ODEs, known as Discretise-then-Optimise (DO) and Optimise-then-Discretise (OD). These methods will be elaborately described later on.
-
-For now, we introduce the ideas of discretising and optimising to provide a general understanding of the techniques required. Discretisation (of the neural ODE) involves solving the ODE numerically. These involve breaking the (continuous) differential equation into discrete time steps and employing numerical methods to calculate the solution at each time step. Optimisation, on the other hand, involves deriving the parameters $\theta$ that minimise some loss function of our choice. 
+Consider a neural ODE defined by a neural network $f$. This gives us the differential equation of the system $\dot{z}=f(z(t),\theta,t)$. There are two predominant methods for solving neural ODEs, known as Discretise-then-Optimise (DO) and Optimise-then-Discretise (OD) \cite{kidger2022neural}. For now, we introduce the ideas of discretising and optimising to provide a general understanding of the techniques required. Discretisation (of the neural ODE) involves solving the ODE numerically. These involve breaking the (continuous) differential equation into discrete time steps and employing numerical methods to calculate the solution at each time step. Optimisation, on the other hand, involves deriving the parameters $\theta$ that minimise some loss function of our choice. 
 
 As such, the two methods for solving neural ODEs require similar numerical methods, albeit used in different contexts. Section \ref{sec:nummethods} aims to introduce these ideas, before Sections \ref{sec:do} and \ref{sec:od} describing their applications in DO and OD respectively - specifically detailing the method of calculating gradients used in their optimisation processes. The two sections also discuss the advantages and disadvantages of each method.
 
@@ -448,19 +446,16 @@ The final term in the iterative process is known as the \textit{error term}. We 
 
 We note several characteristics of Euler's method:
 \begin{itemize}
-    \item It is a \textit{first order} approximation, that is, the error of the approximation to the true value is at most linear with respect to $h$. This can be seen from the iterative step as 
-    $$
-    \frac{z(t_{i+1}) - z(t_i)}{h} = f(z(t_i),\theta,t_i) + O(h)
-    $$
+    \item It is a \textit{first order} approximation, that is, the error of the approximation to the true value is at most linear with respect to $h$. This can be seen from the iterative step as $\frac{z(t_{i+1}) - z(t_i)}{h} = f(z(t_i),\theta,t_i) + O(h)$.
     \item It is a \textit{1-stage} method, in which we only required 1 computation of $f$ at a single point, namely $t_i$ in the iterative step. In a perhaps unintuitive way, we can redefine the iterative step as 
     \begin{align*}
-        z(t_{i+1}) &= z(t_i) + h\sum_{j=1}^1 b_j k_j, \\
-        k_j &= f\left(z(t_i) + h\sum_{l=1}^1 a_{jl}k_l, \theta, t_i + hc_j\right), \\
-        a_{11} &= 0, b_1 = 1, c_1 = 0
+        z(t_{i+1}) &= z(t_i) + h b_1 k_1, \\
+        k_1 &= f\left(z(t_i) + h a_{11}k_1, \theta, t_i + hc_1\right)
     \end{align*}
+    where $a_{11} = 0, b_1 = 1, c_1 = 0$.
 \end{itemize}
 
-These characteristics point toward possible limitations of Euler's method in approximating solutions to initial value problems. The errors of each iterative step can accumulate and result in large errors further away from the initial value. This necessitates having a sufficiently small $h$ for an accurate computation, increasing the computational cost. Furthermore, the assumption of evaluating the derivative (and thus $f$) in the current step $t_i$ might not be an accurate and reliable method to approximate the next step $t_{i+1}$. These limitations call for more robust and computationally efficient algorithms to approximate such solutions. One such class of methods, which extends fairly nicely from Euler's method, are the \textit{Runge-Kutta methods}.
+These characteristics point toward possible limitations of Euler's method in approximating solutions to initial value problems. The errors of each iterative step can accumulate and result in large errors further away from the initial value. This necessitates having a sufficiently small $h$ for an accurate computation, increasing the computational cost. Furthermore, the assumption of evaluating the derivative (and thus $f$) in the current step $t_i$ might not be an accurate and reliable method to approximate the next step $t_{i+1}$. These limitations call for more robust and computationally efficient algorithms to approximate such solutions. One such class of methods, which extends fairly nicely from Euler's method, are the \textit{Runge-Kutta methods} \cite{sulimayers2003}.
 
 \begin{definition}[Runge-Kutta methods]
     Given points $t_i = a + ih \in \left[a, b\right]$, $i = 0, 1, \dots, N - 1$, $h = \frac{b-a}{N}$, we define an $s$\textit{-stage Runge-Kutta method} that solves the initial value problem $\dot{z}= f(z(t), \theta,t)$, $z(t_0) = z_0$ with iterative step
@@ -480,9 +475,7 @@ These characteristics point toward possible limitations of Euler's method in app
     \end{equation*}
 \end{definition}
 
-The Runge-Kutta methods can be categorised into two types: \textit{explicit}, where the matrix $\mathbf{A}$ defined by the Butcher tableau of the method is lower triangular, and \textit{implicit}, where there is no restriction on the structure of the matrix $\mathbf{A}$. 
-
-The most common example of a higher order Runge-Kutta method is the widely studied \textit{RK4 method}. It is a $4$-stage explicit Runge-Kutta method and is a fourth-order approximation. Its Butcher's tableau is specified as
+The Runge-Kutta methods can be categorised into two types: \textit{explicit}, where the matrix $\mathbf{A}$ defined by the Butcher tableau of the method is lower triangular, and \textit{implicit}, where there is no restriction on the structure of the matrix $\mathbf{A}$. The most common example of a higher order Runge-Kutta method is the widely studied \textit{RK4 method} \cite{rungekuttasolvers}. It is a $4$-stage explicit Runge-Kutta method and is a fourth-order approximation. Its Butcher's tableau is specified as
 \begin{equation*}
     \begin{array}{c|cccc}
         0  \\
@@ -494,18 +487,16 @@ The most common example of a higher order Runge-Kutta method is the widely studi
     \end{array}
 \end{equation*}
 
-The characteristics specified above make the RK4 method a much stronger algorithm than Euler's method. Given a fixed $h$, while more stages need to be calculated at each iterative step, we note a much better approximation of the solution. Of course, many more sophisticated numerical methods have been developed (such as \texttt{Vern9}) \textcolor{red}{probably add some citations of better ones} to tackle the approximation of such solutions accurately. These methods give differing levels of accuracy, as seen in Figure \ref{fig:odesolver} (the code for which can be found in Appendix A \textcolor{red}{edit this}), with higher-order approximations clearly giving better approximations.
+The characteristics specified above make the RK4 method a much stronger algorithm than Euler's method. Given a fixed $h$, while more stages need to be calculated at each iterative step, we note a much better approximation of the solution. Of course, many more sophisticated numerical methods have been developed (such as \texttt{Vern9} \cite{verner2010}) to tackle the approximation of such solutions accurately. These methods give differing levels of accuracy, as seen in Figure \ref{fig:odesolver} (the code for which can be found in Appendix A \textcolor{red}{edit this}), with higher-order approximations clearly giving better approximations. Many of these algorithms can be implemented via packages such as \texttt{DifferentialEquations.jl} in Julia.
 
 \begin{figure}
     \centering
     \includegraphics[width=0.5\textwidth]{report/figures/ODESolvers.png}
-    \caption{A comparison of ODE Solvers used to solve the differential equation $\dot{z} = \cos(t)z$.}
+    \caption{A comparison of ODE Solvers used to solve the differential equation $\dot{z} = \cos(t)z$. The errors were calculated by adding the absolute differences of the actual solution and the approximations at discrete times $\{0, 0.1, \dots, 9.9, 10.0\}$.}
     \label{fig:odesolver}
 \end{figure}
 
-With such a wide range of numerical methods, there is much consideration in which method is best. One such consideration is the \textit{absolute stability} of the numerical method. This is an especially important consideration when dealing with stiff ODEs, where the eigenvalues of the linear approximations of $f$ are all negative, with a large ratio between the maximum and minimum real values of the set of eigenvalues. These give rise to numerical instabilities to the numerical methods introduced thus far - essentially requiring an extremely (and thus inefficiently) small value of $h$. A possible alternative to this is to use implicit methods instead. In the context of the Runge-Kutta methods, this means removing the restriction that the matrix $\mathbb{A}$ must be lower triangular. It can be proven that such methods actually have an \textit{unbounded region of absolute stability}, as compared to explicit Runge-Kutta methods which have \textcolor{red}{add citation, Cambridge press thing} \textit{bounded regions of absolute stability}. There is, however, a trade-off for using such implicit methods. The derivation of $k_1, \dots, k_s$ in implicit methods requires solving the $s$ equations simultaneously, instead of in succession as seen in explicit methods. This requires more computational power and might make computation inefficient.
-
-\textcolor{red}{TALK ABOUT THE MODULE THEY CAN BE FOUND IN}
+With such a wide range of numerical methods, there is much consideration in which method is best. One such consideration is the \textit{absolute stability} of the numerical method. This is an especially important consideration when dealing with stiff ODEs, where the eigenvalues of the linear approximations of $f$ are all negative, with a large ratio between the maximum and minimum real values of the set of eigenvalues. These give rise to numerical instabilities to the numerical methods introduced thus far - essentially requiring an extremely (and thus inefficiently) small value of $h$. A possible alternative to this is to use implicit methods instead. In the context of the Runge-Kutta methods, this means removing the restriction that the matrix $\mathbb{A}$ must be lower triangular. It can be proven that such methods have an \textit{unbounded region of absolute stability}, as compared to explicit Runge-Kutta methods which have \textit{bounded regions of absolute stability} \cite{sulimayers2003}. There is, however, a trade-off for using such implicit methods. The derivation of $k_1, \dots, k_s$ in implicit methods requires solving the $s$ equations simultaneously, instead of in succession as seen in explicit methods. This requires more computational power and might make computation inefficient.
 
 \subsubsection{Loss Functions}
 
@@ -532,7 +523,7 @@ Of course, the precise definition of the loss function depends on the optimisati
 
 These loss functions are dependent on $\hat{y}_i$ which in turn is dependent on $\theta$. Given the context of optimisation problems, we want to find $\hat{\theta}$ that produces $\hat{y}_i$, giving the global minimum of $\mathcal{L}(\mathbf{y}, \mathbf{\hat{y}})$. Thus, choosing a loss function that can produce convergence to the global minimum efficiently is of utmost importance. This means that convex functions (which, by definition, can only have one minimum, the global minimum) are generally favoured over non-convex functions, which have multiple (local) minima that an algorithm might get stuck in. We note that only (6) from Table \ref{tab:lfd} is non-convex, which will require more sophisticated methods to more efficiently locate the global minimum. Such methods are discussed in Section \ref{sec:gd}.
 
-Studies have been conducted to consider the theoretical performances of each of these commonly used loss functions, namely the upper bounds of their rates of convergence (which imply their efficiency) \textcolor{red}{insert citation, Are all Loss Functions the same?}. We note that the $L^2$-norm actually has a much slower convergence in both regression and classification problems compared to other convex loss functions discussed.
+Studies have been conducted to consider the theoretical performances of each of these commonly used loss functions, namely the upper bounds of their rates of convergence (which imply their efficiency). We note that the $L^2$-norm actually has a much slower convergence in both regression and classification problems compared to other convex loss functions discussed \cite{Rosasco2004}.
 
 \subsubsection{Gradient Descent and Applications}
 \label{sec:gd}
@@ -712,7 +703,36 @@ $$
 Thus, we only need to solve this initial value problem. By calling the ODE solver on the augmented adjoint once, we are able to calculate all the necessary gradients with respect to $z(t_0)$, $\theta$, $t_0$ and $t_N$.
 
 \pagebreak
-\section{Application (Jiankuan Liu's Part)}
+\section{Application: Continuous Dynamics of Financial Time Series Data}
+Financial time series data, such as stock prices and market indices, exhibit continuous dynamics that can be challenging to model accurately. Traditional machine learning models often struggle to capture these dynamics due to their discrete nature. Neural Ordinary Differential Equations (Neural ODEs) provide a powerful framework for modeling the continuous evolution of market data by integrating neural network architectures within differential equation solvers. This approach leverages the flexibility of neural networks to capture complex patterns while maintaining the mathematical rigor of differential equations.
+
+
+\subsection{Neural ODEs and Financial Time Series}
+Neural ODEs model the evolution of hidden states \(z(t)\) using differential equations of the form:
+\[
+\frac{dz(t)}{dt} = f(z(t), \theta, t)
+\]
+Here, \(f\) is a neural network with parameters \(\theta\), which captures the underlying dynamics of the financial time series data. By embedding the neural network within the ODE framework, Neural ODEs can naturally handle the continuous evolution of market data. This is particularly advantageous for modeling financial time series, where capturing the precise timing and value of price changes is crucial.
+
+\subsection{Numerical Methods for Solving ODEs}
+Runge-Kutta methods are numerical techniques used to solve ordinary differential equations (ODEs). These methods (especially RK4) are widely used due to their balance of accuracy and computational efficiency. In the context of Neural ODEs, Runge-Kutta methods help in approximating the continuous evolution of the hidden states over time. By discretizing the time domain and iteratively updating the state variables, these methods ensure stable and accurate solutions, which are essential for reliable financial modeling.
+
+
+\begin{verbatim}
+using DifferentialEquations, Flux, Optim, Zygote
+
+# Define the ODE function as a neural network
+function neural_ode_function(du, u, p, t)
+    du .= Flux.dense(p)(u)
+end
+\end{verbatim}
+
+
+\subsection{Loss Functions and Optimization}
+The loss function in machine learning quantifies the difference between the predicted values and the actual market data. For financial time series, common choices include Mean Squared Error (MSE) or more sophisticated loss functions that account for financial risk metrics. The loss function drives the optimization process, guiding the model to learn accurate representations of the market dynamics. Gradient descent is the optimization algorithm used to minimize the loss function. In Neural ODEs, the adjoint sensitivity method is employed to efficiently compute gradients with respect to the model parameters, facilitating back-propagation through the ODE solver. Gradient descent updates the parameters \(\theta\) to reduce the loss, iteratively improving the model's performance.
+
+
+\subsection{Approaches to Optimization}
 
 \pagebreak
 \section{Extension: Neural CDEs}
@@ -776,7 +796,7 @@ From the above CDE, we may conclude that the hidden state $Z_t$ of the recurrent
 
 It is theoretically possible to directly solve a CDE $\mathrm{d}y_t = f(y_t)\mathrm{d}x_t$ with a given initial condition by discretisation. In particular, one could use the following modification of the Euler method to obtain a numerical solution: $y_{i+1}=y_i+f_\theta(y_i)(x(t_{i+1})-x(t_j))$.
 
-CDEs are much harder to solve than ODEs since there is a control term introduced in the equation. For the general case, we don't know whether the control path $x_t$ is differentiable or not. Using powerful tools from rough path theory, one can derive an elegant result called the \textit{log-ODE method}, which approximates the CDE by an ODE containing the log-signature of the control path. The details of the log-ODE method are omitted, as the statement and proof of this result would take up too much space in this report. For interested readers, see c for details.
+CDEs are much harder to solve than ODEs since there is a control term introduced in the equation. For the general case, we don't know whether the control path $x_t$ is differentiable or not. Using powerful tools from rough path theory, one can derive an elegant result called the \textit{log-ODE method}, which approximates the CDE by an ODE containing the log-signature of the control path. The details of the log-ODE method are omitted, since the statement and proof of this result would take up too much space in this report. For interested readers, see c for details.
 
 Despite the fact that the log-ODE method can be used to solve CDEs under any circumstances, the log-ODE method is quite complicated to implement numerically. Fortunately, it can be cleverly avoided in terms of applications. By a standard treatment common in numerical analysis, we can guarantee that the control path $x_t$ is continuously differentiable. We defer the discussion of this technique to later parts of this report. In this case, the CDE can be shown to be equivalent to the following non-autonomous ODE: $\mathrm{d}y_t=g(t,y_t)\mathrm{d}t$, where $g(t,y_t)=f(y_t)\frac{\mathrm{d}x_t}{\mathrm{d}t}$. Then, we can solve this ODE using methods explained in Section 4 of this report.
 
@@ -784,9 +804,11 @@ Also, note that the backpropagation through CDE is similar to that of ODE. In pa
 
 \subsection{Applications}
 
-Given a
+It is possible to use neural ODEs to model time series data. However, neural ODEs become less useful when it comes to irregularly sampled time series data. In this final subsection, we propose a naive version using neural CDEs to model financial time series data.
 
-To do so, we need to employ a standard technique from numerical analysis, called \textit{cubic spline}. The only thing that we need to know is that cubic splines are continuously differentiable.
+In the context of financial time series, the input data consists of a sequence of discrete data points $(t_i,x_i)$. As mentioned in the previous subsection, it is possible to construct a continuous control path based on these discrete data points. To do so, we need to employ a standard technique from numerical analysis, called \textit{cubic spline}.
+
+\definition{Cubic splines}
 
 \pagebreak
 \section{Conclusion}
