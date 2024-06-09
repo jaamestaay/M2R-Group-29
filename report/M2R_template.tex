@@ -867,18 +867,25 @@ The table of divided differences provides a visualisation of the process of comp
 \begin{proof}
     Let $s$ be an arbitrary node (a \textit{time point} in the context of time series) not equal to any one of $t_0,t_1,\dots,t_k$.
     
-    By the definition of the Newton polynomial, we have $N_{k+1}(f;t_0,t_1,\dots,t_k,s;t)=N_k(f;t)+[t_0,t_1,\dots,t_k,s]f\prod_{i=0}^k(t-t_i).$
+    By the definition of the Newton polynomial, we have
+    $$N_{k+1}(f;t_0,t_1,\dots,t_k,s;t)=N_k(f;t)+[t_0,t_1,\dots,t_k,s]f\prod_{i=0}^k(t-t_i).$$
     
-    Inserting $t=s$ yields $f(s)=N_k(f;s)+[t_0,t_1,\dots,t_k,s]f\prod_{i=0}^k(s-t_i).$
+    Inserting $t=s$ yields
+    $$f(s)=N_k(f;s)+[t_0,t_1,\dots,t_k,s]f\prod_{i=0}^k(s-t_i).$$
 
-    As the choice of $s$ is arbitrary, we can change the notation from $s$ back to $t$, and thus $f(t)-N_k(f;t)=[t_0,t_1,\dots,t_k,s]f\prod_{i=0}^k(t-t_i).$
+    As the choice of $s$ is arbitrary, we can change the notation from $s$ back to $t$, and thus
+    $$f(t)-N_k(f;t)=[t_0,t_1,\dots,t_k,s]f\prod_{i=0}^k(t-t_i).$$
 
-    Now we quote without proof a classical result about the error of the interpolation: $f(t)-N_k(f;t)=\frac{f^{(k+1)}(\xi(t))}{(k+1)!}\prod_{i=0}^k(t-t_i),$
+    Now we quote without proof a classical result about the error of the interpolation:
+    $$f(t)-N_k(f;t)=\frac{f^{(k+1)}(\xi(t))}{(k+1)!}\prod_{i=0}^k(t-t_i),$$
     where $\xi(t)$ is strictly between the smallest and the largest of these nodes.
 
-    Comparing the two results, we have $[t_0,t_1,\dots,t_k,s]f=\frac{f^{(k+1)}(\xi(t)}{(k+1)!}.$
+    Comparing the two results, we have
+    $$[t_0,t_1,\dots,t_k,s]f=\frac{f^{(k+1)}(\xi(t)}{(k+1)!}.$$
     
-    By letting $t=t_{k+1}$ and replacing $k+1$ by $k$, we obtain $[t_0,t_1,\dots,t_k]f=\frac{1}{k!}f^{(k)}(\xi)$, where $\xi$ is defined similarly as before.
+    By letting $t=t_{k+1}$ and replacing $k+1$ by $k$, we obtain
+    $$[t_0,t_1,\dots,t_k]f=\frac{1}{k!}f^{(k)}(\xi),$$
+    where $\xi$ is defined similarly as before.
 
     Finally, we let $t_1,\dots,t_k\rightarrow t_0$. Then, by the definition of $\xi$, $\xi\rightarrow t_0$, which yields the result.
 \end{proof}
