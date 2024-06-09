@@ -696,16 +696,6 @@ To start, we need to import some essential packages. We will use the \verb|Diffe
 using DifferentialEquations, DiffEqFlux, Lux, MLDatasets
 \end{verbatim}
 
-We load and preprocess the MNIST dataset as before:
-
-\begin{verbatim}
-x_train, y_train = MLDatasets.MNIST.traindata(Float32)
-x_test, y_test = MLDatasets.MNIST.testdata(Float32)
-x_train_flat = Flux.flatten(x_train)
-x_test_flat = Flux.flatten(x_test)
-dataset = [(x_train_flat, Flux.onehotbatch(y_train, 0:9))]
-\end{verbatim}
-
 \pagebreak
 \section{Extension: Neural CDEs}
 
@@ -861,7 +851,7 @@ $t_i$ & $x_i$ & $[t_{i-1},t_i]f$ & $[t_{i-2},t_{i-1},t_i]f$ & \dots & $[t_0,t_1,
 
 The table of divided differences provides a visualisation of the process of computing the coefficients in the Newton polynomial. In particular, the coefficients $a_0,a_1,\dots,a_k$ are the first $k+1$ diagonal entries in the table of divided differences. Using Lemma \ref{lemma62}, one can calculate following this rule: \textbf{Each entry is the difference between the entry immediately to the left and the one above it, divided by the difference between the $t$ value at the right end of the bracket term in this entry and the $t$ value at the left end of the bracket term in this entry}. One can immediately see that the order of the calulation of the coefficients is from the left of the table to the right of it.
 
-\begin{lemma}
+\begin{lemma}\label{lemma63}
     $[t_0,t_0,\dots,t_0]f=\frac{1}{k!}f^{(k)}(t_0)$, where the $\mathrm{LHS}$ contains $k+1$ $t_0$'s.
 \end{lemma}
 \begin{proof}
@@ -881,7 +871,7 @@ The table of divided differences provides a visualisation of the process of comp
     where $\xi(t)$ is strictly between the smallest and the largest of these nodes.
 
     Comparing the two results, we have
-    $$[t_0,t_1,\dots,t_k,s]f=\frac{f^{(k+1)}(\xi(t)}{(k+1)!}.$$
+    $$[t_0,t_1,\dots,t_k,s]f=\frac{f^{(k+1)}(\xi(t))}{(k+1)!}.$$
     
     By letting $t=t_{k+1}$ and replacing $k+1$ by $k$, we obtain
     $$[t_0,t_1,\dots,t_k]f=\frac{1}{k!}f^{(k)}(\xi),$$
@@ -890,7 +880,36 @@ The table of divided differences provides a visualisation of the process of comp
     Finally, we let $t_1,\dots,t_k\rightarrow t_0$. Then, by the definition of $\xi$, $\xi\rightarrow t_0$, which yields the result.
 \end{proof}
 
-Now we are ready to address the method of cubic spline interpolation formally.
+Now we are ready to state and explain the method of cubic spline interpolation formally.
+
+\definition{(Cubic splines)} Given a sample of $k+1$ data points
+$(t_0,x_0), (t_1,x_1), \dots, (t_k,x_k)$, the \textit{cubic spline} $X_t$ corresponding to this sample is an interpolatory curve such that it is twice continuously differentiable.
+
+That is, if $p_i(t)=X(t)|_{[t_i,t_{i+1}]}$, then the following conditions are satisfied:
+
+(1) $p_i(t_i)=x_i, p_i(t_{i+1})=x_{i+1},\quad\forall i=0,1,\dots,k-1;$
+
+(2) $p_i'(t_i)=m_i, p_i'(t_{i+1})=m_{i+1},\quad\forall i=0,1,\dots,k-1;$
+
+(3) $p_{i-1}''(t_i)=p_i''(t_i),\quad\forall i=1,\dots,k-1,$
+
+where $\forall i=0,1,\dots,k$, $m_i$ are chosen constants.
+
+One might be sceptical about whether condition (3) is necessary, since in time series modelling we would only ensure that the control path $X_t$ is continuously differentiable. However, if condition (3) is dropped, it means that the curvature of the resultant path (which is related to the second derivative of the control path) might not be continuous and thus there might exist a drastic change in the curvature of the control path which might then lead to unrealistic modelling.
+
+Using the table of divided differences and Lemma \ref{lemma63}, we obtain that the Newton polynomial defined on each time segment $t_i,t_{i+1}$ is
+$$p_i(t)=x_i+(t-t_i)m_i+(t-t_i)^2\frac{[t_i,t_{i+1}]f-m_i}{\Delta t_i}+(t-t_i)^2(t-t_{i+1})\frac{m_{i+1}+m_i-2[t_i,t_{i+1}]f}{(\Delta t_i)^2},$$
+
+where $\Delta t_i=t_{i+1}-t_i$.
+
+The above polynomial can be reformulated in terms of a Taylor polynomial:
+$$p_i(t)=x_i+m_i(t-t_i)+a_i(t-t_i)^2+b_i(t-t_i)^3,$$
+
+where $\displaystyle a_i=\frac{[t_i,t_{i+1}]f-m_i}{\Delta t_i}-b_i\Delta t_i$ and $\displaystyle b_i=\frac{m_{i+1}+m_i-2[t_i,t_{i+1}]f}{(\Delta t_i)^2}$.
+
+Since $\forall i=1,\dots,k-1, p_{i-1}''(t_i)=p_i''(t_i)$, we have $2a_{i-1}+6b_{i-1}(t_i-t_{i-1})=2a_i$, which simplifies to be $a_{i-1}+3b_{i-1}\Delta t_i=a_i$.
+
+Using the definition of the coefficients of the Taylor polynomial, we obtain a system of linear equations:
 
 \pagebreak
 \section{Conclusion}
