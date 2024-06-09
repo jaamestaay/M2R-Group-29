@@ -338,7 +338,7 @@ By inverting the one-hot encoding and comparing with the target output, we might
 sum(Flux.onecold(model(x_test_flat)) .== (y_test .+ 1)) / length(y_test)
 \end{verbatim}
 
-which is normally around $80\%$. That is great, but not extremely satisfactory. This inspires us to consider a better model, neural differential equations, as detailed below. In Section \ref{sec:app}, we will show that this improves the test accuracy to around \citationneeded.
+which is normally around $80\%$. That is great, but not extremely satisfactory. This inspires us to consider a better model, neural differential equations, as detailed below. In Section \ref{sec:app}, we will show that this improves the test accuracy to around $90\%$.
 
 \pagebreak
 \section{Introduction to Neural ODEs}
@@ -562,7 +562,7 @@ $$\hat{z}(t_i)=\mathrm{ODESolve}(z(t_0),f,\theta(t_0),t_0,t_i),\quad i=0,\dots,N
 The loss function would be applied to all observation points $z(t_i)_{i=0,\dots,N}$, which means the cost of the model is $\mathcal{L}(\hat{z}(t_0),\hat{z}(t_1),\dots,\hat{z}(t_N))$. The next step is to develop a method to update the parameters in neural 
 ODE model. It is equivalent to calculate the gradient of the loss function with respect to different parameters, then we can use the gradient to minimise the loss function. For classical neural networks, the computational cost of backpropagation increases as the number of layers increases. In the case of neural ODEs, if we want to perform backpropagation, if we use the same method as we do for residual networks, this would be very computationally expensive. Backpropagating through an ODE solver would also be very inefficient. This motivates us to use a method to calculate the gradient without needing the explicit solution.
 
-\subsubsection{Introduction to the Adjoint Sensitivity Method}
+\subsubsection{Adjoint Sensitivity Method}
 
 The adjoint sensitivity method was first proposed by Pontryagin in 1962. This method provides a way to find the desired gradients by solving another ODE. Consequently, we do not need to store all the activated states for backpropagation, which helps to reduce the computational cost. 
 
@@ -683,17 +683,35 @@ $$
 Thus, we only need to solve this initial value problem. By calling the ODE solver on the augmented adjoint once, we are able to calculate all the necessary gradients with respect to $z(t_0)$, $\theta$, $t_0$ and $t_N$.
 
 \pagebreak
-\section{Application: A Better Digit Classifier}
+\section{Application: Improving Test Accuracy with Neural ODEs}
 \label{sec:app}
 
-In this section, we return our attention to the example we considered in Section \ref{sec:cla}, in which we implemented a digit classifier with around $80\%$ accuracy using classic neural networks. With the help of neural ODEs, we shall implement a better version of this. The idea is largely taken from Lab 6 of the SciMLSANUM2024 workshop \hyperlink{https://github.com/dlfivefifty/SciMLSANUM2024/blob/main/labs/lab6s.ipynb}{here}.
+In this section, we return our attention to the example we considered in Section \ref{sec:cla}, in which we implemented a digit classifier with around $80\%$ accuracy using classic neural networks. With the help of neural ODEs, we shall implement a better version of this, aiming to boost the test accuracy to approximately $90\%$. The idea is largely taken from Lab 6 of the SciMLSANUM2024 workshop \hyperlink{https://github.com/dlfivefifty/SciMLSANUM2024/blob/main/labs/lab6s.ipynb}{here}.
+
+In this case, a neural ODE model involves several steps. First, we load the MNIST dataset and preprocess it in the same way as before. We then define a neural network that will serve as the right-hand side of the neural ODE. Next, we set up a neural ODE using this neural network and use numerical methods to solve the ODE problem, thereby creating a neural ODE layer. We then define the loss function and train the ODE model with an optimiser over multiple epochs. Finally, we evaluate the performance of the trained model and compare it with what we did before.
+
+To start, we need to import some essential packages. We will use the \verb|DifferentialEquations| and \verb|DiffEqFlux| package for neural ODEs, and despite the name, \verb|DiffEqFlux| uses \verb|Lux| instead of \verb|Flux|.
+
+\begin{verbatim}
+using DifferentialEquations, DiffEqFlux, Lux, MLDatasets
+\end{verbatim}
+
+We load and preprocess the MNIST dataset as before:
+
+\begin{verbatim}
+x_train, y_train = MLDatasets.MNIST.traindata(Float32)
+x_test, y_test = MLDatasets.MNIST.testdata(Float32)
+x_train_flat = Flux.flatten(x_train)
+x_test_flat = Flux.flatten(x_test)
+dataset = [(x_train_flat, Flux.onehotbatch(y_train, 0:9))]
+\end{verbatim}
 
 \pagebreak
 \section{Extension: Neural CDEs}
 
 \subsection{Motivation}
 
-As we have seen before, neural networks and differential equations seem to be irrelevant but, in fact, they have been proven to be two sides of the same coin. In particular, neural ODEs can be seen as a continuous-time analogue to the ResNet. However, there exist certain real-life applications such as time series forecasting where neural ODEs are no longer effective in solving the problem. Fortunately, a British mathematician Terry Lyons developed a novel and exciting field of mathematics called rough path theory in the 1990s \citationneeded, and we can use some mathematical insights from this theory to develop a new concept called \textit{neural controlled differential equations}.
+As we have seen before, neural networks and differential equations seem to be irrelevant but, in fact, they have been proven to be two sides of the same coin. In particular, neural ODEs can be seen as a continuous-time analogue to the ResNet. However, there exist certain real-life applications such as time series forecasting where neural ODEs are no longer effective in solving the problem. Fortunately, a British mathematician Terry Lyons developed a novel and exciting field of mathematics, rough path theory, in the 1990s \citationneeded, and we can use some mathematical insights from this theory to develop a new concept called \textit{neural controlled differential equations}.
 
 \subsection{Controlled Differential Equations}
 
@@ -732,7 +750,7 @@ Note that the continuity of $f$ and the bounded variation of $x$ guarantee the e
 
 From now on, controlled differential equations will be referred to as CDEs and $y(t)$ will be referred to as $y_t$, which is a notation commonly used to describe CDEs.
 
-\subsection{Introduction to Neural CDEs}
+\subsection{Neural CDEs}
 
 One fundamental assumption of neural CDEs is that the data we observe should form a continuous path $X:[a,b]\rightarrow\mathbb{R}^v$ with bounded variation. This assumption is made simply for theoretical purposes, i.e. the continuous data correspond to an evolutionary process or control path in the neural CDE. However, it is worthwhile to note that it is highly unlikely to observe data in such a form in real-life applications, and thus a trick that converts discrete observations to a continuous control path would be introduced in later parts. Let us now formulate the definition of neural CDEs rigorously, and then it will be clear that neural CDE is the continuous analogue to the recurrent neural network.
 
@@ -773,11 +791,11 @@ In the second-year numerical analysis course, we have learnt about Lagrange basi
 \begin{proof}
     Since $|B|=k+1=\dim(P_k)$, it suffices to show that $B$ is linearly independent.
     
-    We prove by induction on $k\in\mathbb{N}\cup\{0\}$. The result is trivial for $k=0$. Suppose that the result is true for $k<m$. Then, for $k=m$, suppose that $\exists a_0,a_1,\dots,a_m$ such that $\sum_{i=0}^ma_in_i(t)=0$.
+    We prove by induction on $k\in\mathbb{N}$. The result is trivial for $k=0$. Suppose that the result is true for $k<m$. Then, for $k=m$, suppose that $\exists a_0,a_1,\dots,a_m$ such that $\sum_{i=0}^ma_in_i(t)=0$.
 
-    If $a_0=a_1=\dots=a_m=0$, then $B$ is linearly independent. Otherwise, let $j$ be the largest integer such that $a_j\neq0$. By the induction hypothesis, ${n_0(t),n_1(t),\dots,n_{j-1}(t)}$ forms a basis of $P_{j-1}$, and thus $\sum_{i=0}^ma_in_i(t)\neq0$, which is a contradiction. Hence, the result is true for $k=m$.
+    If $a_0=a_1=\dots=a_m=0$, then $B$ is linearly independent. Otherwise, let $j$ be the largest integer such that $a_j\neq0$. By the induction hypothesis, $\{n_0(t),n_1(t),\dots,n_{j-1}(t)\}$ forms a basis of $P_{j-1}$, and thus $\sum_{i=0}^ma_in_i(t)\neq0$, which is a contradiction. Hence, the result is true for $k=m$.
 
-    By induction, we have that $\forall k\in\mathbb{N}\cup\{0\}, B={n_0(t),n_1(t),\dots,n_k(t)}$ forms a basis of $P_k$.
+    By induction, we have that $\forall k\in\mathbb{N}, B=\{n_0(t),n_1(t),\dots,n_k(t)\}$ forms a basis of $P_k$.
 \end{proof}
 
 After proving this lemma, we are confident in making the following definitions.
@@ -787,10 +805,85 @@ Given a sample of $k+1$ data points
 $(t_0,x_0), (t_1,x_1), \\\dots, (t_k,x_k)$, the \textit{Newton basis polynomials} corresponding to this sample are defined as $n_0(t)=1$ and $\forall j=1,...,k, n_j(t)=\prod_{i=0}^{j-1}(t-t_i)$.
 
 \definition{(Newton polynomials)}
-Using the same setting as above, we define the Newton polynomial that interpolates the sample of data points to be $p_k(t)=\sum_{i=0}^ka_in_i(t)$.
+Using the same setting as above, we define the \textit{Newton polynomial} that interpolates the sample of data points to be $p_k(t)=\sum_{i=0}^ka_in_i(t)$.
 
-As the Newton polynomial passes through $(t_0,x_0), (t_1,x_1), \dots, (t_k,x_k)$, the coefficients of the Newton polynomial can be uniquely determined by solving a system of linear equations. The details of this computation are left for the interested readers to check.
+As the Newton polynomial passes through $(t_0,x_0), (t_1,x_1), \dots, (t_k,x_k)$, the coefficients of the Newton polynomial can be uniquely determined by solving a system of linear equations. The details of this computation are left for the interested readers to check. In other words, given a sample of $k+1$ data points
+$(t_0,x_0), (t_1,x_1), \dots, (t_k,x_k)$, the corresponding Newton polynomial is unique.
 
+Since $a_k$ is a linear combination of $x_0,x_1,\dots,x_k$, the coefficients are dependent on $t_0,t_1,\dots,t_k$. Let $a_k=[t_0,t_1,\dots,t_k]f$, where $k\in\mathbb{N}$, and $f$ be some unknown function that passes through these points and needs to be estimated using the Newton interpolatory polynomial. The RHS is also denoted as the $n^{\mathrm{th}}$ \textit{divided difference} of $f$ relative to $t_0,t_1,\dots,t_k$. The motivation behind this name can be immediately seen from the following lemma.
+
+\begin{lemma}\label{lemma62}
+    $\forall k\in\mathbb{N}_{>0}$, we have $$[t_0,t_1,t_2\dots,t_k]f=\frac{[t_1,t_2\dots,t_k]f-[t_0,t_1,\dots,t_{k-1}]f}{t_k-t_0}.$$
+\end{lemma}
+\begin{proof}
+    Let $r(t)=n_{k-1}(f;t_1,t_2,\dots,t_k;t)$ and $s(t)=n_{k-1}(f;t_0,t_1,\dots,t_{k-1};t)$, where $n_{k-1}(f;t_1,t_2,\\\dots,t_k;t)$ means that it is approximating $f$ that passes through $(t_1,x_1), (t_2,x_2), \dots, (t_k,x_k)$, and other Newton basis polynomials are expressed in a similar way.
+    
+    We claim that
+    \begin{equation}\label{eq}
+        n_k(f;t_0,t_1,\dots,t_k;t)=r(t)+\frac{t-t_k}{t_k-t_0}(r(t)-s(t)).\tag{*}
+    \end{equation}
+
+    By the definition of Newton basis polynomials, it is obvious that the degree of $\mathrm{RHS}$ is less than or equal to $k$. Since Newton interpolatory polynomials are unique, it suffices to show that $\mathrm{RHS}$ passes through $(t_0,x_0), (t_1,x_1), \dots, (t_k,x_k)$.
+    
+    Substituting $t_0$ into both sides of \ref{eq} gives $\mathrm{LHS}=x_0$ and $\mathrm{RHS}=r(t_0)+\frac{t_0-t_k}{t_k-t_0}(r(t_0)-s(t_0))=s(t_0)=x_0.$
+
+    Substituting $t_k$ into both sides of \ref{eq} gives $\mathrm{LHS}=x_k$ and $\mathrm{RHS}=r(t_k)+\frac{t_k-t_k}{t_k-t_0}(r(t_k)-s(t_k))=r(t_k)=x_k.$
+
+    Substituting $t_i$ into both sides of \ref{eq}, where $i=1,\dots,k-1$, gives $\mathrm{LHS}=x_i$ and $\mathrm{RHS}=r(t_i)+\frac{t_i-t_k}{t_k-t_0}(r(t_i)-s(t_i))=r(t_i)=x_i.$
+
+    In all these cases, we have $\mathrm{LHS} = \mathrm{RHS}$, and thus the claim is true.
+
+    Equating the coefficients of both sides of \ref{eq} yields the result.
+\end{proof}
+
+Using this result, we can establish a powerful tool called the \textit{table of divided differences}.
+
+\definition{(Table of divided differences)} Under the same setting in the previous definition of Newton polynomials, we create a \textit{table of divided differences} as following:
+
+\begin{center}
+\begin{tabular}{ c c c c c }
+ $t$ & $f$ & & & \\ 
+ $t_0$ & $x_0$ & & & \\  
+ $t_1$ & $x_1$ & $[t_0,t_1]f$ & & \\
+ $t_2$ & $x_2$ & $[t_1,t_2]f$ & $[t_0,t_1,t_2]f$ & \\
+ $t_3$ & $x_3$ & $[t_2,t_3]f$ & $[t_1,t_2,t_3]f$ &  $[t_0,t_1,t_2,t_3]f$ \\
+ \dots & \dots & \dots & \dots & \dots
+\end{tabular}
+\end{center}
+
+where the $i+1^{\mathrm{th}}$ row of the table is defined as 
+
+\begin{center}
+\begin{tabular}{ c c c c c c }
+$t_i$ & $x_i$ & $[t_{i-1},t_i]f$ & $[t_{i-2},t_{i-1},t_i]f$ & \dots & $[t_0,t_1,\dots,t_i]f.$
+\end{tabular}
+\end{center}
+
+The table of divided differences provides a visualisation of the process of computing the coefficients in the Newton polynomial. In particular, the coefficients $a_0,a_1,\dots,a_k$ are the first $k+1$ diagonal entries in the table of divided differences. Using Lemma \ref{lemma62}, one can calculate following this rule: \textbf{Each entry is the difference between the entry immediately to the left and the one above it, divided by the difference between the $t$ value at the right end of the bracket term in this entry and the $t$ value at the left end of the bracket term in this entry}. One can immediately see that the order of the calulation of the coefficients is from the left of the table to the right of it.
+
+\begin{lemma}
+    $[t_0,t_0,\dots,t_0]f=\frac{1}{k!}f^{(k)}(t_0)$, where the $\mathrm{LHS}$ contains $k+1$ $t_0$'s.
+\end{lemma}
+\begin{proof}
+    Let $s$ be an arbitrary node (a \textit{time point} in the context of time series) not equal to any one of $t_0,t_1,\dots,t_k$.
+    
+    By the definition of the Newton polynomial, we have $N_{k+1}(f;t_0,t_1,\dots,t_k,s;t)=N_k(f;t)+[t_0,t_1,\dots,t_k,s]f\prod_{i=0}^k(t-t_i).$
+    
+    Inserting $t=s$ yields $f(s)=N_k(f;s)+[t_0,t_1,\dots,t_k,s]f\prod_{i=0}^k(s-t_i).$
+
+    As the choice of $s$ is arbitrary, we can change the notation from $s$ back to $t$, and thus $f(t)-N_k(f;t)=[t_0,t_1,\dots,t_k,s]f\prod_{i=0}^k(t-t_i).$
+
+    Now we quote without proof a classical result about the error of the interpolation: $f(t)-N_k(f;t)=\frac{f^{(k+1)}(\xi(t))}{(k+1)!}\prod_{i=0}^k(t-t_i),$
+    where $\xi(t)$ is strictly between the smallest and the largest of these nodes.
+
+    Comparing the two results, we have $[t_0,t_1,\dots,t_k,s]f=\frac{f^{(k+1)}(\xi(t)}{(k+1)!}.$
+    
+    By letting $t=t_{k+1}$ and replacing $k+1$ by $k$, we obtain $[t_0,t_1,\dots,t_k]f=\frac{1}{k!}f^{(k)}(\xi)$, where $\xi$ is defined similarly as before.
+
+    Finally, we let $t_1,\dots,t_k\rightarrow t_0$. Then, by the definition of $\xi$, $\xi\rightarrow t_0$, which yields the result.
+\end{proof}
+
+Now we are ready to address the method of cubic spline interpolation formally.
 
 \pagebreak
 \section{Conclusion}
