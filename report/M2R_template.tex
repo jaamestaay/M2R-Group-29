@@ -113,7 +113,6 @@ Throughout this report, we will be using the Julia programming language. This is
 
 \pagebreak
 \section{Basic Neural Networks}
-
 \label{sec:neuralnetworks}
 \subsection{History}
 
@@ -387,12 +386,12 @@ We know (or assume) that our data follow an unknown ODE $\dot{z}=f(z(t),t)$, and
     \label{fig:enter-label}
 \end{figure}
 
-Note that the points in the graph on the right-hand side (ODE network) represent the evaluation points. These points can be taken according to a sequence of different time stamps $(t_i)_{i=0,\dots,N}$. Then the values given by the model at those points are $z(t_i)_{i=0,\dots,N}$. They can be obtained by solving an ODE:
+Note that the points in the graph on the right-hand side (ODE network) represent the evaluation points. These points can be taken according to an increasing sequence of different time stamps $(t_i)_{i=0,\dots,N}$. Then the values given by the model at those points are $z(t_i)_{i=0,\dots,N}$. They can be obtained by solving an ODE:
 $$z(t_i)=\mathrm{ODESolve}(z(t_0),f,t_0,t_i),\quad i=0,\dots,N.$$
 
 Also, the time span for defining a neural ODE would be $[t_0,t_N]$. Since all these points are in the same space, each output has the same dimension as the input vector.
 
-Unlike a neural network, where depth refers to the number of layers, in a neural ODE network, depth can be seen as the number of observation points. For a neural network, more layers can help the model fit the training dataset better. Similarly, in an ODE network, more observation points can provide a better understanding of the $f$ we are looking for, allowing the model to fit the training set better.
+Unlike a neural network, where depth refers to the number of layers, in a neural ODE network, depth can be considered as the number of observation points. For a neural network, more layers can help the model fit the training dataset better in general. Similarly, in an ODE network, more observation points can provide a better understanding of the $f$ we are looking for, allowing the model to fit the training set better.
 
 \subsection{Various Neural ODE Models}
 
@@ -526,37 +525,57 @@ points to cover:
 
 The Discretise-then-Optimise (DO) method can be described in the following steps:
 \begin{enumerate}
-    \item \textit{Solve the Neural ODE numerically with starting parameters.} This involves choosing an initial ‘guess’ of parameters $\theta$ and solving the neural ODE with the guessed parameters. The Runge-Kutta methods, typically the RK4 or DOPRI method as described in Section \ref{sec:rungekutta} are most commonly used to achieve this.
-    \item \textit{Compute the Loss Function.} We can compare the solution derived from the previous step with the data set. This inevitably gives some amount of discrepancy, which the loss function measures.
-    \item \textit{Calculate gradients associated with current parameters.} This can be achieved through backpropagation of the gradients using the chain rule. 
-    \item \textit{Gradient Descent to update the parameters.} This is done using the methods detailed in \ref{sec:gd}.
+    \item \textit{Solve the Neural ODE numerically with starting parameters.} This involves choosing an initial ‘guess’ of parameters $\theta$ and solving the neural ODE with the guessed parameters. The Runge-Kutta methods, typically the \texttt{RK4} or \texttt{Vern9} methods as described in Section \ref{sec:rungekutta}, are most commonly used to achieve this.
+    \item \textit{Compute the Loss Function and its gradients with respect to parameters $\theta$.} We can compare the solution derived from the previous step with the data set. This inevitably gives some amount of discrepancy, which the loss function measures. The calculation of gardients can be achieved through backpropagation as detailed in the next section.
+    \item \textit{Gradient Descent to update the parameters.} This is done using the methods detailed in \ref{sec:gd}, until the loss function is minimised (by monitoring the rate of change of the loss function) or the maximum number of iterations have been reached.
 \end{enumerate}
-
-These steps are repeated until the loss function is minimised (by monitoring the rate of change of the loss function) or the maximum number of iterations have been reached. \textcolor{red}{this might have already been discussed in the gradient descent section}
 
 \subsubsection{Discrete Backpropagation}
 \label{sec:ad}
 
 Having discussed the importance of deriving the global minimum of loss functions through gradient descent, it becomes imperative to use algorithms that derive gradients and derivatives efficiently. 
 
-There are a number of methods that do so with varying computational costs. The conventional ideas brought forward by divided differences tend to incur large errors in computation, making gradient calculations inaccurate and thus unreliable. Calculating symbolic expressions of gradients, on the other hand, tends to be rather memory and time consuming. The computational cost of such a method is further compounded by the fact that functions derived from neural networks tend to be rather complicated in nature \cite{tucker2011}. A method that has proven to be time and (relatively) memory efficient is \textit{automatic differentiation} (AD). 
+There are a number of methods that do so with varying computational costs. The conventional ideas brought forward by divided differences tend to incur large errors in computation, making gradient calculations inaccurate and thus unreliable. Calculating symbolic expressions of gradients, on the other hand, tends to be rather memory and time consuming \cite{tucker2011}. The computational cost of such a method is further compounded by the fact that functions derived from neural networks tend to be rather complicated in nature. A method that has proven to be time and (relatively) memory efficient is \textit{automatic differentiation} (AD). 
 
-There are two types of AD. \textit{Forward-mode AD} computes the derivative of the function along with the function evaluation. A familiar (albeit limited) concept that implements this is the commutative ring of \textit{dual number} $\mathbb{D}$ over $\mathbb{R}$ generated by $1$ and $\epsilon$, $\epsilon^2 = 0$. \textit{Reverse-mode AD}, and in particular \textit{backpropagation}, first evaluates the function before propagating the derivatives from the output to the input. The paper aims to discuss the implementations of backpropagation in DO (where the backpropagation conducted is discrete) in this section and OD in Section \ref{sec:contback}.
+There are two distinct types of AD. \textit{Forward-mode AD} computes the derivative of the function along with the function evaluation. A familiar (albeit limited) concept that implements this is the commutative ring of \textit{dual numbers} $\mathbb{D}$ over $\mathbb{R}$ generated by $1$ and $\epsilon$, where $\epsilon^2 = 0$. \textit{Reverse-mode AD}, and in particular \textit{backpropagation}, instead evaluates the function first before propagating the derivatives from the output to the input. This section aims to discuss the implementations of backpropagation in DO (where the backpropagation conducted is discrete). The implementation of backpropagation in OD will be discussed in Section \ref{sec:contback}.
 
-Given a discretised neural ODE (as typically found in the Discretise-then-Optimise method), backpropagation can be used to derive the gradients of $\mathcal{L}(\mathbf{y}, \mathbf{\hat{y}})$ with respect to each parameter in $\theta$. Suppose that we calculate $\hat{y_i}$ (and thus $\mathcal{L}$) via $g(\theta) = (g_m \circ g_{m+1} \circ \cdots \circ g_1) (\theta)$. Additionally, suppose that we know the value of $\frac{\partial \mathcal{L}}{\partial \hat{y_i}}$ - this 
+Given a discretised neural ODE (as typically found in the Discretise-then-Optimise method), backpropagation can be used to derive the gradients of $\mathcal{L}(\mathbf{y}, \mathbf{\hat{y}})$ with respect to each parameter in $\theta = (\theta_1, \dots, \theta_k)$ for some $k$. Suppose that we calculate $\hat{y_i} = g(\theta) = (g_m \circ g_{m+1} \circ \cdots \circ g_1) (\theta)$, where each $g_l$ is some elementary function. Additionally, suppose that we know the value of $\frac{\partial \mathcal{L}}{\partial \hat{y_i}}$, which we will represent with $\overline{\hat{y_i}}$. This assumption is valid since the derivative of the loss function with respect to $\hat{y_i}$ is readily available in practice. This process can be completed using the following algorithm:
+\begin{enumerate}
+    \item \textit{Forward Pass.} Evaluate $g$ with the given values of $\theta$, recording the intermediate values after each $g_l$. Thus, we receive a set of values $\{v_1, v_2, \dots, v_p \}$, where $v_p = \hat{y_i}$. We note that $p \neq m$ in general, since elementary functions can take two inputs (take $+$ for example) and thus have two intermediate values that feed into it. These intermediate values (and the functions that connect them) can be represented by a directed acyclic graph (DAG) (an example is found in Figure \ref{fig:discretebackprop}) that flows (via the functions $g_l$) from each of the $\theta_j$.
+    \item \textit{Chain Rule Application.} By the chain rule, we can easily calculate the values of $\overline{v_q}$, $q = 1, \dots, p$. If $v_q$ contributes directly to some $v_{q+r}$ via the function $g_l$, then
+    $$
+    \overline{v_q} = \overline{v_{q+r}} \cdot \frac{\partial v_{q+r}}{\partial v_q} = \overline{v_{q+1}} \cdot \dot{g_l}(v_q).
+    $$
+    \item \textit{Backward Pass.} Suppose we want to consider the value of $\overline{\theta_j}$. Given $v_p ( = \hat{y_i})$ and $\overline{\hat{y_i}}$, we can work our way up the DAG to $\theta_j$, calculating the intermediate derivatives $\overline{v_q}$ along the way. This can be done for all $\theta_j$.
+\end{enumerate}
+
+An example of such an algorithm can be found in Figure \ref{fig:discretebackprop}. Such an algorithm to calculate derivatives only requires a single forward pass and a reverse pass. This means that the algorithm scales well even for more complex models with high-dimensional $\theta$ \cite{ketkar2017}. 
+
+Much work has been put into the improvement of discrete backpropagation algorithms, including the use of Static Single Assignment (SSA) forms to increase efficiency \cite{innes2019}. These advanced implementations of backpropagation can be found in many Julia modules, such as \texttt{Zygote}, \texttt{Lux}, \texttt{Flux}, and \texttt{DiffEqFlux}. %Similar to classical neural networks, our objective is to optimise the parameters in the neural ODE model to minimise the loss function. Considering our approximation process as a vector field, we define an increasing time sequence $(t_i)_{i=0,\dots,N}$ for the evaluation points, the value for the evaluation points of a neural ODE model are $z(t_i)_{i=1,\dots,N}$, with:
+%$$z(t_i)=\mathrm{ODESolve}(z(t_0),f,\theta(t_0),t_0,t_i),\quad i=0,\dots,N$$
+
+%The loss function would take all the values of the observation points $z(t_i)_{i=0,\dots,N}$, which means that the loss of the model is $\mathcal{L}(z(t_0),z(t_1),\dots,z(t_N))$. The next step is to develop a method to update the parameters in this neural ODE model. It is equivalent to calculate the gradient of the loss function with respect to different parameters, then we can use the gradient to minimise the loss function.
+
+However, the computational cost of backpropagation increases as the number of layers in the neural network increases. This means that performing backpropagation as described above would become computationally expensive. Backpropagating through an ODE solver would also be very inefficient. This motivates us to use a method that calculates gradients without needing the explicit solution \textcolor{red}{do we need to cite something here?}.
+
+%%% NOTE i will remake this figure myself because the notation is all over the place and its taking too much space by being portrait.
+\begin{figure}\label{discretebackprop}
+    \centering
+    \includegraphics[width=0.5\textwidth]{report/figures/backpropdiscrete.png}
+    \caption{A direct acyclic graph representing the intermediate values and the derivatives of $\mathcal{L}$ with respect to each $v_q$. The function used to illustrate this property is $g(\theta_1, \theta_2) = (\theta_1^2 + \theta_2^2)^\frac{1}{2}$.}
+    \label{fig:discretebackprop}
+\end{figure}
 
 \subsection{Optimise-then-Discretise (OD)}
 \label{sec:od}
 
+The Optimise-then-Discretise (OD) method can be described in the following steps:
 \begin{enumerate}
     \item \textit{Train $f_\theta$ to provide the parameters of the neural ODE.} This requires the use of a loss function to train the neural network $f_\theta$, providing the parameters required to accurately state the specific ODE in question. Once the parameters have been approximated, we are left with a standard ODE problem.
     \item \textit{Solve the ODE Problem.} As most ODEs do not have analytical solutions, we make use of numerical ODE solvers to approximate the solution of the system.
 \end{enumerate}
 
-Similar to classical neural networks, our objective is to optimise the parameters in the neural ODE model to minimise the loss function. Considering our approximation process as a vector field, we define an increasing time sequence $(t_i)_{i=0,\dots,N}$ for the evaluation points, the value for the evaluation points of a neural ODE model are $z(t_i)_{i=1,\dots,N}$, with:
-$$z(t_i)=\mathrm{ODESolve}(z(t_0),f,\theta(t_0),t_0,t_i),\quad i=0,\dots,N$$
-
-The loss function would take all the values of the observation points $z(t_i)_{i=0,\dots,N}$, which means that the loss of the model is $\mathcal{L}(z(t_0),z(t_1),\dots,z(t_N))$. The next step is to develop a method to update the parameters in this neural ODE model. It is equivalent to calculate the gradient of the loss function with respect to different parameters, then we can use the gradient to minimise the loss function. For classical neural networks, the computational cost of backpropagation increases as the number of layers increases. In the case of neural ODEs, if we want to perform backpropagation, if we use the same method as we do for residual networks, this would be very computationally expensive. Backpropagating through an ODE solver would also be very inefficient. This motivates us to use a method to calculate the gradient without needing the explicit solution.
+We note that the OD method does not require an explicit calculation of gradients but instead makes use of the \textit{Adjoint Sensitivity Method}.
 
 \subsubsection{Adjoint Sensitivity Method}
 
@@ -569,7 +588,7 @@ Since there will be $N$ evaluation points and all values at these points contrib
 \subsubsection{Continuous Backpropagation}
 \label{sec:contback}
 
-Within the adjoint method, we introduce a quantity $a(t) = \frac{\mathrm{d} \mathcal{L}}{\mathrm{d} z(t)}$, called \textit{adjoint}. We use this to simplify the process of obtaining the gradients with respect to $z(t)$ and other parameters. Here, we first provide a detailed method for finding the gradient with respect to $z(t)$. We have
+Within the adjoint method, we introduce a quantity $a(t) = \frac{\mathrm{d} \mathcal{L}}{\mathrm{d} z(t)}$, called the \textit{adjoint}. We use this to simplify the process of obtaining the gradients with respect to $z(t)$ and other parameters. Here, we first provide a detailed method for finding the gradient with respect to $z(t)$. We have
 \begin{equation}\label{eq3}
     a(t) = \frac{\mathrm{d} \mathcal{L}}{\mathrm{d} z(t)} = \frac{\mathrm{d} \mathcal{L}}{\mathrm{d} z(t+\epsilon)}\frac{\mathrm{d} z(t+\epsilon)}{\mathrm{d} z(t)}=a(t+\epsilon)\frac{\mathrm{d} z(t+\epsilon)}{\mathrm{d} z(t)}. \tag{3}
 \end{equation}
@@ -579,14 +598,14 @@ Using Taylor expansion to approximate $z(t+\epsilon)$, we have
 z(t+\epsilon) = z(t)+\epsilon f(z(t),\theta,t) +\mathcal{O}(\epsilon^2). \tag{4}
 \end{equation}
 
-Taking the derivative with respect to $z(t)$ to both sides of \ref{eq4} gives
+Taking the derivative with respect to $z(t)$ to both sides of (\ref{eq4}) gives
 $$
 \frac{\mathrm{d}z(t+\epsilon)}{\mathrm{d}z(t)} = \frac{\mathrm{d}z(t)}{\mathrm{d}z(t)}+\epsilon\frac{\mathrm{d}}{\mathrm{d}z(t)}f(z(t),\theta,t)+\mathcal{O}(\epsilon^2).
 $$
 
 Here, $\frac{\mathrm{d}z(t)}{\mathrm{d}z(t)}$ equals the identity matrix $\mathbf{I}$ and $\frac{\mathrm{d}}{\mathrm{d}z(t)}f(z(t),\theta,t)$ is the Jacobian matrix of function $f$ with respect to state $z(t)$. This can also be expressed as $\frac{\partial f(z(t),\theta,t)}{\partial z(t)}$.
 
-By using the result of \ref{eq3} to \ref{eq4}, we can try to find the value for $\dot{a}(t)$:
+By combining (\ref{eq3}) to (\ref{eq4}), we can derive the value for $\dot{a}(t)$:
 \begin{align}
 \dot{a}(t) &= \lim_{\epsilon \to 0^{+}}\frac{a(t+\epsilon)-a(t)}{\epsilon}\notag\\
 &=\lim_{\epsilon \to 0^{+}}\frac{a(t+\epsilon)-a(t+\epsilon)\frac{\mathrm{d} z(t+\epsilon)}{\mathrm{d}z(t)}}{\epsilon}\notag\\
@@ -597,18 +616,18 @@ By using the result of \ref{eq3} to \ref{eq4}, we can try to find the value for 
 &=-a(t)\frac{\partial f(z(t),\theta,t)}{\partial z(t)}.\notag
 \end{align}
 
-Since the loss function is a function of $z(t_i)_{i=1,\dots,N}$, we know the exact value of $a(t)$ at these timestamps when performing backpropagation. These values can be obtained either directly (if the neural ODE is the last layer of the network) or as the results from the backpropagation of the next layer (if the neural ODE layer is in the middle of the network). So we can transform the problem into $N$ initial value problems (IVP) as
+Since the loss function is a function of $z(t_i)_{i=1,\dots,N}$, we know the exact value of $a(t)$ at these timestamps when performing backpropagation. These values can be obtained either directly (if the neural ODE is the last layer of the network) or as the results from the backpropagation of the next layer (if the neural ODE layer is in the middle of the network). So we can transform the problem into $N$ initial value problems (IVPs):
 \begin{align}{\label{eq5}}
     \dot{a}(t) &= -a(t)\frac{\partial f(z(t),\theta,t)}{\partial z(t)},\notag\\
     a(t_i) &= \frac{\partial\mathcal{L}}{\partial z(t_i)},\quad i=1,\dots,N. \tag{5}
 \end{align}
 
-One can then compute
+We can then compute
 $$
 \frac{\mathrm{d}\mathcal{L}}{\mathrm{d}z(t_{i-1})} =a(t_i)- \int_{t_i}^{t_{i-1}}a(s)\frac{\partial f(z(s),\theta,s)}{\partial z(s)}\mathrm{d}s,\quad i=1,\dots,N.
 $$
 
-\subsubsection{Gradients wrt. \(\theta\) and \(t\)}
+\subsubsection{Gradients w.r.t. \(\theta\) and \(t\)}
 
 For this part of the proof, we assume that the loss function $\mathcal{L}$ depends only on the final time point $t_N$. If the loss function also depends on intermediate time points $t_1,\dots,t_{N-1}$, we can simply apply the backpropagation using the adjoint method for each interval $[t_{N-1},t_N],\dots,[t_1,t_0]$ in reverse order and sum up the gradients. 
 
@@ -658,7 +677,7 @@ $$a_t(t_N)=-a(t)f(z(t),\theta,t)$$
     \frac{\mathrm{d}a_t(t)}{\mathrm{d}t} = -a(t)\frac{\partial f}{\partial t}. \tag{7}
 \end{equation}
 
-We noticed that equations \ref{eq5}, \ref{eq6}, \ref{eq7} follow a similar pattern. By adding a minus sign when defining $a_t(t)$, we ensure that equation \ref{eq7} aligns with the pattern of equations \ref{eq5}, \ref{eq6}. Accordingly, we define the augumented state $a_{\mathrm{aug}}$ and the corresponding differrential equation $f_{\mathrm{aug}}$ as follows
+We noticed that equations (\ref{eq5}), (\ref{eq6}), (\ref{eq7}) follow a similar pattern. By adding a minus sign when defining $a_t(t)$, we ensure that equation (\ref{eq7}) aligns with the pattern of equations (\ref{eq5}), (\ref{eq6}). Accordingly, we define the augumented state $a_{\mathrm{aug}}$ and the corresponding differrential equation $f_{\mathrm{aug}}$ as follows
 $$a_{\mathrm{aug}}:= \begin{pmatrix}a\\ a_\theta\\ a_t\end{pmatrix}\quad\quad f_{\mathrm{aug}}\left([z,\theta,t]\right):=\frac{\mathrm{d}}{\mathrm{d}t}\begin{pmatrix}z\\\theta\\ t\end{pmatrix}=\begin{pmatrix}f([z,\theta,t])\\0\\1\end{pmatrix}$$
 
 \[
@@ -670,7 +689,7 @@ $$a_{\mathrm{aug}}:= \begin{pmatrix}a\\ a_\theta\\ a_t\end{pmatrix}\quad\quad f_
 \end{pmatrix}.
 \]
 
-This allows us to concatenate all these three adjoints together. Plugging $a_{\mathrm{aug}}$ into $(5)$, we have
+This allows us to concatenate all these three adjoints together. Plugging $a_{\mathrm{aug}}$ into (\ref{eq5}), we have
 $$
 \frac{\mathrm{d}a_{\mathrm{aug}}}{\mathrm{d}t} = -[a(t), a_\theta(t), a_t(t)]\frac{\partial f_{\mathrm{aug}}}{\partial [z,\theta,t]}(t)=-\left[a\frac{\partial f}{\partial z},a\frac{\partial f}{\partial \theta},a\frac{\partial f}{\partial t}\right](t)
 $$
@@ -680,13 +699,13 @@ $$
 
 Thus, we only need to solve this initial value problem. By calling the ODE solver on the augmented adjoint once, we are able to calculate all the necessary gradients with respect to $z(t_0)$, $\theta$, $t_0$ and $t_N$.
 
+\textcolor{red}{we might want to write some pros (other than implicitly calculating gradients) and cons for using OD rather than DO}
+
 \pagebreak
 \section{Application: Digit Classifier with Neural ODEs}
 \label{sec:app}
 
 In this section, we return our attention to the example we considered in Section \ref{sec:cla}, in which we implemented a digit classifier with around $80\%$ accuracy using classic neural networks. With the help of neural ODEs, we shall implement a better version of this, aiming to boost the test accuracy to approximately $95\%$. The idea is largely taken from Lab 6 of the SciMLSANUM2024 workshop \hyperlink{https://github.com/dlfivefifty/SciMLSANUM2024/blob/main/labs/lab6s.ipynb}{here}.
-
-In this case, a neural ODE model involves several steps. First, we load the MNIST dataset and preprocess it in the same way as before. We then define a neural network that will serve as the right-hand side of the neural ODE, thereby creating a neural ODE layer. We then define the loss function and train the model with an optimiser over multiple epochs. Finally, we evaluate the performance of the trained model and compare it with what we did before.
 
 To start, we need to import some essential packages. We will use the \verb|DifferentialEquations| and \verb|DiffEqFlux| packages for neural ODEs, and despite the name, \verb|DiffEqFlux| uses \verb|Lux| instead of \verb|Flux|. We also want to load the MNIST database from the \verb|MLDatasets| package, and the \verb|Images| package is useful for plotting images given by pixels.
 
