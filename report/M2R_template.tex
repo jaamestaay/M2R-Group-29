@@ -515,13 +515,18 @@ Studies have been conducted to consider the theoretical performances of each of 
 
 Following the previous section, we now want to find the parameters $\theta$ that minimise $\mathcal{L}$. The most conventional strategy to achieve this is to perform \textit{gradient descent}: that is, to use the gradient of $\mathcal{L}$ with respect to $\theta$ to calculate the next iteration of $\theta$. These new values of the parameters of $\theta$ will then be used to calculate $\mathbf{\hat{y}}$ and therefore the new value of $\mathcal{L}(\mathbf{y}, \mathbf{y})$. 
 
-We shall formalise this idea in this section. In order to represent the dependence of a given $\theta_t$, we rewrite the loss function as $\mathcal{L}(\mathbf{y},\mathbf{\hat{y}}) = \mathcal{L}(\theta_t)$. The simplest gradient descent method can be described as the following iterative process, given an initial guess $\theta_0$:
+In order to represent the dependence of a given $\theta_t$, we rewrite the loss function as $\mathcal{L}(\mathbf{y},\mathbf{\hat{y}}) = \mathcal{L}(\theta_t)$. The basic gradient descent method can be described as the following iterative process, given an initial guess $\theta_0$:
 $$
 \theta_{t+1} = \theta_t - \eta \nabla\mathcal{L}(\theta_t)
 $$
 where $\nabla\mathcal{L}(\theta_t)$ is the vector of gradients of $\mathcal{L}$ with respect to each parameter in $\theta_t$, and $\eta$ represents the \textit{learning rate} of the algorithm. This algorithm intuitively makes sense: $\nabla\mathcal{L}(\theta_t)$ points toward the steepest ascent. By subtracting a multiple of the learning rate from it, we try to find new parameters $\theta_{t+1}$ that give a smaller value of $\mathcal{L}(\theta_t)$ \cite{nazarathy2021}. 
 
-There are several conditions to be fulfilled for the gradient descent algorithm to be
+There are several conditions on $\eta$ and $\mathcal{L}$ to be fulfilled for the basic gradient descent algorithm to converge on a parameter estimation $\hat{\theta}$. In particular, we require that $\nalba\mathcal{L}$ is Lipschitz continuous with constant $L$ for convergence of $\theta_t$ to $\hat{\theta}$. An additional requirement for $\hat{\theta}$ to provide the global minimum of $\mathcal{L}$ (that is, given any naïve guess of $\theta_0$) is that $\mathcal{L}$ must be convex (thus having one minimum - the global minimum. It is also helpful to have learning rate $\eta = \frac{1}{L}$, which has a linear convergence at rate proportional to $\frac{1}{L}$ \cite{gower2015}. 
+
+In practice, most loss functions are Lipschitz continuous and convex, and thus the gradient descent algorithm will converge. However, there are several considerations that might affect the effectiveness of the basic gradient descent algorithm:
+\begin{enumerate}
+    \item 
+\end{enumerate}
 
 points to cover:
 \begin{itemize}
@@ -568,9 +573,8 @@ Much work has been put into the improvement of discrete backpropagation algorith
 
 %The loss function would take all the values of the observation points $z(t_i)_{i=0,\dots,N}$, which means that the loss of the model is $\mathcal{L}(z(t_0),z(t_1),\dots,z(t_N))$. The next step is to develop a method to update the parameters in this neural ODE model. It is equivalent to calculate the gradient of the loss function with respect to different parameters, then we can use the gradient to minimise the loss function.
 
-However, the computational cost of backpropagation increases as the number of layers in the neural network increases. This means that performing backpropagation as described above would become computationally expensive. Backpropagating through an ODE solver would also be very inefficient. This motivates us to use a method that calculates gradients without needing the explicit solution \textcolor{red}{do we need to cite something here?}.
+However, the computational cost of backpropagation increases as the number of layers in the neural network increases. This means that performing backpropagation as described above would become computationally expensive. Backpropagating through an ODE solver would also be very inefficient. This motivates us to use a method that calculates gradients without needing the explicit solution.
 
-%%% NOTE i will remake this figure myself because the notation is all over the place and its taking too much space by being portrait.
 \begin{figure}\label{discretebackprop}
     \centering
     \includegraphics[width=0.8\textwidth]{report/figures/backpropdiscrete.png}
@@ -807,7 +811,7 @@ which is around $95\%$, a huge improvement!
 
 \subsection{Motivation}
 
-As we have seen before, neural networks and differential equations seem to be irrelevant but, in fact, they have been proven to be two sides of the same coin. In particular, neural ODEs can be seen as a continuous-time analogue to the ResNet. However, there exist certain real-life applications such as time series forecasting where neural ODEs are no longer effective in solving the problem. Fortunately, a British mathematician Terry Lyons developed a novel and exciting field of mathematics, rough path theory, in the 1990s \citationneeded, and we can use some mathematical insights from this theory to develop a new concept called \textit{neural controlled differential equations}.
+As we have seen before, neural networks and differential equations seem to be irrelevant but, in fact, they have been proven to be two sides of the same coin. In particular, neural ODEs can be seen as a continuous-time analogue to the ResNet. However, there exist certain real-life applications such as time series forecasting where neural ODEs are no longer effective in solving the problem. Fortunately, a British mathematician Terry Lyons developed a novel and exciting field of mathematics, rough path theory, in the 1990s \cite{kidger2022neural}, and we can use some mathematical insights from this theory to develop a new concept called \textit{neural controlled differential equations}.
 
 \subsection{Controlled Differential Equations}
 
@@ -818,7 +822,7 @@ Let $f$ and $g$ be two bounded and real functions defined on $[a,b]$, and let $P
 
 We now define the upper and lower ‘Darboux sums’ similar to those in the construction of Riemann integrals as $U(P,f,g)=\sum M_i\Delta g_i$ and $L(P,f,g)=\sum m_i\Delta g_i$.
 
-If $\sup L(P,f,g)$ and $\inf U(P,f,g)$ exist and are equal, then denote their common value by $\int^b_af\mathrm{d}g$, or $\int^b_af(t)\mathrm{d}g(t)$, which is the \textit{Riemann-Stieltjes integral} of $f$ with respect to $g$ on $[a,b]$.
+If $\sup L(P,f,g)$ and $\inf U(P,f,g)$ exist and are equal, then denote their common value by $\int^b_af\mathrm{d}g$, or $\int^b_af(t)\mathrm{d}g(t)$, which is the \textit{Riemann-Stieltjes integral} of $f$ with respect to $g$ on $[a,b]$. \cite{rudin1953}
 
 In short, the Riemann-Stieltjes integral is just a simple extension of the Riemann integral.
 
@@ -828,21 +832,21 @@ $$\sup_{P\in\mathbb{P}}\sum_{i=0}^{n_P-1}\left|f(t_{i+1})-f(t_i)\right|,$$
 
 where $\mathbb{P}=\{P=\{a=t_0<t_1<...<t_{n_P}=b\}\}$, the set of all partitions on $[a,b]$.
 
-Then $f$ is a function of \textit{bounded variation} iff $V_a^b(f)<\infty$.
+Then $f$ is a function of \textit{bounded variation} iff $V_a^b(f)<\infty$. \cite{rudin1953}
 
 \definition{(Controlled differential equations (CDE))}
 Let $a,b\in\mathbb{R}$ with $a<b$ and let $v,w\in\mathbb{N}$. Let $x:[a,b]\rightarrow\mathbb{R}^v$ be a continuous function of bounded variation. Let $f:\mathbb{R}^w\rightarrow\mathbb{R}^{w\times v}$ be Lipschitz continuous. Let $y_a\in\mathbb{R}^w$.
 
 A continuous function $y:[a,b]\rightarrow\mathbb{R}^w$ is said to be a solution of the following initial value problem:
 $$y(a)=y_a, y(t)=y(a)+\int_a^bf(y(s))\mathrm{d}x(s),$$
-where $t\in(a,b].$
+where $t\in(a,b].$ \cite{kidger2022neural}
 
 In the above controlled integral equation, $\int_a^bf(y(s))\mathrm{d}x(s)$ is a Riemann-Stieltjes integral, and $f(y(s))\mathrm{d}x(s)$ is a matrix vector multiplication.
 
 We can rewrite the above control integral equation as the following control differential equation
 $$y(a)=y_a, \mathrm{d}y(t) = f(y(t))\mathrm{d}x(t).$$
 
-Note that the continuity of $f$ and the bounded variation of $x$ guarantee the existence of the Riemann-Stieltjes integral, and the Lipschitz continuity of $f$ satisfies the condition of the Picard-Lindelöf theorem for controlled differential equations. Hence, the solution to this initial value problem is unique. The existence of the integral and the uniqueness of the solution will not be investigated in detail. For interested readers, see a and b for details.
+Note that the continuity of $f$ and the bounded variation of $x$ guarantee the existence of the Riemann-Stieltjes integral, and the Lipschitz continuity of $f$ satisfies the condition of the Picard-Lindelöf theorem for controlled differential equations. Hence, the solution to this initial value problem is unique. The existence of the integral and the uniqueness of the solution will not be investigated in detail. For interested readers, see \cite{rudin1953} and \cite{kidger2022neural} for details.
 
 From now on, controlled differential equations will be referred to as CDEs and $y(t)$ will be referred to as $y_t$, which is a notation commonly used to describe CDEs.
 
@@ -856,7 +860,7 @@ Let $f_\theta:\mathbb{R}^w\rightarrow\mathbb{R}^{w\times v}$ be an arbitrary neu
 Then, we define the initial value problem of a neural CDE to be the following
 $$Z_a=g_\theta(X_a), Z_t=Z_a+\int_a^tf_\theta(Z_s)\mathrm{d}X_s,$$ where $t\in(a,b],$
 or in the differential form
-$$Z_a=g_\theta(X_a), \mathrm{d}Z_t=f_\theta(Z_t)\mathrm{d}X_t,$$ where $t\in(a,b].$
+$$Z_a=g_\theta(X_a), \mathrm{d}Z_t=f_\theta(Z_t)\mathrm{d}X_t,$$ where $t\in(a,b].$ \cite{kidger2022neural}
 
 From the above CDE, we may conclude that the hidden state $Z_t$ of the recurrent neural network can be continuously updated as the input $X_t$ evolves over time. Thus, neural CDE is a continuous analogue of the recurrent neural network. Finally, let $l_\theta:\mathbb{R}^w\rightarrow\mathbb{R}^p$ be a linear map mapping the hidden states $Z_t$ to the output $Y_t$, where $p$ is the dimension of the output $Y_t$. The difference between a neural network and a linear map is that a neural network contains an activation function and a linear map does not.
 
@@ -864,7 +868,7 @@ From the above CDE, we may conclude that the hidden state $Z_t$ of the recurrent
 
 It is theoretically possible to directly solve a CDE $\mathrm{d}y_t = f(y_t)\mathrm{d}x_t$ with a given initial condition by discretisation. In particular, one could use the following modification of Euler's method to obtain a numerical solution: $y_{i+1}=y_i+f_\theta(y_i)(x(t_{i+1})-x(t_j))$.
 
-CDEs are much harder to solve than ODEs since there is a control term introduced in the equation. For the general case, we do not know whether the control path $x_t$ is differentiable or not. Using powerful tools from rough path theory, one can derive an elegant result called the \textit{log-ODE method}, which approximates the CDE by an ODE containing the log-signature of the control path. The details of the log-ODE method are omitted, since the statement and proof of this result would take up too much space in this report. For interested readers, see c for details.
+CDEs are much harder to solve than ODEs since there is a control term introduced in the equation. For the general case, we do not know whether the control path $x_t$ is differentiable or not. Using powerful tools from rough path theory, one can derive an elegant result called the \textit{log-ODE method}, which approximates the CDE by an ODE containing the log-signature of the control path. \cite{morrill2021} The details of the log-ODE method are omitted, as the statement and proof of this result would take up too much space in this report. For interested readers, see \cite{morrill2021} for more details.
 
 Despite the fact that the log-ODE method can be used to solve CDEs under any circumstances, the log-ODE method is quite complicated to implement numerically. Fortunately, it can be cleverly avoided in terms of applications. By a standard treatment common in numerical analysis, we can guarantee that the control path $x_t$ is continuously differentiable. We defer the discussion of this technique to later parts of this report. In this case, the CDE can be shown to be equivalent to the following non-autonomous ODE: $\mathrm{d}y_t=g(t,y_t)\mathrm{d}t$, where $g(t,y_t)=f(y_t)\frac{\mathrm{d}x_t}{\mathrm{d}t}$. Then, we can solve this ODE using methods explained in Section \ref{sec:rungekutta} of this report.
 
@@ -1037,7 +1041,7 @@ which simplifies to
 $$2m_0+m_1=3[t_0,t_1]f,$$
 $$m_{k-1}+2m_k=3[t_{k-1},t_k]f.$$
 
-Adding these equations to the system of $k-1$ linear equations, we can readily solve for the constants $m_0,m_1,\dots,m_k$, and thus we can obtain an explicit expression for the control path $X_t$.
+Adding these equations to the system of $k-1$ linear equations, we can readily solve for the constants $m_0,m_1,\dots,m_k$, and thus we can obtain an explicit expression for the control path $X_t$. \cite{Gautschi2012}
 
 \subsubsection{A Naive Implementation}
 
@@ -1049,7 +1053,7 @@ The time series data used are adapted from kaggle. It records the daily adjusted
 
 \textbf{Data preprocessing:}
 
-The data preprocessing process contains several steps. Firstly, the time series data are normalised using min-max scaling. In particular, the time-series data are now set to be in the range $[0,1]$. Secondly, all dates are reorganised into the unified format "yyyy/mm/dd". Then, we transform each date into the realtive date, which is the difference of days between the initial date and itself. Finally, we use the time series data of the form $(t_i,x_i)$, where $t_i\in\mathbb{N}, x_i\in[0,1]$ to create a natural cubic spline. The relevant codes are included in the appendix.
+The data preprocessing process contains several steps. Firstly, the time series data are normalised using min-max scaling. In particular, the time series data are now set to be in the range $[0,1]$. Secondly, all dates are reorganised into the unified format "yyyy/mm/dd". Then, we transform each date into the relative date, which is the difference in days between the initial date and itself. Finally, we use the time series data of the form $(t_i,x_i)$, where $t_i\in\mathbb{N}, x_i\in[0,1]$ to create a natural cubic spline. The relevant codes are included in the appendix.
 
 \textbf{Training:}
 
@@ -1059,7 +1063,7 @@ Recall that the entire forecasting process consists of three linear maps. In par
 
 The main goal is to find the optimal parameters for each of the neural networks and the final linear map. In the training process of the second neural network, we need to incorporate the derivative of the control path obtained in the previous section into the CDE. In other words, use the method mentioned previously to convert the neural CDE to an ODE.
 
-There exist online Python libraries that uses neural CDEs to achieve time series forecasting. See d for details.
+There exist online Python libraries that uses neural CDEs to achieve time series forecasting. See \cite{Jhin2023} for details.
 
 \pagebreak
 \section{Conclusion}
