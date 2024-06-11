@@ -346,7 +346,7 @@ which is normally around $80\%$. That is great, but not extremely satisfactory. 
 
 \subsection{Motivation}
 
-The method of \textit{neural ODEs} (neural ordinary differential equations) was first proposed in a 2018 paper titled "Neural Ordinary Differential Equations" \citationneeded. This paper won the Best Paper Award at NeurIPS in the same year. The inspiration for neural ODEs came from the observation of a specific neural network model called the \textit{residual neural network} (ResNet). This model was introduced by a Microsoft research team in 2015 \citationneeded. Unlike traditional neural networks, ResNet incorporates residual connections by adding a \textit{residual term} to the output of each layer, as shown in the equation below.
+The method of \textit{neural ODEs} (neural ordinary differential equations) was first proposed in a 2018 paper titled "Neural Ordinary Differential Equations" \cite{chen2018neural}. This paper won the Best Paper Award at NeurIPS in the same year. The inspiration for neural ODEs came from the observation of a specific neural network model called the \textit{residual neural network} (ResNet). This model was introduced by a Microsoft research team in 2015 \cite{he2016deep}. Unlike traditional neural networks, ResNet incorporates residual connections by adding a \textit{residual term} to the output of each layer, as shown in the equation below.
 \begin{equation}\label{eq1}
     \textbf{h}_{t+1} = \textbf{h}_t + \sigma\left(\textbf{W}_t\textbf{h}_t + \textbf{b}_t\right).\tag{1}
 \end{equation}
@@ -382,7 +382,7 @@ We know (or assume) that our data follow an unknown ODE $\dot{z}=f(z(t),t)$, and
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.5\textwidth]{report/figures/ResNetvsODENet.png}
-    \caption{A residual network typically represents discrete transformations, whereas an ODE network defines a continuous vector field. \citationneeded}
+    \caption{A residual network typically represents discrete transformations, whereas an ODE network defines a continuous vector field. \cite{chen2018neural}}
     \label{fig:enter-label}
 \end{figure}
 
@@ -397,7 +397,9 @@ Unlike a neural network, where depth refers to the number of layers, in a neural
 
 \subsubsection{Augmented Neural ODEs}
 
-According to the previous section, 
+According to the previous section, we find that the input space and the output space of a neural ODE always have the same dimension. It poses a problem when simulating certain types of data. For instance, if we want to simulate a sine function, where we want the model to output $sin x$ for a given input $x$, we might choose to use a simple neural ODE with a one-dimensional input space. In that case, for the sine function, if we input $\frac{\pi}{2}$ and $\frac{3\pi}{2}$, we would expect the model to output $1$ and $-1$, respectively, since the idea of a neural ODE model is to follow a trajectory from the input and try to reach the expected output value after a fixed time. And the function $f$ used to define a neural ODE is Lipschitz continuous, meaning the different trajectories cannot intersect. This makes it difficult for a simple neural ODE to handle such problems.
+
+This is why we sometimes need to use the augmented neural ODE medel. The idea is to avoid conflicting trjectories by adding more dimensions to the input. In practice, we usually concatenate some zero features into the input and then drop the excess dimensions into the output. This method allows the model to learn a more complex function in a higher-dimension space.
 
 \subsubsection{Neural ODEs with Scientific Machine Learning}
 
@@ -508,8 +510,18 @@ These loss functions are dependent on $\hat{y}_i$ which in turn is dependent on 
 
 Studies have been conducted to consider the theoretical performances of each of these commonly used loss functions, namely the upper bounds of their rates of convergence (which imply their efficiency). We note that the $L^2$-norm actually has a much slower convergence in both regression and classification problems compared to other convex loss functions discussed \cite{Rosasco2004}.
 
-\subsubsection{Gradient Descent and Applications}
+\subsubsection{Gradient Descent}
 \label{sec:gd}
+
+Following the previous section, we now want to find the parameters $\theta$ that minimise $\mathcal{L}$. The most conventional strategy to achieve this is to perform \textit{gradient descent}: that is, to use the gradient of $\mathcal{L}$ with respect to $\theta$ to calculate the next iteration of $\theta$. These new values of the parameters of $\theta$ will then be used to calculate $\mathbf{\hat{y}}$ and therefore the new value of $\mathcal{L}(\mathbf{y}, \mathbf{y})$. 
+
+We shall formalise this idea in this section. In order to represent the dependence of a given $\theta_t$, we rewrite the loss function as $\mathcal{L}(\mathbf{y},\mathbf{\hat{y}}) = \mathcal{L}(\theta_t)$. The simplest gradient descent method can be described as the following iterative process, given an initial guess $\theta_0$:
+$$
+\theta_{t+1} = \theta_t - \eta \nabla\mathcal{L}(\theta_t)
+$$
+where $\nabla\mathcal{L}(\theta_t)$ is the vector of gradients of $\mathcal{L}$ with respect to each parameter in $\theta_t$, and $\eta$ represents the \textit{learning rate} of the algorithm. This algorithm intuitively makes sense: $\nabla\mathcal{L}(\theta_t)$ points toward the steepest ascent. By subtracting a multiple of the learning rate from it, we try to find new parameters $\theta_{t+1}$ that give a smaller value of $\mathcal{L}(\theta_t)$ \cite{nazarathy2021}. 
+
+There are several conditions to be fulfilled for the gradient descent algorithm to be
 
 points to cover:
 \begin{itemize}
@@ -539,12 +551,12 @@ There are a number of methods that do so with varying computational costs. The c
 
 There are two distinct types of AD. \textit{Forward-mode AD} computes the derivative of the function along with the function evaluation. A familiar (albeit limited) concept that implements this is the commutative ring of \textit{dual numbers} $\mathbb{D}$ over $\mathbb{R}$ generated by $1$ and $\epsilon$, where $\epsilon^2 = 0$. \textit{Reverse-mode AD}, and in particular \textit{backpropagation}, instead evaluates the function first before propagating the derivatives from the output to the input. This section aims to discuss the implementations of backpropagation in DO (where the backpropagation conducted is discrete). The implementation of backpropagation in OD will be discussed in Section \ref{sec:contback}.
 
-Given a discretised neural ODE (as typically found in the Discretise-then-Optimise method), backpropagation can be used to derive the gradients of $\mathcal{L}(\mathbf{y}, \mathbf{\hat{y}})$ with respect to each parameter in $\theta = (\theta_1, \dots, \theta_k)$ for some $k$. Suppose that we calculate $\hat{y_i} = g(\theta) = (g_m \circ g_{m+1} \circ \cdots \circ g_1) (\theta)$, where each $g_l$ is some elementary operator. Additionally, suppose that we know the value of $\frac{\partial \mathcal{L}}{\partial \hat{y_i}}$, which we will represent with $\overline{\hat{y_i}}$. This assumption is valid since the derivative of the loss function with respect to $\hat{y_i}$ is readily available in practice. This process can be completed using the following algorithm:
+Given a discretised neural ODE (as typically found in the Discretise-then-Optimise method), backpropagation can be used to derive the gradients of $\mathcal{L}(\mathbf{y}, \mathbf{\hat{y}})$ with respect to each parameter in $\theta = (\theta_1, \dots, \theta_k)$ for some $k$. Suppose that we calculate $\hat{y_i} = g(\theta)$, where $g$ is made up of a composition of $m$ elementary operators $g_1, ..., g_m$. Additionally, suppose that we know the value of $\frac{\partial \mathcal{L}}{\partial \hat{y_i}}$, which we will represent with $\overline{\hat{y_i}}$. This assumption is valid since the derivative of the loss function with respect to $\hat{y_i}$ is readily available in practice. This process can be completed using the following algorithm:
 \begin{enumerate}
-    \item \textit{Forward Pass.} Evaluate $g$ with the given values of $\theta$, recording the intermediate values after each $g_l$. Thus, we receive a set of values $\{v_1, v_2, \dots, v_p \}$, where $v_p = \hat{y_i}$. We note that $p \neq m$ in general, since elementary operators can take two inputs (take $+$ for example) and thus have two intermediate values that feed into it. These intermediate values (and the functions that connect them) can be represented by a directed acyclic graph (DAG) (an example is found in Figure \ref{fig:discretebackprop}) that flows (via the functions $g_l$) from each of the $\theta_j$.
-    \item \textit{Chain Rule Application.} By the chain rule, we can easily calculate the values of $\overline{v_q}$, $q = 1, \dots, p$. If $v_q$ contributes directly to some $v_{q+r}$ via the function $g_l$, then
+    \item \textit{Forward Pass.} Evaluate $g$ with the given values of $\theta$, recording the intermediate values after each $g_l$. Thus, we receive a set of values $\{v_1, v_2, \dots, v_m \}$, where $v_m = \hat{y_i}$. These intermediate values (and the functions that connect them) can be represented by a directed acyclic graph (DAG) (an example is found in Figure \ref{fig:discretebackprop}) that flows (via the functions $g_l$) from each of the $\theta_j$.
+    \item \textit{Chain Rule Application.} By the chain rule, we can easily calculate the values of $\overline{v_l}$, $q = 1, \dots, m$. If $v_l$ contributes directly to some $v_{q}$ via the function $g_q$, then
     $$
-    \overline{v_q} = \overline{v_{q+r}} \cdot \frac{\partial v_{q+r}}{\partial v_q} = \overline{v_{q+1}} \cdot \dot{g_l}(v_q).
+    \overline{v_l} = \overline{v_{q}} \cdot \frac{\partial v_{q}}{\partial v_l} = \overline{v_{q}} \cdot \dot{g_q}(v_l).
     $$
     \item \textit{Backward Pass.} Suppose we want to consider the value of $\overline{\theta_j}$. Given $v_p ( = \hat{y_i})$ and $\overline{\hat{y_i}}$, we can work our way up the DAG to $\theta_j$, calculating the intermediate derivatives $\overline{v_q}$ along the way. This can be done for all $\theta_j$.
 \end{enumerate}
@@ -561,8 +573,8 @@ However, the computational cost of backpropagation increases as the number of la
 %%% NOTE i will remake this figure myself because the notation is all over the place and its taking too much space by being portrait.
 \begin{figure}\label{discretebackprop}
     \centering
-    \includegraphics[width=0.5\textwidth]{report/figures/backpropdiscrete.png}
-    \caption{A direct acyclic graph representing the intermediate values and the derivatives of $\mathcal{L}$ with respect to each $v_q$. The function used to illustrate this property is $g(\theta_1, \theta_2) = (\theta_1^2 + \theta_2^2)^\frac{1}{2}$.}
+    \includegraphics[width=0.8\textwidth]{report/figures/backpropdiscrete.png}
+    \caption{A direct acyclic graph representing the intermediate values and the derivatives of $\mathcal{L}$ with respect to each $v_l$. The function used to illustrate this property is $g(\theta_1, \theta_2) = (\theta_1^2 + \theta_2^2)^\frac{1}{2}$. The forward pass is represented in black, while the backward pass is represented in blue.}
     \label{fig:discretebackprop}
 \end{figure}
 
