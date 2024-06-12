@@ -14,7 +14,6 @@ This is the GitHub repository for the MATH50002 Group Research Project (M2R) on 
 
 - Structure
 - Activation Function
-- Types
 - Gradient Descent
 
 2.3 Example: Regression
@@ -71,4 +70,4 @@ This is the GitHub repository for the MATH50002 Group Research Project (M2R) on 
 
 ### Acknowledgement
 
-### Appendix
+### Appendices
