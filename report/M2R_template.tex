@@ -401,9 +401,11 @@ Unlike in neural networks, where depth refers to the number of layers, in neural
 
 From the previous part, we find that the input space and the output space of a neural ODE always have the same dimension. It poses a problem when simulating certain types of data. For instance, if we want to simulate a sine function, where we want the model to output $\sin x$ for a given input $x$, we might choose to use a simple neural ODE with a one-dimensional input space. In that case, for the sine function, if we input $\frac{\pi}{2}$ and $\frac{3\pi}{2}$, we would expect the model to output $1$ and $-1$, respectively, since the idea of a neural ODE model is to follow a trajectory from the input and try to reach the expected output value after a fixed time. And the function $f$ used to define a neural ODE is Lipschitz continuous, meaning the different trajectories cannot intersect. This makes it difficult for a simple neural ODE to handle such problems.
 
-This is why we sometimes need to use the \textit{augmented neural ODE medel}. The idea is to avoid conflicting trajectories by adding more dimensions to the input. In practice, we usually concatenate some zero features into the input and then drop the excess dimensions into the output. This method allows the model to learn a more complex function in a higher-dimension space.
+This is why we sometimes need to use the \textit{augmented neural ODE medel}. The idea is to avoid conflicting trajectories by adding more dimensions to the input. In practice, we usually concatenate some zeros to the input and then drop the excess dimensions into the output. This method allows the model to learn a more complex function in a higher-dimension space.
 
 \subsubsection{Neural ODEs with Scientific Machine Learning}
+
+In practice
 
 \pagebreak
 \section{Solving Neural ODEs}
@@ -569,7 +571,7 @@ Much work has been put into the improvement of discrete backpropagation algorith
 
 %The loss function would take all the values of the observation points $z(t_i)_{i=0,\dots,N}$, which means that the loss of the model is $\mathcal{L}(z(t_0),z(t_1),\dots,z(t_N))$. The next step is to develop a method to update the parameters in this neural ODE model. It is equivalent to calculate the gradient of the loss function with respect to different parameters, then we can use the gradient to minimise the loss function.
 
-However, the computational cost of backpropagation increases as the number of layers in the neural network increases. This means that performing backpropagation as described above would become computationally expensive. Backpropagating through an ODE solver would also be very inefficient. This motivates us to use a method that calculates gradients without needing to store solution.
+However, the computational cost of backpropagation increases as the number of layers in the neural network increases. This means that performing backpropagation as described above would become computationally expensive. Backpropagating through an ODE solver would also be very inefficient. This motivates us to use a method that calculates gradients without needing to store all the intermediate states while doing backpropagation.
 
 \begin{figure}\label{discretebackprop}
     \centering
@@ -591,7 +593,7 @@ We note that the OD method does not require an explicit calculation of gradients
 
 \subsubsection{Adjoint Sensitivity Method}
 
-The adjoint sensitivity method was first proposed by Pontryagin in 1962. \citationneeded This method provides a way to find the desired gradients by solving another ODE. Consequently, we do not need to store all the activated states for backpropagation, which helps to reduce the computational cost. 
+The adjoint sensitivity method was first proposed by Pontryagin in 1962\cite{pontryagin2018mathematical}. This method provides a way to find the desired gradients by solving another ODE. Consequently, we do not need to store all the activated states for backpropagation, which helps to reduce the computational cost. 
 
 An important point to note is that in the adjoint method we treat $\theta$ as a constant that does not change over time. Therefore, the adjoint method can only be used to solve these specific classes of neural ODEs.
 
@@ -711,6 +713,7 @@ $$
 
 Thus, we only need to solve this initial value problem. By calling the ODE solver on the augmented adjoint once, we are able to calculate all the necessary gradients with respect to $z(t_0)$, $\theta$, $t_0$ and $t_N$.
 
+In Appendix 1, we provide a simple example and use the adjoint method to perform backpropagation. A numerical solution is provided to illustrate how this method can be applied.
 \textcolor{red}{we might want to write some pros (other than implicitly calculating gradients) and cons for using OD rather than DO}
 
 \pagebreak
@@ -872,7 +875,7 @@ Also, note that the backpropagation through CDE is similar to that of ODE. In pa
 
 \subsection{Application}
 
-It is possible to use neural ODEs to model time series data. However, neural ODEs become less useful when it comes to irregularly sampled time series data. In this final subsection, we propose a naive version using neural CDEs to model financial time series data.
+It is possible to use neural ODEs to model time series data. However, neural ODEs become less useful when it comes to irregularly sampled time series data. In this final subsection, we propose a naive implementation of using neural CDEs to model financial time series data.
 
 In the context of financial time series, the input data consists of a sequence of discrete data points $\left(t_i,x_i\right)$. As mentioned in the previous subsection, it is possible to construct a continuous control path based on these discrete data points. To do so, we need to employ a standard technique from numerical analysis, called \textit{cubic spline}. 
 
@@ -927,7 +930,7 @@ Since $a_k$ is a linear combination of $x_0,x_1,\dots,x_k$, the coefficients are
 
     Substituting $t_i$ into both sides of \ref{eq}, where $i=1,\dots,k-1$, gives $\mathrm{LHS}=x_i$ and $\mathrm{RHS}=r(t_i)+\frac{t_i-t_k}{t_k-t_0}(r(t_i)-s(t_i))=r(t_i)=x_i.$
 
-    In all these cases, we have $\mathrm{LHS} = \mathrm{RHS}$, and thus the claim is true.
+    In all cases, we have $\mathrm{LHS} = \mathrm{RHS}$, and thus the claim is true.
 
     Equating the coefficients of both sides of \ref{eq} yields the result.\cite{Gautschi2012}
 \end{proof}
@@ -1074,7 +1077,45 @@ We would like to
 \appendix
 
 \pagebreak
-\section{First Appendix}
+\section{Appendix 1: A Simple Example of Using the Adjoint Method}
+
+In this appendix, we provide a simple example and try to apply the adjoint method to find the desired gradients. We aim to create a model where, given an input $x$, the output is $x\mathrm{e}$. We initialise our neural ODE with $f(z(t),\theta,t)=\theta z$, or $\dot{z}=\theta z$ over the timespan $[t_0,t_1]$, where $\theta$, $t_0$, $t_1$ are constants. Since $f$ is autonomous, we can fix $t_0 = 0$, and only make $t_1$ a trainable time parameter. Suppose that the model has one evaluation point at time $t_1$. Given an input $x$, the output will be $x\mathrm{e}^{\theta t_1}$. So, the model will perfectly align with our goal if $\theta t_1=1$.
+
+After setting up the model, we provide one training data as $z(t_0)$. We can then solve the initial value problem and get $z(t) = z(t_0)\mathrm{e}^{\theta(t-t_0)}$, then output $z(t_1)=z(t_0)\mathrm{e}^{\theta t_1}$. We also provide the expected output value $c:=z(t_0)\mathrm{e}$.
+To use the adjoint method, we first calculate the loss function. For simplicity, we choose the mean square error (MSE) as the loss function. Thus, we have
+$$\mathcal{L} = \frac{1}{2}\left(c-z(t_0)\mathrm{e}^{\theta t_1}\right)^2.$$
+
+Here we add $\frac{1}{2}$ to simplify the derivatives.
+For the adjoint method, we need to calculate the derivative for $a_{\mathrm{aug}}$ and its derivative $\frac{\mathrm{d}a_{\mathrm{aug}}}{\mathrm{d}t}$. To make it clear, in this example, instead of solving an IVP for $a_{\mathrm{aug}}$ in one call, we will solve three IVPs with respect to $a$, $a_\theta$, and $a_t$ numerically, providing an idea of how this method actually works.
+
+For $a$, we know $$\frac{\mathrm{d}{a}}{\mathrm{d}{t}}=-a\frac{\partial f(z(t),\theta,t)}{\partial z(t)}=-a\theta,\quad\quad a^{\mathrm{initial}} = z(t_1)-c.$$
+
+Solving this IVP, we get $$a(t)= (z(t_1)-c)\mathrm{e}^{-\theta(t-t_1)}.$$
+
+Next, for $a_\theta$, $$\frac{\mathrm{d}{a_\theta}}{\mathrm{d}{t}}=-a\frac{\partial f(z(t),\theta,t)}{\partial \theta}=-az,\quad\quad a^{\mathrm{initial}}_\theta=0.$$
+
+So we have
+\begin{align}
+\frac{\mathrm{d}{a_\theta}}{\mathrm{d}{t}}&=-a(t)z(t)\notag\\
+&= -(z(t_1)-c)\mathrm{e}^{-\theta(t-t_1)}z(t_0)\mathrm{e}^{\theta t}\notag\\
+&= -(z(t_1)-c)z(t_0)\mathrm{e}^{\theta t_1}.\notag
+\end{align}
+
+Here, $c_\theta:=-\frac{\mathrm{d}{a_\theta}}{\mathrm{d}{t}}$ is a constant. Hence, $a_\theta(t_0) =\frac{\mathrm{d}L}{\mathrm{d}\theta} =t_1c_\theta$, and this is the gradient we need for updating $\theta$.
+
+For $a_t$,
+$$
+\frac{\mathrm{d}{a_t}}{\mathrm{d}{t}}=-a\frac{\partial f(z(t),\theta,t)}{\partial t}=0,
+$$
+\begin{align}
+a^{\mathrm{initial}}_t &= -a(t_1)f(z(t_1),\theta,t)\notag\\
+&=-a(t_1)z(t_1)\theta\notag\\
+&=-(z(t_1)-c)z(t_1)\theta.\notag
+\end{align}
+
+So we can obtain the required gradients to update the time parameter $\frac{\mathrm{d}L}{\mathrm{d}t_1}=(z(t_1)-c)z(t_1)\theta$.
+
+After obtaining these gradients, we can use them in the gradient descent to adjust the parameters in the model. Additionally, by setting some random values for $\theta$ and $t_1$, we can see that the gradients we get always point in the right direction to make $t_1\theta$ closer to $1$.
 
 \pagebreak
 \section{Second Appendix}
