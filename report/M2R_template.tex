@@ -405,7 +405,19 @@ This is why we sometimes need to use the \textit{augmented neural ODE medel}. Th
 
 \subsubsection{Neural ODEs with Scientific Machine Learning}
 
-In practice
+In practice, we sometimes define the function $f$ using a neural network. However, if we have some prior knowledge about the model, we can introduce some interpretable terms to define $f$, and use a neural ODE to approximate the remaining part. This means that we can represent the model as $\dot{z}=g(u,t)+f(u,\theta,t)$, where we already know $g$ (if $g=0$, it is just the simple neural ODE discussed earlier), and we try to approximate $f$ with a neural network. For example, in a predator-prey model, the dynamic would be
+\begin{align*}
+    \frac{\mathrm{d}x}{\mathrm{d}t}&=\alpha x-\beta xy,\\
+    \frac{\mathrm{d}y}{\mathrm{d}t}&=-\delta y-\gamma xy,
+\end{align*}
+
+where $x$ represents the number of prey and $y$ represents the number of predators. If we have some information about the model, and we can express it as:
+$$
+\begin{pmatrix}x'\\ y'
+\end{pmatrix}=\begin{pmatrix}\alpha x\\-\delta y\end{pmatrix}+f(x,y,\theta,t),
+$$
+
+where $\alpha$ and $\delta$ are known constants and $f$ is an unknown function.
 
 \pagebreak
 \section{Solving Neural ODEs}
@@ -713,7 +725,7 @@ $$
 
 Thus, we only need to solve this initial value problem. By calling the ODE solver on the augmented adjoint once, we are able to calculate all the necessary gradients with respect to $z(t_0)$, $\theta$, $t_0$ and $t_N$.
 
-In Appendix 1, we provide a simple example and use the adjoint method to perform backpropagation. A numerical solution is provided to illustrate how this method can be applied.
+In \ref{appendix 1}, we provide a simple example and use the adjoint method to perform backpropagation. A numerical solution is provided to illustrate how this method can be applied.
 \textcolor{red}{we might want to write some pros (other than implicitly calculating gradients) and cons for using OD rather than DO}
 
 \pagebreak
@@ -1116,7 +1128,7 @@ a^{\mathrm{initial}}_t &= -a(t_1)f(z(t_1),\theta,t)\notag\\
 So we can obtain the required gradients to update the time parameter $\frac{\mathrm{d}L}{\mathrm{d}t_1}=(z(t_1)-c)z(t_1)\theta$.
 
 After obtaining these gradients, we can use them in the gradient descent to adjust the parameters in the model. Additionally, by setting some random values for $\theta$ and $t_1$, we can see that the gradients we get always point in the right direction to make $t_1\theta$ closer to $1$.
-
+\label{appendix 1}
 \pagebreak
 \section{Second Appendix}
 
