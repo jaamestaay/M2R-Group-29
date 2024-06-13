@@ -6,68 +6,63 @@ This is the GitHub repository for the MATH50002 Group Research Project (M2R) on 
 
 ### 1. Introduction
 
-### 2. Basic Neural Networks (Jiaru)
+### 2. Basic Neural Networks (Jiaru, James)
 
-2.1 History
+2.1 History (Jiaru)
 
-2.2 Concepts
+2.2 Concepts (Jiaru)
 
-- Structure
-- Activation Function
-- Gradient Descent
+- Structure (Jiaru)
+- Activation Function (Jiaru)
+- Gradient Descent (James)
+- Loss Functions (James)
 
-2.3 Example: Regression
+2.3 Automatic Differentiation, Discrete Backpropagation (James)
 
-2.4 Example: Classification
+2.4 Example: Regression (Jiaru)
 
-### 3. Introduction to Neural ODEs (Xinyan)
+2.5 Example: Classification (Jiaru)
 
-3.1 Motivation
+### 3. Introduction to Neural ODEs (Xinyan, James)
 
-3.2 Comparing Neural ODEs with ResNet
+3.1 Motivation (Xinyan)
 
-3.3 Various Neural ODE Models
+3.2 Comparing Neural ODEs with ResNet (Xinyan)
+
+3.3 Various Neural ODE Models (Xinyan)
 
 - Augmented Neural ODEs
 - Neural ODEs with Scientific Machine Learning
 
-### 4. Solving Neural ODEs (Xinyan, James)
+3.4 Backpropagation of Gradients 
+- Runge-Kutta Methods (James)
+- Brief mention of Discretise-then-Optimise (as described above) (Xinyan)
+- Optimise-then-Discretise (Xinyan)
 
-4.1 Numerical Methods
-
-- Runge-Kutta Methods
-- Loss Functions
-- Gradient Descent
-
-4.2 Discretise-then-Optimise (DO)
-
-- Discrete Backpropagation
-
-4.3 Optimise-then-Discretise (OD)
-
+3.5 Optimise-then-Discretise (Xinyan)
 - Introduction to the Adjoint Sensitivity Method
 - Continuous Backpropagation
 - Gradient w.r.t. $\theta$ and $t$
 
-### 5. Application: Digit Classifier with Neural ODEs (Jiankuan, Jiaru)
+### 4. Application: Digit Classifier with Neural ODEs (Jiankuan, Jiaru)
 
-### 6. Extension: Neural CDEs (Tianshi)
+### 5. Extension: Neural CDEs (Tianshi)
 
-6.1 Motivation
+5.1 Motivation
 
-6.2 Controlled Differential Equations
+5.2 Controlled Differential Equations
 
-6.3 Introduction to Neural CDEs
+5.3 Introduction to Neural CDEs
 
-6.4 Solving Neural CDEs
+5.4 Solving Neural CDEs
 
-6.5 Application
+5.5 Application
 
 - Cubic Splines
 - A Naive Implementation
 
-### 7. Conclusion
+### 6. Conclusion
 
-### Acknowledgement
+### Acknowledgements
 
 ### Appendices
