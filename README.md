@@ -14,7 +14,6 @@ This is the GitHub repository for the MATH50002 Group Research Project (M2R) on 
 
 - Structure
 - Activation Function
-- Types
 - Gradient Descent
 
 2.3 Example: Regression
@@ -38,19 +37,19 @@ This is the GitHub repository for the MATH50002 Group Research Project (M2R) on 
 
 - Runge-Kutta Methods
 - Loss Functions
-- Gradient Descent and Applications
+- Gradient Descent
 
 4.2 Discretise-then-Optimise (DO)
 
-- Automatic Differentiation
+- Discrete Backpropagation
 
 4.3 Optimise-then-Discretise (OD)
 
 - Introduction to the Adjoint Sensitivity Method
 - Continuous Backpropagation
-- Gradient wrt. $\theta$ and $t$
+- Gradient w.r.t. $\theta$ and $t$
 
-### 5. Application: A Better Digit Classifier (Jiankuan, Jiaru)
+### 5. Application: Digit Classifier with Neural ODEs (Jiankuan, Jiaru)
 
 ### 6. Extension: Neural CDEs (Tianshi)
 
@@ -64,8 +63,11 @@ This is the GitHub repository for the MATH50002 Group Research Project (M2R) on 
 
 6.5 Application
 
+- Cubic Splines
+- A Naive Implementation
+
 ### 7. Conclusion
 
 ### Acknowledgement
 
-### Appendix
+### Appendices
