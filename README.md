@@ -10,14 +10,15 @@ This is the GitHub repository for the MATH50002 Group Research Project (M2R) on 
 
 2.1 History (Jiaru)
 
-2.2 Concepts (Jiaru)
+2.2 Concepts
 
 - Structure (Jiaru)
 - Activation Function (Jiaru)
-- Gradient Descent (James)
 - Loss Functions (James)
 
-2.3 Automatic Differentiation, Discrete Backpropagation (James)
+2.3 Optimisation (James)
+- Gradient Descent
+- Automatic Differentiation, Discrete Backpropagation
 
 2.4 Example: Regression (Jiaru)
 
