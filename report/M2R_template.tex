@@ -437,7 +437,7 @@ The method of \textit{neural ODEs} (neural ordinary differential equations) was 
     \textbf{h}_{t+1} = \textbf{h}_t + \sigma\left(\textbf{W}_t\textbf{h}_t + \textbf{b}_t\right).\tag{1}
 \end{equation}
 
-The second term in equation \ref{eq1} is in the form of a typical neural network. To obtain the state at layer $t+1$, we perform a calculation using the current state $\textbf{h}_t$, the weight matrix $\textbf{W}_t$ and the bias vector $\textbf{b}_t$ at layer $t$, and an activation function $\sigma$. The first term $\textbf{h}_t$ on the right-hand side of equation \ref{eq1} is the residual term, representing the identity of the hidden state in the layer $t$.
+The second term in equation \ref{eq1} is in the form of a typical neural network. To obtain the state at layer $t+1$, we perform a calculation using the current state $\textbf{h}_t$, the weight matrix $\textbf{W}_t$ and the bias vector $\textbf{b}_t$ at layer $t$, and an activation function $\sigma$. The term $\textbf{h}_t$ \ref{eq1} is the residual term, representing the identity of the hidden state in the layer $t$.
 \begin{equation}\label{eq2}
     \textbf{h}_{t+1} = \textbf{h}_t + f\left(\textbf{h}_t, \theta_t\right).\tag{2}
 \end{equation}
