@@ -105,7 +105,7 @@ In this report, we are first going to describe some foundational notions of neur
 
 Subsequently, we dive into the formulation and implementation of neural ODEs and mention their connection to residual neural networks in Section \ref{sec:intro}. Backpropagation and the adjoint method will be discussed in detail, and we will also show the strengths and limitations of neural ODEs in Section \ref{sec:intro}.
 
-Furthermore, we examine the techniques for solving neural ODEs, introducing theories such as loss functions and gradient descent. We also present and analyse numerical ODE solvers, including Euler's method and Runge-Kutta methods in Section \citationneeded.
+Furthermore, we examine the techniques for solving neural ODEs, introducing theories such as loss functions and gradient descent. We also present and analyse numerical ODE solvers, including Euler's method and Runge-Kutta methods in Section \ref{sec:intro}.
 
 As an application, we apply neural ODEs to the MNIST handwritten digit classification task, improving the accuracy from $80\%$ achieved by the traditional neural network method to around $95\%$, thereby demonstrating the capabilities of neural ODEs in Section \ref{sec:app}.
 
@@ -323,7 +323,7 @@ model = Chain(
 )
 \end{verbatim}
 
-After that, we will implement the loss function based on \verb|norm| from the \verb|LinearAlgebra| package. We might consider our loss function to be the $L^2$-norm of $f(\mathbf{x}) - \sin (\mathbf{x})$, i.e., the square root of the sum of squares of differences between the predicted output and the target output.
+After that, we will implement the loss function based on \verb|norm| from the \verb|LinearAlgebra| package. For simplicity, we might consider our loss function to be the $L^2$-norm of $f(\mathbf{x}) - \sin (\mathbf{x})$, i.e., the square root of the sum of squares of differences between the predicted output and the target output.
 
 \begin{verbatim}
 function regression_loss(ps, (model, st, (x, y)))
@@ -337,14 +337,14 @@ We now turn our attention to training the neural network. This is essentially eq
 ps, st = Lux.setup(MersenneTwister(), model)
 \end{verbatim}
 
-To define the optimisation problem, we use the \verb|Optimization| package. Note that we need to wrap \verb|ps| in an array type supplied in the \verb|ComponentArrays| package, as the \verb|Optimization| package requires optimisation to be over an array type. To calculate the gradients needed, \verb|AutoZygote| from the \verb|Zygote| package is used for automatic differentiation. The details will be left to \ref{sec:gd}.
+To define the optimisation problem, we use the \verb|Optimization| package. Note that we need to wrap \verb|ps| in an array type supplied in the \verb|ComponentArrays| package, as the \verb|Optimization| package requires optimisation to be over an array type. To calculate the gradients needed, \verb|AutoZygote| from the \verb|Zygote| package is used for automatic differentiation.
 
 \begin{verbatim}
 prob = OptimizationProblem(OptimizationFunction(regression_loss,
        Optimization.AutoZygote()), ComponentArray(ps), (model, st, (x, y)))
 \end{verbatim}
 
-To solve the optimisation problem, we use the aforementioned gradient descent method supplied by \verb|Adam| in \verb|OptimizationOptimisers| with appropriate parameters. Again, the details will be left to \ref{sec:gd}.
+To solve the optimisation problem, we use the gradient descent method supplied by the aforementioned \verb|Adam| in \verb|OptimizationOptimisers| with appropriate parameters. We let the learning rate be $\eta = 0.03$ and the maximum number of iterations be $N = 250$.
 
 \begin{verbatim}
 ret = solve(prob, Adam(0.03), maxiters = 250)
@@ -889,7 +889,7 @@ From the above CDE, we may conclude that the hidden state $Z_t$ of the recurrent
 
 It is theoretically possible to directly solve a CDE $\mathrm{d}y_t = f(y_t)\mathrm{d}x_t$ with a given initial condition by discretisation. In particular, one could use the following modification of Euler's method to obtain a numerical solution: $y_{i+1}=y_i+f_\theta(y_i)(x(t_{i+1})-x(t_j))$.
 
-CDEs are much harder to solve than ODEs since there is a control term introduced in the equation. For the general case, we do not know whether the control path $x_t$ is differentiable or not. Using powerful tools from rough path theory, one can derive an elegant result called the \textit{log-ODE method}, which approximates the CDE by an ODE containing the log-signature of the control path \cite{morrill2021}. The details of the log-ODE method are omitted here.
+CDEs are much harder to solve than ODEs since there is a control term introduced in the equation. For the general case, we do not know whether the control path $x_t$ is differentiable or not. Using powerful tools from rough path theory, one can derive an elegant result called the \textit{log-ODE method}, which approximates the CDE by an ODE containing the log-signature of the control path \cite{morrill2021}. The details of the log-ODE method are omitted here since the underlying theory is too advanced for second year undergraduate students.
 
 Despite the fact that the log-ODE method can be used to solve CDEs under any circumstances, the log-ODE method is quite complicated to be implemented numerically. Fortunately, it can be cleverly avoided in terms of applications. By a standard treatment common in numerical analysis, we can guarantee that the control path $x_t$ is continuously differentiable. We defer the discussion of this technique to later parts of this report. In this case, the CDE can be shown to be equivalent to the following non-autonomous ODE: $\mathrm{d}y_t=g(t,y_t)\mathrm{d}t$, where $g(t,y_t)=f(y_t)\frac{\mathrm{d}x_t}{\mathrm{d}t}$. Then, we can solve this ODE using methods explained in Section \ref{sec:rungekutta} of this report.
 

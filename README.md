@@ -14,11 +14,12 @@ This is the GitHub repository for the MATH50002 Group Research Project (M2R) on 
 
 - Structure (Jiaru)
 - Activation Function (Jiaru)
-- Loss Functions (James)
+- Loss Function (James)
 
-2.3 Optimisation (James)
+2.3 Optimisation Techniques (James)
+
 - Gradient Descent
-- Automatic Differentiation, Discrete Backpropagation
+- Automatic Differentiation and Discrete Backpropagation
 
 2.4 Example: Regression (Jiaru)
 
@@ -35,13 +36,13 @@ This is the GitHub repository for the MATH50002 Group Research Project (M2R) on 
 - Augmented Neural ODEs
 - Neural ODEs with Scientific Machine Learning
 
-3.4 Backpropagation of Gradients 
-- Runge-Kutta Methods (James)
-- Brief mention of Discretise-then-Optimise (as described above) (Xinyan)
-- Optimise-then-Discretise (Xinyan)
+3.4 Runge-Kutta Methods (James)
 
-3.5 Optimise-then-Discretise (Xinyan)
-- Introduction to the Adjoint Sensitivity Method
+3.5 Discretise-then-Optimise (DO) (Xinyan)
+
+3.6 Optimise-then-Discretise (OD) (Xinyan)
+
+- Adjoint Sensitivity Method
 - Continuous Backpropagation
 - Gradient w.r.t. $\theta$ and $t$
 
@@ -64,6 +65,14 @@ This is the GitHub repository for the MATH50002 Group Research Project (M2R) on 
 
 ### 6. Conclusion
 
-### Acknowledgements
+### Acknowledgement
 
 ### Appendices
+
+A Comparison of ODE Solvers
+
+B Proof of Convergence of Gradient Descent Algorithm
+
+C A Simple Example of the Adjoint Method
+
+D Data Preprocessing of Financial Time Series
