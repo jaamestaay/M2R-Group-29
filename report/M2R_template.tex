@@ -488,7 +488,7 @@ We can write equation (\ref{eq1}) in the form of equation (\ref{eq2}), where $f$
 $$\frac{\textbf{h}_{t+1} - \textbf{h}_t}{1}=f\left(\textbf{h}_t, \theta_t\right),$$
 
 which gives
-$$\frac{\textbf{h}_{t+\Delta t} - \textbf{h}_t }{\Delta t}\Bigg|_{\Delta t=1}=f\left(\textbf{h}_t, \theta_t\right).$$
+$$\frac{\textbf{h}_{t+\Delta t} - \textbf{h}_t }{\Delta t}\Bigg\rvert_{\Delta t=1}=f\left(\textbf{h}_t, \theta_t\right).$$
 
 Such a form inspires us to make $\Delta t$ infinitesimally small, allowing us to transform this discrete form into a continuous one:
 $$\lim_{\Delta t\to 0}\frac{\textbf{h}_{t+\Delta t} - \textbf{h}_t }{\Delta t}= f(\textbf{h}_t, \theta_t,t).$$
@@ -503,19 +503,24 @@ $$\dot{z}=f(z(t),\theta,t).$$
 
 According to the previous part, we know that the inspiration for neural ODEs originates from ResNet, where it transforms a discrete function into a continuous one. In a ResNet with $L$ layers, the transition between states from one layer to the next is discrete, and each layer has its own function to alter the current state. However, in an ODE network, it defines a continuous vector field which essentially represents a neural network with infinitely many layers. The state change can thus be interpreted as a flow within this vector field.
 
-For neural ODE, we want to solve a problem like this: 
+For neural ODEs, we want to solve a problem like this: 
 
-We know (or assume) that our data follow an unknown ODE $\dot{z}=f(z(t),t)$, and we have some observations of the model at time $(t_i)_{i=0,\dots,N}$ along the trajectory; we want to find an approximation $\hat{f}(z(t),\theta,t)$ to the target $f(z(t),t)$.
+We know (or assume) that our data follow an unknown ODE $\dot{z}=f(z(t),t)$, and we have some observations of the model at time $(t_i)_{i=1,\dots,N}$ along the trajectory; we want to find an approximation $\hat{f}(z(t),\theta,t)$ to the target $f(z(t),t)$.
 
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.5\textwidth]{report/figures/ResNetvsODENet.png}
     \caption{A residual network typically represents discrete transformations, whereas an ODE network defines a continuous vector field. This figure is taken from \cite{chen2018neural}.}
-    \label{fig:enter-label}
 \end{figure}
 
-Note that the points in both graphs represent the evaluation points. In the residual network, these points correspond to different layers, whereas in the ODE network, the points are taken according to an increasing sequence of time stamps $(t_i)_{i=0,\dots,N}$. The values given by the model at these points are $z(t_i)_{i=0,\dots,N}$. These can be obtained by solving an ODE:
-$$z(t_i)=\mathrm{ODESolve}(z(t_0),f,t_0,t_i),\quad i=0,\dots,N.$$
+Note that the points in both graphs represent the evaluation points. In the residual network, these points correspond to different layers, whereas in the ODE network, the points are taken according to an increasing sequence of time stamps $(t_i)_{i=1,\dots,N}$, and $\left(z(t_0),t_0\right)$ is the initial condition. The values given by the model at these points are $z(t_i)_{i=1,\dots,N}$. These can be obtained by solving an ODE:
+$$z(t_i)=\mathrm{ODESolve}\left(z(t_0),f,t_0,t_i\right),\quad i=1,\dots,N.$$
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.5\linewidth]{report/figures/ForwardODE.png}
+    \caption{Solving a neural ODE.}
+\end{figure}
 
 Then the time span here for defining a neural ODE would be $[t_0,t_N]$. Since all these points are in the same space, each output has the same dimension as the input vector.
 
@@ -633,13 +638,13 @@ However, the computational cost of backpropagation increases as the number of la
 \subsection{Optimise-then-Discretise (OD)}
 \label{sec:od}
 
-The Optimise-then-Discretise (OD) method can be described in the following steps. \textcolor{red}{Make sure this is accurate. Think through it properly}:
+The Optimise-then-Discretise (OD) method can be described in the following steps.
 \begin{enumerate}
     \item \textit{Train $f_\theta$ to provide the parameters of the neural ODE.} This requires the use of a loss function to train the neural network $f_\theta$, providing the parameters required to accurately state the specific ODE in question. Once the parameters have been approximated, we are left with a standard ODE problem.
     \item \textit{Solve the ODE Problem.} As most ODEs do not have analytical solutions, we make use of numerical ODE solvers to approximate the solution of the system.
 \end{enumerate}
 
-We note that the OD method does not require an explicit calculation of gradients but instead makes use of the \textit{Adjoint Sensitivity Method}.
+We note that the OD method does not require an explicit calculation of gradients but instead makes use of the \textit{adjoint sensitivity method}.
 
 \subsubsection{Adjoint Sensitivity Method}
 
@@ -648,51 +653,141 @@ The adjoint sensitivity method, first proposed by Pontryagin in 1962 \cite{pontr
 An important point to note is that in the adjoint method we treat $\theta$ as a constant that does not change over time. Therefore, the adjoint method can only be used to solve these specific classes of neural ODEs.
 
 Since there will be $N$ evaluation points and all values at these points contribute to the loss function, we need to obtain the gradient of the parameters with respect to the loss function at each evaluation point; we then aggregate these gradients to get the overall gradient of each parameter for the model.
+
 \subsubsection{Continuous Backpropagation}
 \label{sec:contback}
 
-Within the adjoint method, we introduce a quantity $a(t) = \frac{\mathrm{d} \mathcal{L}}{\mathrm{d} z(t)}$, called the \textit{adjoint}. We use this to simplify the process of obtaining the gradients with respect to $z(t)$ and other parameters. Here, we first provide a detailed method for finding the gradient with respect to $z(t)$. We have
-\begin{equation}\label{eq3}
-    a(t) = \frac{\mathrm{d} \mathcal{L}}{\mathrm{d} z(t)} = \frac{\mathrm{d} \mathcal{L}}{\mathrm{d} z(t+\epsilon)}\frac{\mathrm{d} z(t+\epsilon)}{\mathrm{d} z(t)}=a(t+\epsilon)\frac{\mathrm{d} z(t+\epsilon)}{\mathrm{d} z(t)}. \tag{3}
-\end{equation}
+% Within the adjoint method, we introduce a quantity $a(t) = \frac{\mathrm{d} \mathcal{L}}{\mathrm{d} z(t)}$, called the \textit{adjoint}. We use this to simplify the process of obtaining the gradients with respect to $z(t)$ and other parameters. Here, we first provide a detailed method for finding the gradient with respect to $z(t)$. We have
+% \begin{equation}\label{eq3}
+%     a(t) = \frac{\mathrm{d} \mathcal{L}}{\mathrm{d} z(t)} = \frac{\mathrm{d} \mathcal{L}}{\mathrm{d} z(t+\epsilon)}\frac{\mathrm{d} z(t+\epsilon)}{\mathrm{d} z(t)}=a(t+\epsilon)\frac{\mathrm{d} z(t+\epsilon)}{\mathrm{d} z(t)}. \tag{3}
+% \end{equation}
 
-Using Taylor expansion to approximate $z(t+\epsilon)$, we have
-\begin{equation}\label{eq4}
-z(t+\epsilon) = z(t)+\epsilon f(z(t),\theta,t) +\mathcal{O}(\epsilon^2). \tag{4}
-\end{equation}
+% Using Taylor expansion to approximate $z(t+\epsilon)$, we have
+% \begin{equation}\label{eq4}
+% z(t+\epsilon) = z(t)+\epsilon f(z(t),\theta,t) +\mathcal{O}(\epsilon^2). \tag{4}
+% \end{equation}
 
-Taking the derivative with respect to $z(t)$ to both sides of (\ref{eq4}) gives
+% Taking the derivative with respect to $z(t)$ to both sides of (\ref{eq4}) gives
+% $$
+% \frac{\mathrm{d}z(t+\epsilon)}{\mathrm{d}z(t)} = \frac{\mathrm{d}z(t)}{\mathrm{d}z(t)}+\epsilon\frac{\mathrm{d}}{\mathrm{d}z(t)}f(z(t),\theta,t)+\mathcal{O}(\epsilon^2).
+% $$
+
+% Here, $\frac{\mathrm{d}z(t)}{\mathrm{d}z(t)}$ equals the identity matrix $\mathbf{I}$ and $\frac{\mathrm{d}}{\mathrm{d}z(t)}f(z(t),\theta,t)$ is the Jacobian matrix of function $f$ with respect to state $z(t)$. This can also be expressed as $\frac{\partial f(z(t),\theta,t)}{\partial z(t)}$.
+
+% By combining (\ref{eq3}) to (\ref{eq4}), we can derive the value for $\dot{a}(t)$:
+% \begin{align}
+% \dot{a}(t) &= \lim_{\epsilon \to 0^{+}}\frac{a(t+\epsilon)-a(t)}{\epsilon}\notag\\
+% &=\lim_{\epsilon \to 0^{+}}\frac{a(t+\epsilon)-a(t+\epsilon)\frac{\mathrm{d} z(t+\epsilon)}{\mathrm{d}z(t)}}{\epsilon}\notag\\
+% &=\lim_{\epsilon \to 0^{+}}\frac{a(t+\epsilon)-a(t+\epsilon)\left(\mathbf{I}+\epsilon\frac{\partial f(z(t),\theta,t)}{\partial z(t)}+\mathcal{O}(\epsilon^2)\right)}{\epsilon}\notag\\
+% &=\lim_{\epsilon \to 0^{+}}\frac{-\epsilon a(t+\epsilon)\frac{\partial f(z(t),\theta,t)}{\partial z(t)}+\mathcal{O}(\epsilon^2)}{\epsilon}\notag
+% \\
+% &=\lim_{\epsilon \to 0^{+}}-a(t+\epsilon)\frac{\partial f(z(t),\theta,t)}{\partial z(t)}+\mathcal{O}(\epsilon)\notag\\
+% &=-a(t)\frac{\partial f(z(t),\theta,t)}{\partial z(t)}.\notag
+% \end{align}
+
+% Since the loss function is a function of $z(t_i)_{i=1,\dots,N}$, we know the exact value of $a(t)$ at these timestamps when performing backpropagation. These values can be obtained either directly (if the neural ODE is the last layer of the network) or as the results from the backpropagation of the next layer (if the neural ODE layer is in the middle of the network). So we can transform the problem into $N$ initial value problems (IVPs):
+% \begin{align}{\label{eq5}}
+%     \dot{a}(t) &= -a(t)\frac{\partial f(z(t),\theta,t)}{\partial z(t)},\notag\\
+%     a(t_i) &= \frac{\mathrm{d}\mathcal{L}}{\mathrm{d} z(t_i)},\quad i=1,\dots,N. \tag{5}
+% \end{align}
+
+% We can then compute
+% $$
+% \frac{\mathrm{d}\mathcal{L}}{\mathrm{d}z(t_{i-1})} =a(t_i)- \int_{t_i}^{t_{i-1}}a(s)\frac{\partial f(z(s),\theta,s)}{\partial z(s)}\mathrm{d}s,\quad i=1,\dots,N.
+% $$
+
+In this section, we provide a proof of the adjoint sensitivity method. The proof references the method from ‘A Note on the Adjoint Method for Neural ODEs’ \cite{hu2024note}. However, we adjust the choice of the Lagrange multiplier to ensure that the adjoint states adjust in the same direction as outlined in the original neural ODE paper \cite{chen2018neural}. Additionally, we used a clearer notation to illustrate the adjustment process at each evaluation point.
+
+We know that there will be multiple evaluation points on the trajectory and that these points are obtained as the output of the model. So, each evaluation point $z(t_i)_{i=1,\dots,N}$ contributes to the loss function. Our first goal is to find the gradient of the loss function with respect to the parameter $\theta$. We can turn this into an optimisation problem:
 $$
-\frac{\mathrm{d}z(t+\epsilon)}{\mathrm{d}z(t)} = \frac{\mathrm{d}z(t)}{\mathrm{d}z(t)}+\epsilon\frac{\mathrm{d}}{\mathrm{d}z(t)}f(z(t),\theta,t)+\mathcal{O}(\epsilon^2).
+\min_{\theta} \mathcal{L}(z(t_1),\dots,z(t_{tN})),
+$$
+$$
+\mathrm{s.t.}\quad\dot{z}=f(z,\theta,t).
 $$
 
-Here, $\frac{\mathrm{d}z(t)}{\mathrm{d}z(t)}$ equals the identity matrix $\mathbf{I}$ and $\frac{\mathrm{d}}{\mathrm{d}z(t)}f(z(t),\theta,t)$ is the Jacobian matrix of function $f$ with respect to state $z(t)$. This can also be expressed as $\frac{\partial f(z(t),\theta,t)}{\partial z(t)}$.
+Then we introduce a Lagrange multiplier $\lambda(t)$ which is a function of time, and use $\lambda$ to define the Lagrange cost as
+$$
+\mathcal{J}(\theta) = \mathcal{L}(z(t_1),\dots,z(t_{N}))-\int^{t_N}_{t_0}\lambda(t)(\dot{z}(t)-f(z(t),\theta,t))\mathrm{d}t.
+$$
 
-By combining (\ref{eq3}) to (\ref{eq4}), we can derive the value for $\dot{a}(t)$:
+Note that we also impose a constraint on $\lambda(t)$ such that $\lambda(t_N)=\lambda(t_N^+)=0$. To find the gradient with respect to $\theta$, we introduce a small perturbation to $\theta$ to see how it affects the cost function. Therefore, we define the perturbed parameter as
+$$
+\theta^*=\theta+\epsilon\zeta,
+$$
+
+where $\zeta=\zeta(t)$ is the perturbation and $\epsilon$ is a small perturbation factor. Consequently, the value $z(t)$ will also change according to $\theta$. We define the perturbed trajectory $z^*(t)$ as 
+$$z^*(t)=z(t)+\epsilon\eta(t)+\mathcal{O}(\epsilon^2),$$
+
+and we assume that $z(t_0)=z^*(t_0)$. The difference in the Lagrange cost due to the added perturbation is then:
 \begin{align}
-\dot{a}(t) &= \lim_{\epsilon \to 0^{+}}\frac{a(t+\epsilon)-a(t)}{\epsilon}\notag\\
-&=\lim_{\epsilon \to 0^{+}}\frac{a(t+\epsilon)-a(t+\epsilon)\frac{\mathrm{d} z(t+\epsilon)}{\mathrm{d}z(t)}}{\epsilon}\notag\\
-&=\lim_{\epsilon \to 0^{+}}\frac{a(t+\epsilon)-a(t+\epsilon)\left(\mathbf{I}+\epsilon\frac{\partial f(z(t),\theta,t)}{\partial z(t)}+\mathcal{O}(\epsilon^2)\right)}{\epsilon}\notag\\
-&=\lim_{\epsilon \to 0^{+}}\frac{-\epsilon a(t+\epsilon)\frac{\partial f(z(t),\theta,t)}{\partial z(t)}+\mathcal{O}(\epsilon^2)}{\epsilon}\notag
-\\
-&=\lim_{\epsilon \to 0^{+}}-a(t+\epsilon)\frac{\partial f(z(t),\theta,t)}{\partial z(t)}+\mathcal{O}(\epsilon)\notag\\
-&=-a(t)\frac{\partial f(z(t),\theta,t)}{\partial z(t)}.\notag
+\mathcal{J}(\theta^*)-\mathcal{J}(\theta)=&\left(\mathcal{L}(z^*(t_1),\dots,z^*(t_{N}))-\mathcal{L}(z(t_1),\dots,z(t_{N}))\right)\notag\\
+&-\int^{t_N}_{t_0}\lambda(t)(\dot{z}^*(t)-\dot{z}(t))\mathrm{d}t\notag\\
+&+\int^{t_N}_{t_0}\lambda(t)(f(z^*(t),\theta^*,t)-f(z(t),\theta,t))\mathrm{d}t.\notag
 \end{align}
 
-Since the loss function is a function of $z(t_i)_{i=1,\dots,N}$, we know the exact value of $a(t)$ at these timestamps when performing backpropagation. These values can be obtained either directly (if the neural ODE is the last layer of the network) or as the results from the backpropagation of the next layer (if the neural ODE layer is in the middle of the network). So we can transform the problem into $N$ initial value problems (IVPs):
-\begin{align}{\label{eq5}}
-    \dot{a}(t) &= -a(t)\frac{\partial f(z(t),\theta,t)}{\partial z(t)},\notag\\
-    a(t_i) &= \frac{\mathrm{d}\mathcal{L}}{\mathrm{d} z(t_i)},\quad i=1,\dots,N. \tag{5}
+The first term can be written as
+$$
+\mathcal{L}\left(z(t_1),\dots,z(t_{N})\right)-\mathcal{L}\left(z^*(t_1),\dots,z^*(t_{N})\right) = \sum^N_{i=1}\frac{\partial \mathcal{L}}{\partial z(t_i)}\epsilon\eta(t_i)+\mathcal{O}\left(\epsilon^2\right).\notag
+$$
+
+Assuming that $\lambda(t)$ is continuous in each pair of successive time steps $[t_i,t_{i+1}]_{i=0,\dots,N-1}$, the second term yields 
+\begin{align}
+-\int^{t_N}_{t_0}\lambda(\dot{z}^*(t)-\dot{z}(t))\mathrm{d}t&=-\sum^{N}_{i=1}[\lambda(t)(z^*(t)-z(t))]_{t_{i-1}^+}^{t_{i}^-}+\int^{t_N}_{t_0}\dot{\lambda}(t)(z^*(t)-z(t))\mathrm{d}t\notag\\
+&=-\sum^{N}_{i=1}[\lambda(t)\epsilon\eta(t)]_{t_{i-1}^+}^{t_{i}^-}+\int^{t_N}_{t_0}\dot{\lambda}(t)\epsilon\eta(t)\mathrm{d}t+\mathcal{O}(\epsilon^2)\notag\\
+&=-\sum^{N}_{i=1}\left(\lambda(t_i^-)\epsilon\eta(t_i)-\lambda(t_{i-1}^+)\epsilon\eta(t_{i-1})\right)+\int^{t_N}_{t_0}\dot{\lambda}(t)\epsilon\eta(t)\mathrm{d}t+\mathcal{O}(\epsilon^2)\notag\\
+&=\sum^{N}_{i=1} (\lambda(t_i^+)-\lambda(t_i^-))\eta(t_i)\epsilon+\lambda(t_0)\eta(t_0)\epsilon+\int^{t_N}_{t_0}\dot{\lambda}(t)\epsilon\eta(t)\mathrm{d}t+\mathcal{O}(\epsilon^2).\notag
 \end{align}
 
-We can then compute
+To transform the third term using the same method, we need to first get the value of $\dot{\eta}$, and from the definition of $z^*(t)$ we know $\eta(t)=\frac{\mathrm{d}z^*(t)}{\mathrm{d}\epsilon}\big\rvert_{\epsilon=0}$. Then we have
+\begin{align}
+\dot{\eta}(t)&=\frac{\mathrm{d}z^*(t)^2}{\mathrm{d}\epsilon\mathrm{d}t}\Bigg\rvert_{\epsilon=0}\notag\\
+&=\frac{\mathrm{d}}{\mathrm{d}\epsilon}\Bigg\rvert_{\epsilon=0}\frac{\mathrm{d}z^*(t)}{\mathrm{d}t}\notag\\
+&=\frac{\mathrm{d}}{\mathrm{d}\epsilon}\Bigg\rvert_{\epsilon=0}f\left(z(t)+\epsilon\eta(t)+\mathcal{O}(\epsilon^2),\theta+\epsilon\zeta,t\right)\notag\\
+&=\frac{\partial f}{\partial z}\epsilon\eta+\frac{\partial f}{\partial \theta}\epsilon\zeta.\notag\end{align}
+
+So the third term yields
+\begin{align}
+\int^{t_N}_{t_0}\lambda(f(z^*(t),\theta^*,t)-f(z(t),\theta,t))\mathrm{d}t&=\int^{t_N}_{t_0}\lambda(t)(f(z(t)+\epsilon\eta(t)+\mathcal{O}(\epsilon^2),\theta+\epsilon\zeta,t)-f(z(t),\theta,t))\mathrm{d}t\notag\\
+&=\int^{t_N}_{t_0}\lambda(t)\left(\frac{\partial f}{\partial z}\epsilon\eta+\frac{\partial f}{\partial \theta}\epsilon\zeta\right)\mathrm{d}t+\mathcal{O}(\epsilon^2).\notag
+\end{align}
+
+So the difference becomes
+\begin{align}
+\label{eq3}
+\mathcal{J}(\theta^*)-\mathcal{J}(\theta)=&\int^{t_N}_{t_0}\left(\lambda(t)\frac{\partial f}{\partial z}+\dot{\lambda}(t)\right)\epsilon\eta(t)\mathrm{d}t+\lambda(t_0)\eta(t_0)\epsilon\notag\\
+&+\sum^{N}_{i=1} \left(\lambda(t_i^+)-\lambda(t_i^-)+\frac{\partial \mathcal{L}}{\partial z(t_i)}\right)\epsilon\eta(t_i)\notag\\
+&+\int^{t_N}_{t_0}\lambda(t)\frac{\partial f}{\partial \theta}\epsilon\zeta\mathrm{d}t+\mathcal{O}(\epsilon^2).\tag{3}
+\end{align}
+
+This motivates us to choose $\lambda$ as follows to eliminate the first three terms in the difference:
 $$
-\frac{\mathrm{d}\mathcal{L}}{\mathrm{d}z(t_{i-1})} =a(t_i)- \int_{t_i}^{t_{i-1}}a(s)\frac{\partial f(z(s),\theta,s)}{\partial z(s)}\mathrm{d}s,\quad i=1,\dots,N.
+\dot{\lambda}(t)=\lambda(t)\frac{\partial f}{\partial z}\quad\quad \lambda(t_i^-)=\lambda(t_i^+)+\frac{\partial\mathcal{L}}{\partial z(t_i)}, \quad i=N,N-1,\dots,1.
 $$
 
-\subsubsection{Gradients w.r.t. \(\theta\) and \(t\)}
+Now we introduce the \textit{adjoint state} $a(t)$ as the solution to these $N$ initial value problems:
+\begin{equation}\label{eq4}
+\dot{a}(t)=a(t)\frac{\partial f}{\partial z}\quad\quad a^{\mathrm{initial}}(t_i)=a(t_i)+\frac{\partial\mathcal{L}}{\partial z(t_i)}, \quad i=N,N-1,\dots,1.\tag{4}
+\end{equation}
 
-For this part of the proof, we assume that the loss function $\mathcal{L}$ depends only on the final time point $t_N$. If the loss function also depends on intermediate time points $t_1,\dots,t_{N-1}$, we can simply apply the backpropagation using the adjoint method for each interval $[t_{N-1},t_N],\dots,[t_1,t_0]$ in reverse order and sum up the gradients. 
+and by substituting this $a(t)$ as $\lambda$ in (\ref{eq3}) we can get
+$$
+\mathcal{J}(\theta^*)-\mathcal{J}(\theta)=\int^{t_N}_{t_0}\lambda(t)\frac{\partial f}{\partial \theta}\epsilon\zeta\mathrm{d}t+\mathcal{O}(\epsilon^2).
+$$
+
+Then the gradient of the Lagrange loss with respect to $\theta$ is
+$$
+\frac{\mathrm{d}\mathcal{J}}{\mathrm{d}\theta}=\int^{t_N}_{t_0}a(t)\frac{\partial f}{\partial \theta}\mathrm{d}t.
+$$
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.75\linewidth]{report/figures/BackpropODE.png}
+    \caption{The graph of the adjoint state $a(t)$.}
+\end{figure}
+
+\subsubsection{Gradient wrt. \(\theta\) and \(t\)}
+
+For this part of the proof, we assume that the loss function $\mathcal{L}$ depends only on the final time point $t_N$. If the loss function also depends on intermediate time points $t_1,\dots,t_{N-1}$, we can simply apply the backpropagation for each interval $[t_{N-1},t_N],\dots,[t_1,t_0]$ in reverse order and sum up the gradients of the parameters at each evaluation point.
 
 To calculate the gradient with respect to $\theta$ and $t$, similarly, we define two more adjoints as
 $$a_{\theta}(t):=\frac{\mathrm{d}\mathcal{L}}{\mathrm{d} \theta},
@@ -700,16 +795,14 @@ $$a_{\theta}(t):=\frac{\mathrm{d}\mathcal{L}}{\mathrm{d} \theta},
 
 (Note that the minus sign in the second term is added to simplify future calculations.)
 
-Using the same method, we can obtain the following two IVPs. For $a_\theta(t)$, to simplify the computation, we assume that $a_\theta(t_N)=0$:
+For $a_\theta(t)$, to simplify the computation, we assume that $a_\theta(t_N)=0$:
 $$
 a_{\theta}(t) = \frac{\mathrm{d}\mathcal{L}}{\mathrm{d} z(t)}\frac{\mathrm{d} z(t)}{\mathrm{d}\theta}=a(t)\frac{\mathrm{d} z(t)}{\mathrm{d}\theta}.
 $$
 
-Then we have
+Notice that the loss $\mathcal{L}$ is the same as the Lagrange loss $\mathcal{J}$. Thus, we have
 \begin{align}
-\frac{\mathrm{d}\mathcal{L}}{\mathrm{d}\theta}&=\int_{t_0}^{t_N}\frac{\mathrm{d}a(t)}{\mathrm{d}t}\frac{\mathrm{d} z(t)}{\mathrm{d}\theta}+a(t)\frac{\mathrm{d}}{\mathrm{d}\theta}\left(\frac{\mathrm{d}z(t)}{\mathrm{d}t}\right)\mathrm{d}t\notag\\
-&=\int_{t_0}^{t_N}\frac{\mathrm{d}a(t)}{\mathrm{d}t}\frac{\mathrm{d}z(t)}{\mathrm{d}\theta}+a(t)\frac{\mathrm{d}f}{\mathrm{d}\theta}\mathrm{d}t\notag\\
-&=\int_{t_0}^{t_N}-a(t)\frac{\partial f}{\partial z(t)}\frac{\mathrm{d}z(t)}{\mathrm{d}\theta}+a(t)\left(\frac{\partial f}{\partial z(t)}\frac{\mathrm{d}z(t)}{\mathrm{d}\theta}+\frac{\partial f}{\partial \theta}\right)\mathrm{d}t\notag\\
+\frac{\mathrm{d}\mathcal{L}}{\mathrm{d} \theta}&=\frac{\mathrm{d}\mathcal{J}}{\mathrm{d} \theta}\notag\\
 &=\int_{t_0}^{t_N}a(t)\frac{\partial f}{\partial \theta}\mathrm{d}t\notag\\
 &=\int_{t_N}^{t_0}-a(t)\frac{\partial f}{\partial \theta}\mathrm{d}t\notag\\
 &=a_{\theta}(t_0)-a_{\theta}(t_N)\notag\\
@@ -720,8 +813,8 @@ So we have shown that $a_{\theta}$ is also a function of $t$ such that $$\frac{\
 
 Then the first initial value problem is 
 $$a_\theta(t_N)=0$$
-\begin{equation}\label{eq6}
-    \frac{\mathrm{d}a_{\theta}(t)}{\mathrm{d}t} = -a(t)\frac{\partial f}{\partial \theta}. \tag{6}
+\begin{equation}\label{eq5}
+    \frac{\mathrm{d}a_{\theta}(t)}{\mathrm{d}t} = -a(t)\frac{\partial f}{\partial \theta}. \tag{5}
 \end{equation}
 
 Next, we consider $a_t(t)$:
@@ -736,11 +829,11 @@ $$
 
 So the second initial value problem is 
 $$a_t(t_N)=-a(t)f(z(t),\theta,t)$$
-\begin{equation}\label{eq7}
-    \frac{\mathrm{d}a_t(t)}{\mathrm{d}t} = -a(t)\frac{\partial f}{\partial t}. \tag{7}
+\begin{equation}\label{eq6}
+    \frac{\mathrm{d}a_t(t)}{\mathrm{d}t} = -a(t)\frac{\partial f}{\partial t}. \tag{6}
 \end{equation}
 
-We noticed that equations (\ref{eq5}), (\ref{eq6}), (\ref{eq7}) follow a similar pattern. By adding a minus sign when defining $a_t(t)$, we ensure that equation (\ref{eq7}) aligns with the pattern of equations (\ref{eq5}), (\ref{eq6}). Accordingly, we define the augumented state $a_{\mathrm{aug}}$ and the corresponding differrential equation $f_{\mathrm{aug}}$ as follows
+We noticed that equations (\ref{eq4}), (\ref{eq5}), (\ref{eq6}) follow a similar pattern. By adding a minus sign when defining $a_t(t)$, we ensure that equation (\ref{eq6}) aligns with the pattern of equations (\ref{eq4}), (\ref{eq5}). Accordingly, we define the augumented state $a_{\mathrm{aug}}$ and the corresponding differrential equation $f_{\mathrm{aug}}$ as follows
 $$a_{\mathrm{aug}}:= \begin{pmatrix}a\\ a_\theta\\ a_t\end{pmatrix}\quad\quad f_{\mathrm{aug}}\left([z,\theta,t]\right):=\frac{\mathrm{d}}{\mathrm{d}t}\begin{pmatrix}z\\\theta\\ t\end{pmatrix}=\begin{pmatrix}f([z,\theta,t])\\0\\1\end{pmatrix}$$
 
 \[
@@ -757,7 +850,7 @@ $$
 \frac{\mathrm{d}a_{\mathrm{aug}}}{\mathrm{d}t} = -[a(t), a_\theta(t), a_t(t)]\frac{\partial f_{\mathrm{aug}}}{\partial [z,\theta,t]}(t)=-\left[a\frac{\partial f}{\partial z},a\frac{\partial f}{\partial \theta},a\frac{\partial f}{\partial t}\right](t)
 $$
 $$
-a_{\mathrm{aug}}(t_N)=\left[\frac{\mathrm{d}\mathcal{L}}{\mathrm{d} z(t_N)},0,-a(t_N)f(z(t_N),\theta, t_N)\right].
+a_{\mathrm{aug}}(t_N)=\left[a^{\mathrm{initial}}(t_N),0,-a(t_N)f(z(t_N),\theta, t_N)\right].
 $$
 
 Thus, we only need to solve this initial value problem. By calling the ODE solver on the augmented adjoint once, we are able to calculate all the necessary gradients with respect to $z(t_0)$, $\theta$, $t_0$ and $t_N$.
@@ -914,7 +1007,14 @@ or in the differential form
 $$Z_a=g_\theta(X_a), \mathrm{d}Z_t=f_\theta(Z_t)\mathrm{d}X_t,$$ where $t\in(a,b].$ \cite{kidger2022neural}
 \end{definition}
 
-From the above CDE, we may conclude that the hidden state $Z_t$ of the recurrent neural network can be continuously updated as the input $X_t$ evolves over time. Thus, neural CDE is a continuous analogue of the recurrent neural network. Finally, let $l_\theta:\mathbb{R}^w\rightarrow\mathbb{R}^p$ be a linear map mapping the hidden states $Z_t$ to the output $Y_t$, where $p$ is the dimension of the output $Y_t$. The difference between a neural network and a linear map is that a neural network contains an activation function, and a linear map does not.
+From the above CDE, we may conclude that the hidden state $Z_t$ of the recurrent neural network can be continuously updated as the input $X_t$ evolves over time. Thus, neural CDE is a continuous analogue of the recurrent neural network. Finally, let $l_\theta:\mathbb{R}^w\rightarrow\mathbb{R}^p$ be a linear map mapping the hidden states $Z_t$ to the output $Y_t$, where $p$ is the dimension of the output $Y_t$. The difference between a neural network and a linear map is that a neural network contains an activation function, and a linear map does not. The figure below illustrates the difference between neural ODE and neural CDE in terms of modelling time series data. For a detailed discussion of the comparison between two models, we refer to \cite{kidger2020}.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.75\linewidth]{report/figures/ODE vs CDE implementation Neural CDE for irregular time series.jpeg}
+    \caption{The comparison of neural ODE and neural CDE when modelling time series data. \cite{kidger2020}}
+    \label{fig:enter-label}
+\end{figure}
 
 \subsection{Solving Neural CDEs}
 
