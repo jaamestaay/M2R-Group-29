@@ -540,7 +540,7 @@ Unlike neural networks, where depth refers to the number of layers, the depth of
 
 From the previous part, we find that the input space and the output space of a neural ODE always have the same dimension. It poses a problem when simulating certain types of data. For instance, if we want to use a neural ODE to simulate a sine function, where we want the model to output $\sin x$ for a given input $x$, we might choose to use a simple neural ODE with a one-dimensional input space. In that case, for the sine function, if we input $\frac{\pi}{2}$ and $\frac{3\pi}{2}$, we would expect the model to output $1$ and $-1$, respectively, since the idea of the neural ODE model here is to follow a trajectory from the input $x$ and try to reach the expected output value $\sin x$ after some time $t$ ($t$ can be either fixed or trainable as the parameter $\theta$). And the function $f$ used to define a neural ODE is Lipschitz continuous \cite{chen2018neural}, meaning that the different trajectories cannot intersect. This makes it difficult for a simple neural ODE to handle such problems.
 
-This is why we might need to use the \textit{augmented neural ODE model}. The idea is to avoid conflicting trajectories by adding more dimensions to the input. In practice, we usually concatenate some zeros to the input and then drop the excess dimensions to the output. This method allows the model to learn a more complex function in a higher-dimension space.
+This is why we might need to use the \textit{augmented neural ODE model} \cite{dupont2019augmented}. The idea is to avoid conflicting trajectories by adding more dimensions to the input. In practice, we usually concatenate some zeros to the input and then drop the excess dimensions to the output \cite{nguyen2020exploration}. This method allows the model to learn a more complex function in a higher-dimension space.
 
 \subsubsection{Neural ODEs with Scientific Machine Learning}
 
@@ -771,7 +771,7 @@ $$
 
 For this part of the proof, we assume that the loss function $\mathcal{L}$ depends only on the final time point $t_N$. If the loss function also depends on intermediate time points $t_1,\dots,t_{N-1}$, we can simply apply the following method for each interval $[t_{N-1},t_N],\dots,[t_1,t_0]$ in reverse order and sum up the gradients of the parameters at each evaluation point.
 
-To calculate the gradient with respect to $\theta$ and $t$, similarly, we try to turn the problem into solving two initial value problems.
+To calculate the gradient with respect to $\theta$ and $t$, similarly, we try to turn the problem into solving two initial value problems. 
 
 We first try to find the value of the gradient of loss function with respect to $\theta$ at the start time $t_0$. Notice that the loss $\mathcal{L}$ is the same as the Lagrange loss $\mathcal{J}$. We define $a_\theta$ as a function such that $\frac{\mathrm{d}a_\theta}{\mathrm{d}t}=-a(t)\frac{\partial f}{\partial \theta}$. Thus, we have
 \begin{align}
