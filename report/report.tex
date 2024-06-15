@@ -17,6 +17,7 @@
 \usepackage{caption}
 \DeclareUnicodeCharacter{0302}{\^{}}
 \captionsetup[figure]{labelfont={bf},labelsep=quad}
+\captionsetup[table]{labelfont={bf},labelsep=quad}
 \usepackage[ruled,vlined]{algorithm2e}
 \makeatletter
 \DeclareMathOperator*{\argmin}{argmin}
@@ -89,7 +90,7 @@
 
 \begin{abstract}
 
-This paper delves into the integration of neural networks with differential equations, known as neural differential equations, within the field of scientific machine learning. They offer a continuous-time model that is particularly effective for handling time series data, surpassing traditional methods that operate in discrete time. We explore the core principles of neural networks, their architecture, and training techniques, and then introduce neural ordinary differential equations, highlighting their formulation and practical applications as part of larger neural networks. As an extension, we briefly discuss neural controlled differential equations. This study not only highlights the theoretical importance of neural differential equations but also showcases their potential in various applications.
+This paper delves into the integration of neural networks with differential equations, known as neural differential equations, within the field of scientific machine learning. They offer a continuous-time model that is particularly effective for handling time series data, surpassing traditional methods that operate in discrete time. We explore the core principles of neural networks, their architecture, and training techniques, and then introduce neural ordinary differential equations, highlighting their formulation and practical applications as part of larger neural networks. As an extension, we briefly discuss neural controlled differential equations. This study not only emphasises the theoretical importance of neural differential equations but also showcases their potential in various applications.
 
 \end{abstract}
 \tableofcontents
@@ -100,15 +101,15 @@ In recent years, the intersection of machine learning and scientific computing h
 
 The motivation behind neural differential equations stems from the limitations of traditional neural networks, such as their inability to handle continuous time series data. Neural differential equations address these issues by providing a continuous-time analogue to discrete-layer architectures, such as residual neural networks. Additionally, neural differential equations are advantageous because of their efficient memory use \cite{haoxuan2023}.
 
-In this section, we first describe some foundational notions of neural networks. We review the history and basic structure of neural networks, including key concepts such as layers, activation functions, and loss functions. Optimisation strategies are also discussed, specifically gradient descent and automatic differentiation for efficient calculations. We then explore some simple applications to further illustrate these ideas and help us to discover how neural networks work in terms of real-world scenarios, such as in the regression and classification optimisation problems.
+In the first section, we describe some foundational notions of neural networks. We review the history and basic structure of neural networks, including key concepts such as layers, activation functions, and loss functions. Optimisation strategies are also discussed, specifically gradient descent and automatic differentiation for efficient calculations. We then explore some simple applications to further illustrate these ideas and help us to discover how neural networks work in terms of real-world scenarios, such as regression and classification problems.
 
-Subsequently, we dive into the formulation and implementation of neural ordinary differential equations (ODEs) and discuss their connection to residual neural networks. Most importantly, the backpropagation of gradients needs to be derived in the gradient descent algorithm process - we discuss the methods to do so with neural ODEs, elaborating on numerical ODE solvers and the adjoint method. We finish the section by discussing several strengths and limitations of neural ODEs.
+Subsequently, we dive into the formulation and implementation of neural ordinary differential equations (ODEs) and discuss their connection to residual neural networks. Most importantly, the backpropagation of gradients needs to be derived in the gradient descent algorithm process. We discuss the methods to do so with neural ODEs, elaborating on numerical ODE solvers and the adjoint method.
 
-Furthermore, we provide two applications for neural ODEs. We first extend the MNIST handwritten digit classification example provided in Section \ref{sec:neuralnetworks} with neural ODEs, improving the accuracy from $80\%$ achieved by the traditional neural network method to around $95\%$, thereby demonstrating the capabilities of neural ODEs. \textcolor{red}{We then provide another application of using neural ODEs using a regression optimisation problem.}
+Furthermore, we provide two applications for neural ODEs. We first extend the MNIST handwritten digit classification task from classic neural networks to neural ODEs, improving the accuracy from $80\%$ to around $95\%$ with even faster running time and a smaller number of parameters, thereby demonstrating the capabilities of neural ODEs. \textcolor{red}{We then provide another application of using neural ODEs using a regression optimisation problem.}
 
-Finally, building on the framework of neural ODEs to handle more complex and irregular data streams, we extend our discussion to neural CDEs. We delve into the definition of neural CDEs and discuss and apply methods to model time series data using neural CDEs and a technique from numerical analysis called cubic splines.
+Finally, building on the framework of neural ODEs to handle more complex and irregular data streams, we extend our discussion to neural controlled differential equations (CDEs). We delve into the definition of neural CDEs and discuss and apply methods to model time series data using neural CDEs and a technique from numerical analysis called cubic splines.
 
-Throughout this section, we use the Julia programming language. Julia is a modern, compiled, high-level, open-source language developed at MIT. It is becoming increasingly important in scientific machine learning and is widely used in high-performance computing and artificial intelligence, including by Astrazeneca, Moderna, and Pfizer in drug development and clinical trial acceleration, IBM for medical diagnosis, MIT for robot locomotion, and elsewhere \cite{SciMLSANUM2024}. Where appropriate, we will supplement suitable Julia code to accompany the ideas presented. All code can be found in the project's \href{https://github.com/jaamestaay/M2R-Group-29}{GitHub repository}.
+Throughout this section, we use the Julia programming language. Julia is a modern, compiled, high-level, open-source language developed at MIT. It is becoming increasingly important in scientific machine learning and is widely used in high-performance computing and artificial intelligence, including by Astrazeneca, Moderna, and Pfizer in drug development and clinical trial acceleration, IBM for medical diagnosis, MIT for robot locomotion, and elsewhere \cite{SciMLSANUM2024}. Where appropriate, we supplement suitable Julia code to accompany the ideas presented. All code can be found in the project's \href{https://github.com/jaamestaay/M2R-Group-29}{GitHub repository}.
 
 Overall, we aim to provide a thorough understanding of neural differential equations and their significance in scientific machine learning. 
 
@@ -117,7 +118,7 @@ Overall, we aim to provide a thorough understanding of neural differential equat
 \label{sec:neuralnetworks}
 \subsection{History}
 
-Before diving into neural ordinary and control differential equations, we shall first explore classic neural networks. Generally speaking, a \textit{neural network} is a group of units called \textit{neurons} connected by signals called \textit{synapses}.
+Before diving into neural ordinary and control differential equations, we first explore classic neural networks. Generally speaking, a \textit{neural network} is a group of units called \textit{neurons} connected by signals called \textit{synapses}.
 
 In 1943, Warren McCulloch and Walter Pitts published a seminal paper, in which they proposed the first mathematical model of an \textit{artificial neural network}, inspired by biological neural networks in animal brains \cite{McCulloch1943}. This model was named the \textit{McCulloch-Pitts neuron}, or \textit{perceptron}. In some sense, it could ‘learn’ from given data and make decisions or predictions based on some parameters. The process of optimising the choice of such parameters is called \textit{training} the neural network.
 
@@ -359,7 +360,7 @@ model = Chain(
 )
 \end{verbatim}
 
-After that, we implement the loss function based on \verb|norm| from the \verb|LinearAlgebra| package. For simplicity, we might consider our loss function to be the $L^2$-norm of $f(\mathbf{x}) - \sin (\mathbf{x})$, i.e., the square root of the sum of squares of differences between the predicted output and the target output.
+After that, we implement the loss function based on \verb|norm| from the \verb|LinearAlgebra| package. For simplicity, we consider our loss function to be the $L^2$-norm of $f(\mathbf{x}) - \sin (\mathbf{x})$, i.e., the square root of the sum of squares of differences between the predicted output and the target output.
 
 \begin{verbatim}
 function regression_loss(ps, (model, st, (x, y)))
@@ -386,7 +387,7 @@ To solve the optimisation problem, we use the gradient descent method supplied b
 ret = solve(prob, Adam(0.03), maxiters = 250)
 \end{verbatim}
 
-Lastly, we can visualise our results by plotting supplied in the \verb|Plots| package:
+Lastly, we visualise our results by plotting supplied in the \verb|Plots| package:
 
 \begin{verbatim}
 plot(x, y, label = "Target")
@@ -407,7 +408,7 @@ The result of the regression is found in Figure \ref{fig:regression}. This is a 
 
 Neural networks can also be applied to \textit{classification} problems. They involve using a neural network to assign labels to input data based on some patterns learnt during the training process. A classic example is digit recognition based on the \textit{Modified National Institute of Standards and Technology database} (MNIST database). This database presents a large collection of handwritten digits given in pixels. The task is to learn from the database and classify the digits. As we can see, it is basically another form of regression; therefore, neural networks would be a suitable model.
 
-A sample image from MNIST is shown below. We can immediately see that it is a $6$. We want our model to recognise it as a $6$ as well, i.e., that the model thinks that the probability that this digit is a $6$ is higher than any other digit.
+A sample image from MNIST is shown below. We immediately see that it is a $6$. We want our model to recognise it as a $6$ as well, i.e., that the model thinks that the probability that this digit is a $6$ is higher than any other digit.
 
 \begin{figure}[htbp]
     \centering
@@ -470,7 +471,7 @@ We see that the training process takes $13$ seconds. By inverting the one-hot en
 sum(Flux.onecold(model(x_test_flat)) .== (y_test .+ 1)) / length(y_test)
 \end{verbatim}
 
-which is normally around $80\%$.  That is great, but not extremely satisfactory. This inspires us to consider a better model that incorporates other structures such as neural differential equations, as detailed in the following sections. In Section \ref{sec:app}, we will show that this improves the test accuracy to around $95\%$.
+which is normally around $80\%$ - satisfactory, but not perfect. This inspires us to consider a better model that incorporates other structures such as neural differential equations, as detailed in the following sections. In Section \ref{sec:app}, we will show that implementing a network with a neural ODE improves the test accuracy to around $95\%$.
 
 \pagebreak
 \section{Neural ODEs}
@@ -488,7 +489,7 @@ The second term in equation (\ref{eq1}) is in the form of a typical neural netwo
     \textbf{h}_{t+1} = \textbf{h}_t + f\left(\textbf{h}_t, \theta_t\right).
 \end{equation}
 
-We can write equation (\ref{eq1}) in the form of equation (\ref{eq2}), where $f$ is a function that depends on the state of layer $t$ and some parameters $\theta_t$ related to this layer. Then, by transforming equation (\ref{eq2}), we get
+We  write equation (\ref{eq1}) in the form of equation (\ref{eq2}), where $f$ is a function that depends on the state of layer $t$ and some parameters $\theta_t$ related to this layer. Then, by transforming equation (\ref{eq2}), we get
 $$\frac{\textbf{h}_{t+1} - \textbf{h}_t}{1}=f\left(\textbf{h}_t, \theta_t\right),$$
 
 which gives
@@ -540,11 +541,11 @@ Unlike neural networks, where depth refers to the number of layers, the depth of
 
 From the previous part, we find that the input space and the output space of a neural ODE always have the same dimension. It poses a problem when simulating certain types of data. For instance, if we want to use a neural ODE to simulate a sine function, where we want the model to output $\sin x$ for a given input $x$, we might choose to use a simple neural ODE with a one-dimensional input space. In that case, for the sine function, if we input $\frac{\pi}{2}$ and $\frac{3\pi}{2}$, we would expect the model to output $1$ and $-1$, respectively, since the idea of the neural ODE model here is to follow a trajectory from the input $x$ and try to reach the expected output value $\sin x$ after some time $t$ ($t$ can be either fixed or trainable as the parameter $\theta$). And the function $f$ used to define a neural ODE is Lipschitz continuous \cite{chen2018neural}, meaning that the different trajectories cannot intersect. This makes it difficult for a simple neural ODE to handle such problems.
 
-This is why we might need to use the \textit{augmented neural ODE model} \cite{dupont2019augmented}. The idea is to avoid conflicting trajectories by adding more dimensions to the input. In practice, we usually concatenate some zeros to the input and then drop the excess dimensions to the output \cite{nguyen2020exploration}. This method allows the model to learn a more complex function in a higher-dimension space.
+This is why we might use the \textit{augmented neural ODE model} \cite{dupont2019augmented}. The idea is to avoid conflicting trajectories by adding more dimensions to the input. In practice, we usually concatenate some zeros to the input and then drop the excess dimensions to the output \cite{nguyen2020exploration}. This method allows the model to learn a more complex function in a higher-dimension space.
 
 \subsubsection{Neural ODEs with Scientific Machine Learning}
 
-As mentioned above, we usually define the right-hand side of (\ref{nodeeqn}) with a neural network represented by a function $f$. However, if we have some prior knowledge about the model, we can introduce some interpretable terms to define $f$, and use a neural ODE to approximate the remaining part. This means that we can represent the model as $\dot{z}=g(u,t)+f(u,\theta,t)$, where we already know $g$ (if $g=0$, it is just the neural ODE discussed earlier), and we try to approximate $f$ with a neural network. For example, in a Lotka-Volterra system, the dynamic would be
+As mentioned above, we usually define the right-hand side of (\ref{nodeeqn}) with a neural network represented by a function $f$. However, if we have some prior knowledge about the model, we can introduce some interpretable terms to define $f$, and use a neural ODE to approximate the remaining part. This means that we can represent the model as $\dot{z}=g(u,t)+f(u,\theta,t)$, where we already know $g$ (if $g=0$, it is just the neural ODE discussed earlier), and approximate $f$ with a neural network. For example, in a Lotka-Volterra system, the dynamic would be
 \begin{align*}
     \frac{\mathrm{d}x}{\mathrm{d}t}&=\alpha x-\beta xy,\\
     \frac{\mathrm{d}y}{\mathrm{d}t}&=-\delta y-\gamma xy
@@ -757,7 +758,7 @@ Figure \ref{fig:graphat} illustrates the graph of $a(t)$. We see that the value 
     \label{fig:graphat}
 \end{figure}
 
-By substituting this $a(t)$ as $\lambda$ in (\ref{eq7}), we can get
+By substituting this $a(t)$ as $\lambda$ in (\ref{eq7}), we get
 $$
 \mathcal{J}(\theta^*)-\mathcal{J}(\theta)=\int^{t_N}_{t_0}\lambda(t)\frac{\partial f}{\partial \theta}\epsilon\zeta\mathrm{d}t+\mathcal{O}(\epsilon^2).
 $$
@@ -808,7 +809,7 @@ $$a_t(t_N)=-a(t)f\left(z(t),\theta,t\right)$$
     \frac{\mathrm{d}a_t(t)}{\mathrm{d}t} = -a(t)\frac{\partial f}{\partial t}.
 \end{equation}
 
-We noticed that equations (\ref{eq7}), (\ref{eq8}), (\ref{eq9}) follow a similar pattern. By adding a minus sign when defining $a_t(t)$, we ensure that equation (\ref{eq9}) aligns with the pattern of equations (\ref{eq7}), (\ref{eq8}). Accordingly, we define the augumented state $a_{\mathrm{aug}}$ and the corresponding differrential equation $f_{\mathrm{aug}}$ as follows
+We notice that equations (\ref{eq7}), (\ref{eq8}), (\ref{eq9}) follow a similar pattern. By adding a minus sign when defining $a_t(t)$, we ensure that equation (\ref{eq9}) aligns with the pattern of equations (\ref{eq7}), (\ref{eq8}). Accordingly, we define the augumented state $a_{\mathrm{aug}}$ and the corresponding differrential equation $f_{\mathrm{aug}}$ as follows
 $$a_{\mathrm{aug}}:= \begin{pmatrix}a\\ a_\theta\\ a_t\end{pmatrix}\quad\quad f_{\mathrm{aug}}\left([z,\theta,t]\right):=\frac{\mathrm{d}}{\mathrm{d}t}\begin{pmatrix}z\\\theta\\ t\end{pmatrix}=\begin{pmatrix}f(z,\theta,t)\\0\\1\end{pmatrix}$$
 
 \[
@@ -828,7 +829,7 @@ $$
 a_{\mathrm{aug}}(t_N)=\left[a^{\mathrm{initial}}(t_N),0,-a(t_N)f(z(t_N),\theta, t_N)\right].
 $$
 
-Thus, we only need to solve this initial value problem. By calling the ODE solver on the augmented adjoint once, we are able to calculate all the necessary gradients with respect to $z(t_0)$, $\theta$, $t_0$ and $t_N$.
+Thus, we only need to solve this initial value problem. By calling the ODE solver on the augmented adjoint once, we can calculate all necessary gradients with respect to $z(t_0)$, $\theta$, $t_0$ and $t_N$.
 
 In Appendix \ref{sec:adjmethod}, we provide a simple example and use the adjoint method to perform backpropagation. A solution is provided to illustrate how this method can be applied.
 
@@ -934,7 +935,7 @@ model = Chain(
 
 The number of parameters related to the weights is $784\times 196+196\times 49+49\times 10$, and the total number of biases is $196+49+10=255$. So, the total number of parameters in this model is $163758+255=164013$.
 
-However, for the network we used here, which embeds a neural ODE layer, since we are using a neural network to initailise the neural ode layer, the model would have the same parameter as a neural network with the following structure:
+However, for the network we used here which embeds a neural ODE layer, since we are using a neural network to initailise the neural ODE layer, the model would have the same parameter as a neural network with the following structure:
 \begin{verbatim}
 model = Chain(
     Dense(784, 20, tanh),
@@ -1011,7 +1012,7 @@ From now on $y(t)$ will be referred to as $y_t$, which is a notation commonly us
 
 \subsection{Neural CDEs}
 
-Before we introduce neural CDEs, we will first explore the idea of a \textit{recurrent neural network} (RNN). In fact, so far, we have been discussing \textit{feedforward neural network} (FNN) only, whose flow of information is uni-directional, from the input layer to the output layer, without any cycles or loops. FNN is sufficient for ordinary tasks such as regression and classification. However, for more complicated problems, RNN plays an important role. In RNN, the output of previous steps can be fed as input to the current step, allowing it to maintain a form of ‘memory’. This makes RNN particularly effective for tasks such as time series prediction, natural language processing, and speech recognition.
+Before we introduce neural CDEs, we first explore the idea of a \textit{recurrent neural network} (RNN). In fact, so far, we have been discussing \textit{feedforward neural networks} (FNNs) only, whose flow of information is uni-directional, from the input layer to the output layer, without any cycles or loops. FNNs are sufficient for ordinary tasks such as regression and classification. However, for more complicated problems, RNNs play an important role. In RNNs, the output of previous steps can be fed as input to the current step, allowing it to maintain a form of ‘memory’. This makes RNNs particularly effective for tasks such as time series prediction, natural language processing, and speech recognition.
 
 One fundamental assumption of neural CDEs is that the data we observe should form a continuous path $X:[a,b]\rightarrow\mathbb{R}^v$ with bounded variation. This assumption is made simply for theoretical purposes, i.e. the continuous data correspond to an evolutionary process or control path in the neural CDE. However, it is worthwhile to note that it is highly unlikely to observe data in such a form in real-life applications, and thus a trick that converts discrete observations to a continuous control path would be introduced in later parts of this extension. Let us now formulate the definition of neural CDEs rigorously, and then it will be clear that neural CDE is the continuous analogue to the recurrent neural network.
 
@@ -1185,7 +1186,7 @@ p_{i-1}''(t_i)=p_i''(t_i),\quad\forall i=1,\dots,k-1, \tag{C}\label{eqC}
 where $\forall i=0,1,\dots,k$, $m_i$ are chosen constants.
 \end{definition}
 
-One might be sceptical about whether the condition (\ref{eqC}) is necessary, since in time series modelling we would only ensure that the control path $X_t$ is continuously differentiable. However, if condition (\ref{eqC}) is dropped, it means that the curvature of the resultant path (which is related to the second derivative of the control path) might not be continuous, resulting in a possibly drastic change in the curvature of the control path that leads to unrealistic modelling.
+One might be sceptical about whether the condition (\ref{eqC}) is necessary, since in time series modelling we only ensure that the control path $X_t$ is continuously differentiable. However, if condition (\ref{eqC}) is dropped, it means that the curvature of the resultant path (which is related to the second derivative of the control path) might not be continuous, resulting in a possibly drastic change in the curvature of the control path that leads to unrealistic modelling.
 
 Using the table of divided differences and Lemma \ref{lemma53}, we obtain that the Newton polynomial defined on each time segment $t_i,t_{i+1}$ is
 $$p_i(t)=x_i+(t-t_i)m_i+(t-t_i)^2\frac{[t_i,t_{i+1}]f-m_i}{\Delta t_i}+(t-t_i)^2(t-t_{i+1})\frac{m_{i+1}+m_i-2[t_i,t_{i+1}]f}{(\Delta t_i)^2},$$
@@ -1240,7 +1241,7 @@ The data preprocessing process contains several steps. Firstly, the time series 
 
 \textbf{Training}
 
-In this part, we will only give a brief overview of the training process.
+In this part, we only give a brief overview of the training process.
 
 Recall that the entire forecasting process consists of three linear maps. In particular, $g_\theta:\mathbb{R}^v\rightarrow\mathbb{R}^w$ is a neural network that maps the input $X_t$ to hidden states $Z_t$, $f_\theta:\mathbb{R}^w\rightarrow\mathbb{R}^{w\times v}$ is an arbitrary neural network with parameters $\theta$ that represents the dynamics between hidden states. Note that $v$ represents the dimension of the input $X_t$, and $w$ represents the dimension of the hidden states $Z_t$. Finally, $l_\theta:\mathbb{R}^w\rightarrow\mathbb{R}^p$ is a linear map that maps the hidden states $Z_t$ to the output $Y_t$, where $p$ is the dimension of the output $Y_t$.
 
@@ -1254,10 +1255,15 @@ There exist online Python libraries that uses neural CDEs to achieve time series
 \textcolor{red}{to work on and make longer(?)}
 The field of scientific machine learning is a highly active one, attracting scientists and mathematicians alike. Various libraries are being developed, the most important of which in Julia is the \href{https://sciml.ai/}{\texttt{SciML}} package.
 
-\section*{Acknowledgment}
-\addcontentsline{toc}{section}{Acknowledgement}
+\section*{Acknowledgments}
+\addcontentsline{toc}{section}{Acknowledgements}
 
 We would like to thank Dr. Olver, our project supervisor, and his PhD students Mr. VandenHeuvel and Mr. Pu for their continued support and guidance throughout the project. Also, we would like to thank Dr. Salvi and Prof. Cass for kindly sharing their lecture notes which inspire the neural CDE extension section in this paper.
+
+\pagebreak
+\phantomsection
+\addcontentsline{toc}{section}{References}
+\bibliography{bibliography.bib}
 
 \pagebreak
 \appendix
@@ -1431,7 +1437,7 @@ To use the adjoint method, we first calculate the loss function. For simplicity,
 $$\mathcal{L} = \frac{1}{2}\left(c-z(t_0)e^{\theta t_1}\right)^2.$$
 
 Here we add $\frac{1}{2}$ to simplify the derivatives.
-For the adjoint method, we need to calculate the derivative for $a_{\mathrm{aug}}$ and its derivative $\frac{\mathrm{d}a_{\mathrm{aug}}}{\mathrm{d}t}$. To make it clear, in this example, instead of solving an IVP for $a_{\mathrm{aug}}$ in one call, we will solve three IVPs with respect to $a$, $a_\theta$, and $a_t$ numerically, providing an idea of how this method actually works.
+For the adjoint method, we need to calculate the derivative for $a_{\mathrm{aug}}$ and its derivative $\frac{\mathrm{d}a_{\mathrm{aug}}}{\mathrm{d}t}$. To make it clear, in this example, instead of solving an IVP for $a_{\mathrm{aug}}$ in one call, we solve three IVPs with respect to $a$, $a_\theta$, and $a_t$ numerically, providing an idea of how this method actually works.
 
 For $a$, we know $$\frac{\mathrm{d}{a}}{\mathrm{d}{t}}=-a\frac{\partial f(z(t),\theta,t)}{\partial z(t)}=-a\theta,\quad\quad a^{\mathrm{initial}} = z(t_1)-c.$$
 
@@ -1546,6 +1552,5 @@ function cubic_spline(t)
     return (cubic_spline_t(t), cubic_spline_p(t))
 end
 \end{verbatim}
-\pagebreak
-\bibliography{bibliography.bib}
+
 \end{document}
