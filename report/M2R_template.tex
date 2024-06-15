@@ -89,7 +89,7 @@
 
 \begin{abstract}
 
-This report delves into the integration of neural networks with differential equations, known as neural differential equations, within the field of scientific machine learning. They offer a continuous-time model that is particularly effective for handling time series data, surpassing traditional methods that operate in discrete time. We explore the core principles of neural networks, their architecture, and training techniques, and then introduce neural ordinary differential equations, highlighting their formulation and practical applications as part of larger neural networks. As an extension, we briefly discuss neural controlled differential equations. This study not only highlights the theoretical importance of neural differential equations but also showcases their potential in various applications.
+This paper delves into the integration of neural networks with differential equations, known as neural differential equations, within the field of scientific machine learning. They offer a continuous-time model that is particularly effective for handling time series data, surpassing traditional methods that operate in discrete time. We explore the core principles of neural networks, their architecture, and training techniques, and then introduce neural ordinary differential equations, highlighting their formulation and practical applications as part of larger neural networks. As an extension, we briefly discuss neural controlled differential equations. This study not only highlights the theoretical importance of neural differential equations but also showcases their potential in various applications.
 
 \end{abstract}
 \tableofcontents
@@ -100,7 +100,7 @@ In recent years, the intersection of machine learning and scientific computing h
 
 The motivation behind neural differential equations stems from the limitations of traditional neural networks, such as their inability to handle continuous time series data. Neural differential equations address these issues by providing a continuous-time analogue to discrete-layer architectures, such as residual neural networks. Additionally, neural differential equations are advantageous because of their efficient memory use \cite{haoxuan2023}.
 
-In this report, we first describe some foundational notions of neural networks. We review the history and basic structure of neural networks, including key concepts such as layers, activation functions, and loss functions. Optimisation strategies are also discussed, specifically gradient descent and automatic differentiation for efficient calculations. We then explore some simple applications to further illustrate these ideas and help us to discover how neural networks work in terms of real-world scenarios, such as in the regression and classification optimisation problems.
+In this section, we first describe some foundational notions of neural networks. We review the history and basic structure of neural networks, including key concepts such as layers, activation functions, and loss functions. Optimisation strategies are also discussed, specifically gradient descent and automatic differentiation for efficient calculations. We then explore some simple applications to further illustrate these ideas and help us to discover how neural networks work in terms of real-world scenarios, such as in the regression and classification optimisation problems.
 
 Subsequently, we dive into the formulation and implementation of neural ordinary differential equations (ODEs) and discuss their connection to residual neural networks. Most importantly, the backpropagation of gradients needs to be derived in the gradient descent algorithm process - we discuss the methods to do so with neural ODEs, elaborating on numerical ODE solvers and the adjoint method. We finish the section by discussing several strengths and limitations of neural ODEs.
 
@@ -108,9 +108,9 @@ Furthermore, we provide two applications for neural ODEs. We first extend the MN
 
 Finally, building on the framework of neural ODEs to handle more complex and irregular data streams, we extend our discussion to neural CDEs. We delve into the definition of neural CDEs and discuss and apply methods to model time series data using neural CDEs and a technique from numerical analysis called cubic splines.
 
-Throughout this report, we use the Julia programming language. Julia is a modern, compiled, high-level, open-source language developed at MIT. It is becoming increasingly important in scientific machine learning and is widely used in high-performance computing and artificial intelligence, including by Astrazeneca, Moderna, and Pfizer in drug development and clinical trial acceleration, IBM for medical diagnosis, MIT for robot locomotion, and elsewhere \cite{SciMLSANUM2024}. Where appropriate, we will supplement suitable Julia code to accompany the ideas presented.
+Throughout this section, we use the Julia programming language. Julia is a modern, compiled, high-level, open-source language developed at MIT. It is becoming increasingly important in scientific machine learning and is widely used in high-performance computing and artificial intelligence, including by Astrazeneca, Moderna, and Pfizer in drug development and clinical trial acceleration, IBM for medical diagnosis, MIT for robot locomotion, and elsewhere \cite{SciMLSANUM2024}. Where appropriate, we will supplement suitable Julia code to accompany the ideas presented. All code can be found in the project's \href{https://github.com/jaamestaay/M2R-Group-29}{GitHub repository}.
 
-Overall, we aim to provide a thorough understanding of neural differential equations and their significance in scientific machine learning. The GitHub repository for our project can be found \href{https://github.com/jaamestaay/M2R-Group-29}{here}.
+Overall, we aim to provide a thorough understanding of neural differential equations and their significance in scientific machine learning. 
 
 \pagebreak
 \section{Neural Networks}
@@ -175,7 +175,7 @@ A simple neural network with an input layer (1 neuron), a hidden layer (5 neuron
 
 For neural networks with multiple layers, an \textit{activation function} $\sigma$ is usually used. This is because it helps to decide whether a neuron should be ‘activated’ and introduces non-linearity into the model. The output of each layer is therefore calculated as $\mathbf{h}_{t+1}=\sigma\left(\mathbf{W}_t\mathbf{h}_t+\mathbf{b}_t\right)$, where $\sigma$ acts element-wise, $\mathbf{h}_t$ is the output vector for layer $t$, $\mathbf{W}_t$ is the weight matrix connecting layer $t$ to layer $t+1$, and $\mathbf{b}_t$ is the bias vector for layer $t$. 
 
-Regarding the choice of the activation function, the S-shaped \textit{sigmoid function} has some nice properties: it is bounded, differentiable with a non-negative derivative, and has exactly one point of inflection \cite{HanMoraga}. Two familiar examples of sigmoid functions are the \textit{logistic function} $\sigma(x)=1/\left(1+\mathrm{e}^{-x}\right)$ and the hyperbolic tangent function $\sigma(x)=\tanh x$. Another commonly used activation function is the \textit{rectifier}, or \textit{rectified linear unit} (ReLU), defined as $\sigma(x)=\max(0, x)$.
+Regarding the choice of the activation function, the S-shaped \textit{sigmoid function} has some nice properties: it is bounded, differentiable with a non-negative derivative, and has exactly one point of inflection \cite{HanMoraga}. Two familiar examples of sigmoid functions are the \textit{logistic function} $\sigma(x)=1/\left(1+e^{-x}\right)$ and the hyperbolic tangent function $\sigma(x)=\tanh x$. Another commonly used activation function is the \textit{rectifier}, or \textit{rectified linear unit} (ReLU), defined as $\sigma(x)=\max(0, x)$.
 
 \begin{figure}[htbp]
     \centering
@@ -183,7 +183,7 @@ Regarding the choice of the activation function, the S-shaped \textit{sigmoid fu
         \centering
         \begin{tikzpicture}
             \begin{axis}[
-                title={$1/\left(1+\mathrm{e}^{-x}\right)$},
+                title={$1/\left(1+e^{-x}\right)$},
                 xlabel={$x$},
                 ylabel={$y$},
                 grid=major,
@@ -332,7 +332,7 @@ Now we turn our attention to two examples that utilise neural networks. We consi
 
 Consider a simple example of a neural network that performs regression-based analysis on $y = \sin x$. Assume that we are given $n$ data points between $[-\pi, \pi]$, denoted by $\mathbf{x}$. We try to minimise the difference between the predicted output $f(\mathbf{x})$ and the target output $\sin (\mathbf{x})$, where $f$ is the neural network being considered.
 
-We are now going to present an implementation of this neural network in Julia. The file containing all the code below can be found in the project's GitHub repository at \texttt{Neural\_Network}
+We now present an implementation of this neural network in Julia. The file containing all the code below can be found in the project's GitHub repository at \texttt{Neural\_Network}
 \texttt{.ipynb}.
 
 We first need to import some packages for later use.
@@ -927,7 +927,7 @@ which is around $95\%$, a huge improvement from the previous result of $80\%$ be
 
 \subsection{Motivation}
 
-As we have seen before, neural networks and differential equations seem to be irrelevant but, in fact, they have been proven to be two sides of the same coin. In particular, neural ODEs can be seen as a continuous-time analogue to the ResNet. However, there exist certain real-life applications such as time series forecasting where neural ODEs are no longer effective in solving the problem. \textcolor{red}{Do you have an example of such a scenario? It would be best to include one, but if you don't that is fine too.} Fortunately, a British mathematician Terry Lyons developed a novel and exciting field of mathematics, rough path theory, in the 1990s \cite{kidger2022neural}. The mathematical insights from this theory can be used to develop a new concept called \textit{neural controlled differential equations} (neural CDEs).
+As we have seen before, neural networks and differential equations seem to be irrelevant but, in fact, they have been proven to be two sides of the same coin. In particular, neural ODEs can be seen as a continuous-time analogue to the ResNet. However, there exist certain real-life applications such as time series forecasting where neural ODEs are no longer effective in solving the problem. One such example is in irregularly sampled time series data. Fortunately, a British mathematician Terry Lyons developed a novel and exciting field of mathematics, rough path theory, in the 1990s \cite{kidger2022neural}. The mathematical insights from this theory can be used to develop a new concept called \textit{neural controlled differential equations} (neural CDEs).
 
 \subsection{Controlled Differential Equations}
 
@@ -999,7 +999,7 @@ It is theoretically possible to directly solve a CDE $\mathrm{d}Z_t = f(Z_t)\mat
 
 However, CDEs are much harder to solve than ODEs since there is a control term introduced in the equation. For the general case, we do not know whether the control path $X_t$ is differentiable or not. Using powerful tools from rough path theory, one can derive an elegant result called the \textit{log-ODE method}, which approximates the CDE by an ODE containing the log-signature of the control path \cite{morrill2021}. The details of the log-ODE method are omitted here, since the underlying theory is beyond the scope of the paper.
 
-Despite the fact that the log-ODE method can be used to solve CDEs under any circumstances, the log-ODE method is quite complicated to be implemented numerically. Fortunately, it can be cleverly avoided in terms of application. By a standard treatment common in numerical analysis, we can guarantee that the control path $X_t$ is continuously differentiable. We defer the discussion of this technique to later parts of this paper. In this case, the CDE can be shown to be equivalent to the following non-autonomous ODE: $\mathrm{d}Z_t=g(t,Z_t)\mathrm{d}t$, where $g(t,Z_t)=f(Z_t)\frac{\mathrm{d}X_t}{\mathrm{d}t}$. Then, we can solve this ODE using methods explained in Section \ref{sec:rungekutta} of this report.
+Despite the fact that the log-ODE method can be used to solve CDEs under any circumstances, the log-ODE method is quite complicated to be implemented numerically. Fortunately, it can be cleverly avoided in terms of application. By a standard treatment common in numerical analysis, we can guarantee that the control path $X_t$ is continuously differentiable. We defer the discussion of this technique to later parts of this paper. In this case, the CDE can be shown to be equivalent to the following non-autonomous ODE: $\mathrm{d}Z_t=g(t,Z_t)\mathrm{d}t$, where $g(t,Z_t)=f(Z_t)\frac{\mathrm{d}X_t}{\mathrm{d}t}$. Then, we can solve this ODE using methods explained in Section \ref{sec:rungekutta} of this paper.
 
 It can also be noted that the backpropagation through neural CDEs is similar to that through neural ODEs. In particular, the Discretise-then-Optimise method is exactly the same as that of neural ODEs, and the Optimise-then-Discretise method is similar to that of neural ODEs. Since the proofs are very similar, we omit them here.
 
@@ -1042,7 +1042,7 @@ $\{(t_0,x_0), (t_1,x_1), \\\dots, (t_k,x_k)\}$, the \textit{Newton basis polynom
 As the Newton polynomial passes through data points $(t_0,x_0), (t_1,x_1), \dots, (t_k,x_k)$, the coefficients of the Newton polynomial can be uniquely determined by solving a system of linear equations. The details of this computation are left for the interested readers to check. In other words, given a sample of $k+1$ data points
 $(t_0,x_0), (t_1,x_1), \dots, (t_k,x_k)$, the corresponding Newton polynomial is unique.
 
-Since $a_i$ is a linear combination of $x_0,x_1,\dots,x_i$, the coefficients are dependent on $t_0,t_1,\dots,\\t_i$. Let $a_i=[t_0,t_1,\dots,t_i]f$, where $i\in[0,k]$, and $f$ be some unknown function that passes through these points and needs to be estimated using the Newton interpolatory polynomial. The right-hand side is also denoted as the $i^{\mathrm{th}}$ \textit{divided difference} of $f$ relative to $t_0,t_1,\dots,t_i$. The motivation behind this name can be immediately seen from the following lemma.
+Since $a_i$ is a linear combination of $x_0,x_1,\dots,x_i$, the coefficients are dependent on $t_0,t_1,\dots,\\t_i$. We denote $a_i$ as $[t_0,t_1,\dots,t_i]f$, where $i\in[0,k]$, and let $f$ be some unknown function that passes through these points and needs to be estimated using the Newton interpolatory polynomial. The right-hand side is also denoted as the $i^{\mathrm{th}}$ \textit{divided difference} of $f$ relative to $t_0,t_1,\dots,t_i$. The motivation behind this name can be immediately seen from the following lemma.
 
 \begin{lemma}\label{lemma52}
     $\forall k\in\mathbb{N}_{>0}$, we have $$[t_0,t_1,t_2\dots,t_k]f=\frac{[t_1,t_2\dots,t_k]f-[t_0,t_1,\dots,t_{k-1}]f}{t_k-t_0}.$$
@@ -1181,6 +1181,7 @@ $$m_{k-1}+2m_k=3[t_{k-1},t_k]f.$$
 Adding these equations to the system of $k-1$ linear equations, we can readily solve for the constants $m_0,m_1,\dots,m_k$, and thus we can obtain an explicit expression for the control path $X_t$. 
 
 \subsubsection{A Naive Implementation}
+\label{sec:implementation}
 
 In this section, we propose a possible naive implementation of neural CDEs to model irregularly sampled time series data.
 
@@ -1205,12 +1206,13 @@ There exist online Python libraries that uses neural CDEs to achieve time series
 \pagebreak
 \section{Conclusion}
 
+\textcolor{red}{to work on and make longer(?)}
 The field of scientific machine learning is a highly active one, attracting scientists and mathematicians alike. Various libraries are being developed, the most important of which in Julia is the \href{https://sciml.ai/}{\texttt{SciML}} package.
 
 \section*{Acknowledgment}
 \addcontentsline{toc}{section}{Acknowledgement}
 
-We would like to thank Dr. Olver, our project supervisor, and his PhD students Mr. VandenHeuvel and Mr. Pu for their continued support and guidance throughout the project. Also, we would like to thank Dr. Salvi and Prof. Cass for kindly sharing their lecture notes which inspire the neural CDE extension section in this report.
+We would like to thank Dr. Olver, our project supervisor, and his PhD students Mr. VandenHeuvel and Mr. Pu for their continued support and guidance throughout the project. Also, we would like to thank Dr. Salvi and Prof. Cass for kindly sharing their lecture notes which inspire the neural CDE extension section in this paper.
 
 \pagebreak
 \appendix
@@ -1239,7 +1241,7 @@ We first note that since $\mathbf{\hat{y}}$ depends on the values of $\theta$, w
     $$
 \end{definition}
 
-In order to prove the convergence of the gradient descent algorithm, we need the following lemmas:
+In order to prove the convergence of the gradient descent algorithm, we need the following lemmas.
 
 \begin{lemma}
     If $\mathcal{L}$ is $L$-smooth, then the following inequalities hold $\forall  \theta_x \in \mathbb{R}^p$: 
@@ -1281,7 +1283,7 @@ In order to prove the convergence of the gradient descent algorithm, we need the
     $$
 \end{proof}
 
-We can now state the theorem for convergence, requiring that $\mathcal{L}(\theta, \mathbf{\hat{y}})$ is $L$-smooth and that $\mathcal{L}$ is convex for the gradient descent algorithm to produce a convergent sequence $(\theta_n)_\infty$ to $\hat{\theta} = \arg\min_\theta \mathcal{L}(\theta, \mathbf{\hat{y}})$:
+We can now state the theorem for convergence, requiring that $\mathcal{L}(\theta, \mathbf{\hat{y}})$ is $L$-smooth and that $\mathcal{L}$ is convex. This produces a convergent sequence $(\theta_n)_\infty$ to $\hat{\theta} = \arg\min_\theta \mathcal{L}(\theta, \mathbf{\hat{y}})$ through the gradient descent algorithm described in Section \ref{sec:gd}:
 
 \begin{theorem}[Convergence of Gradient Descent Algorithm]
     Let $\mathcal{L}$ be $L$-smooth and let $\theta_n$ for $n = 1, \dots$ be the sequence of iterates generated by the gradient descent algorithm
@@ -1335,13 +1337,13 @@ We can now state the theorem for convergence, requiring that $\mathcal{L}(\theta
     which means that for any arbitrarily small $\epsilon > 0$, we can find $N$ sufficiently large, such that $\forall n > N$, $|\mathcal{L}(\theta_n) - \mathcal{L}(\hat{\theta})| < \epsilon$. This concludes the proof.
 \end{proof}
 
-A more detailed proof, as well as stronger theorems for convergence, can be found in \cite{gower2015}.
+A more detailed proof, as well as further theorems for convergence rates involving learning rates $\eta$, can be found in \cite{gower2015}.
 
 \pagebreak
 \section{Comparison of ODE Solvers}
 \label{sec:odesolvecode}
 
-In this appendix, we provide the Julia code used to compare several numerical ODE solvers, namely the Euler, RK4 and Vern9 methods. The file containing all the code below can be found in the project's GitHub repository at \verb|ODE_Solvers.ipynb|. The initial value problem evaluated here was $\dot{z} = \cos(t)z, z(0) = 1$ in the interval $[0.0, 10.0]$, which has a trivial solution $z(t) = e^{\sin t}$. We first import relevant packages and define the problem in Julia:
+In this appendix, we provide the Julia code used to compare several numerical ODE solvers, namely the \texttt{Euler()}, \texttt{RK4()} and \texttt{Vern9()} methods. The file containing all the code below can be found in the project's GitHub repository at \verb|ODE_Solvers.ipynb|. The initial value problem evaluated here was $\dot{z} = \cos(t)z, z(0) = 1$ in the interval $[0.0, 10.0]$, which has the trivial solution $z(t) = e^{\sin t}$. We first import relevant packages and define the problem in Julia:
 \begin{verbatim}
 using DifferentialEquations, Plots
 function ode_problem!(dz, z, p, t)
@@ -1377,26 +1379,26 @@ plot!(times, vern9_discrete, label="Vern9")
 \section{A Simple Example of the Adjoint Method}
 \label{sec:adjmethod}
 
-In this appendix, we provide a simple example and try to apply the adjoint method to find the desired gradients. We aim to create a model where, given an input $x$, the output is $x\mathrm{e}$. We initialise our neural ODE with $f(z(t),\theta,t)=\theta z$, or $\dot{z}=\theta z$ over the timespan $[t_0,t_1]$, where $\theta$, $t_0$, $t_1$ are constants. Since $f$ is autonomous, we can fix $t_0 = 0$, and only make $t_1$ a trainable time parameter. Suppose that the model has one evaluation point at time $t_1$. Given an input $x$, the output will be $x\mathrm{e}^{\theta t_1}$. So, the model will perfectly align with our goal if $\theta t_1=1$.
+In this appendix, we provide a simple example and try to apply the adjoint method to find the desired gradients. We aim to create a model where, given an input $x$, the output is $xe$. We initialise our neural ODE with $f(z(t),\theta,t)=\theta z$, or $\dot{z}=\theta z$ over the timespan $[t_0,t_1]$, where $\theta$, $t_0$, $t_1$ are constants. Since $f$ is autonomous, we can fix $t_0 = 0$, and only make $t_1$ a trainable time parameter. Suppose that the model has one evaluation point at time $t_1$. Given an input $x$, the output will be $xe^{\theta t_1}$. So, the model will perfectly align with our goal if $\theta t_1=1$.
 
-After setting up the model, we provide one training data as $z(t_0)$. We can then solve the initial value problem and get $z(t) = z(t_0)\mathrm{e}^{\theta(t-t_0)}$, then output $z(t_1)=z(t_0)\mathrm{e}^{\theta t_1}$. We also provide the expected output value $c:=z(t_0)\mathrm{e}$.
+After setting up the model, we provide one training data as $z(t_0)$. We can then solve the initial value problem and get $z(t) = z(t_0)e^{\theta(t-t_0)}$, then output $z(t_1)=z(t_0)e^{\theta t_1}$. We also provide the expected output value $c:=z(t_0)e$.
 To use the adjoint method, we first calculate the loss function. For simplicity, we choose the mean square error (MSE) as the loss function. Thus, we have
-$$\mathcal{L} = \frac{1}{2}\left(c-z(t_0)\mathrm{e}^{\theta t_1}\right)^2.$$
+$$\mathcal{L} = \frac{1}{2}\left(c-z(t_0)e^{\theta t_1}\right)^2.$$
 
 Here we add $\frac{1}{2}$ to simplify the derivatives.
 For the adjoint method, we need to calculate the derivative for $a_{\mathrm{aug}}$ and its derivative $\frac{\mathrm{d}a_{\mathrm{aug}}}{\mathrm{d}t}$. To make it clear, in this example, instead of solving an IVP for $a_{\mathrm{aug}}$ in one call, we will solve three IVPs with respect to $a$, $a_\theta$, and $a_t$ numerically, providing an idea of how this method actually works.
 
 For $a$, we know $$\frac{\mathrm{d}{a}}{\mathrm{d}{t}}=-a\frac{\partial f(z(t),\theta,t)}{\partial z(t)}=-a\theta,\quad\quad a^{\mathrm{initial}} = z(t_1)-c.$$
 
-Solving this IVP, we get $$a(t)= (z(t_1)-c)\mathrm{e}^{-\theta(t-t_1)}.$$
+Solving this IVP, we get $$a(t)= (z(t_1)-c)e^{-\theta(t-t_1)}.$$
 
 Next, for $a_\theta$, $$\frac{\mathrm{d}{a_\theta}}{\mathrm{d}{t}}=-a\frac{\partial f(z(t),\theta,t)}{\partial \theta}=-az,\quad\quad a^{\mathrm{initial}}_\theta=0.$$
 
 So we have
 \begin{align}
 \frac{\mathrm{d}{a_\theta}}{\mathrm{d}{t}}&=-a(t)z(t)\notag\\
-&= -(z(t_1)-c)\mathrm{e}^{-\theta(t-t_1)}z(t_0)\mathrm{e}^{\theta t}\notag\\
-&= -(z(t_1)-c)z(t_0)\mathrm{e}^{\theta t_1}.\notag
+&= -(z(t_1)-c)e^{-\theta(t-t_1)}z(t_0)e^{\theta t}\notag\\
+&= -(z(t_1)-c)z(t_0)e^{\theta t_1}.\notag
 \end{align}
 
 Here, $c_\theta:=-\frac{\mathrm{d}{a_\theta}}{\mathrm{d}{t}}$ is a constant. Hence, $a_\theta(t_0) =\frac{\mathrm{d}L}{\mathrm{d}\theta} =t_1c_\theta$, and this is the gradient we need for updating $\theta$.
@@ -1449,9 +1451,7 @@ for col in names(amzn_norm)
 end
 \end{verbatim}
 
-We then have to calculate the relative dates as defined in the last section of the report.
-
-The first step is to extract the sorted dates and adjusted close values. 
+We then have to calculate the relative dates as defined in Section \ref{sec:implementation}. The first step is to extract the sorted dates and adjusted close values. 
 \begin{verbatim}
 using Dates
 dates = amzn_norm."Date"
