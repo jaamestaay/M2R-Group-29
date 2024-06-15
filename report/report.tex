@@ -978,6 +978,22 @@ where $\mathbb{P}=\{P=\{a=t_0<t_1<...<t_{n_P}=b\}\}$, the set of all partitions 
 Then $f$ is a function of \textit{bounded variation} iff $V_a^b(f)<\infty$.
 \end{definition}
 
+We have the following theorem about bounded variation.
+\begin{theorem}\label{bv}
+    If $f:[a,b]\rightarrow\mathbb{R}$ is continuously differentiable, then $f$ is of bounded variation.
+\end{theorem}
+\begin{proof}
+    Since $f:[a,b]\rightarrow\mathbb{R}$ is differentiable,
+    \begin{align*}
+    V_a^b(f) &= \sup_{P\in\mathbb{P}} \sum_{i=0}^{n_P-1} \left|\int_{t_i}^{t_{i+1}} f'(x)\mathrm{d}x\right| \\
+    &\leq \sup_{P\in\mathbb{P}} \sum_{i=0}^{n_P-1} \int_{t_i}^{t_{i+1}} \left|f'(x)\right|\mathrm{d}x\\
+    &= \int_a^b \left|f'(x)\right|\mathrm{d}x\\
+    &< \infty.
+    \end{align*}
+    
+    where the last inequality follows from the fact that $f'(x)$ is continuous on a closed interval and thus is bounded. This implies that $f$ is of bounded variation.
+\end{proof}
+
 \begin{definition}[Controlled differential equations (CDEs)]
     Let $a,b\in\mathbb{R}$ with $a<b$ and let $v,w\in\mathbb{N}$. Let $x:[a,b]\rightarrow\mathbb{R}^v$ be a continuous function of bounded variation. Let $f:\mathbb{R}^w\rightarrow\mathbb{R}^{w\times v}$ be Lipschitz continuous. Let $y_a\in\mathbb{R}^w$.
     
@@ -1017,17 +1033,18 @@ From the above CDE, we may conclude that the hidden state $Z_t$ of the recurrent
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.75\linewidth]{report/figures/ODE vs CDE implementation Neural CDE for irregular time series.jpeg}
-    \caption{The comparison of neural ODE and neural CDE when modelling time series data. \cite{kidger2020}}
+    \caption{The comparison of neural ODE and neural CDE when modelling time series data. This figure is taken from \cite{kidger2020}.}
     \label{fig:nodesncdes}
 \end{figure}
 
 \subsection{Solving Neural CDEs}
+\label{sec:CDEs}
 
 It is theoretically possible to directly solve a CDE $\mathrm{d}Z_t = f(Z_t)\mathrm{d}X_t$ with a given initial condition by discretisation. In particular, one could use the following modification of Euler's method from Section \ref{sec:rungekutta} to obtain a numerical solution: $Z_{i+1}=Z_i+f_\theta(Z_i)(X(t_{i+1})-X(t_j))$.
 
 However, CDEs are much harder to solve than ODEs since there is a control term introduced in the equation. For the general case, we do not know whether the control path $X_t$ is differentiable or not. Using powerful tools from rough path theory, one can derive an elegant result called the \textit{log-ODE method}, which approximates the CDE by an ODE containing the log-signature of the control path \cite{morrill2021}. The details of the log-ODE method are omitted here, since the underlying theory is beyond the scope of the paper.
 
-Despite the fact that the log-ODE method can be used to solve CDEs under any circumstances, the log-ODE method is quite complicated to be implemented numerically. Fortunately, it can be cleverly avoided in terms of application. By a standard treatment common in numerical analysis, we can guarantee that the control path $X_t$ is continuously differentiable. We defer the discussion of this technique to later parts of this paper. In this case, the CDE can be shown to be equivalent to the following non-autonomous ODE: $\mathrm{d}Z_t=g(t,Z_t)\mathrm{d}t$, where $g(t,Z_t)=f(Z_t)\frac{\mathrm{d}X_t}{\mathrm{d}t}$. Then, we can solve this ODE using methods explained in Section \ref{sec:rungekutta} of this paper.
+Despite the fact that the log-ODE method can be used to solve CDEs under any circumstances, the log-ODE method is quite complicated to be implemented numerically. Fortunately, it can be cleverly avoided in terms of application. By a standard treatment common in numerical analysis, we can guarantee that the control path $X_t$ is continuously differentiable. Thus, by Theorem \ref{bv}, it is of bounded variation and satisfies the condition of a path in CDEs. We defer the discussion of this technique to later parts of this paper. In this case, the CDE can be shown to be equivalent to the following non-autonomous ODE: $\mathrm{d}Z_t=g(t,Z_t)\mathrm{d}t$, where $g(t,Z_t)=f(Z_t)\frac{\mathrm{d}X_t}{\mathrm{d}t}$. Then, we can solve this ODE using methods explained in Section \ref{sec:rungekutta} of this paper.
 
 It can also be noted that the backpropagation through neural CDEs is similar to that through neural ODEs. In particular, the Discretise-then-Optimise method is exactly the same as that of neural ODEs, and the Optimise-then-Discretise method is similar to that of neural ODEs. Since the proofs are very similar, we omit them here.
 
@@ -1140,7 +1157,7 @@ The table of divided differences provides a visualisation of the process of comp
 
     Now we quote without proof a classical result about the error of the interpolation:
     $$f(t)-N_k(f;t)=\frac{f^{(k+1)}(\xi(t))}{(k+1)!}\prod_{i=0}^k(t-t_i),$$
-    where $\xi(t)$ is strictly between the smallest and the largest of these nodes.
+    where $\xi(t)$ is strictly between the smallest and the largest of these nodes. See \cite{Gautschi2012} for details.
 
     Comparing the two results, we have
     $$[t_0,t_1,\dots,t_k,s]f=\frac{f^{(k+1)}(\xi(t))}{(k+1)!}.$$
