@@ -459,12 +459,12 @@ loss(x, y) = Flux.Losses.logitcrossentropy(model(x), y)
 We are now ready to train our neural network. For this task, it is better to train the neural network several times, or \textit{epochs}. To optimise the performance, we shall use 25 epochs. We use a smaller learning rate $\eta = 0.003$ here.
 
 \begin{verbatim}
-for epoch in 1:25
+@time for epoch in 1:25
     Flux.train!(loss, Flux.params(model), dataset, Adam(0.003))
 end
 \end{verbatim}
 
-By inverting the one-hot encoding using \verb|onecold| and comparing with the target output, we might see the test accuracy given as (where the \verb|+1| is because Julia uses 1-based indexing and \verb|y_test| starts at 0)
+We see that the training process takes $13$ seconds. By inverting the one-hot encoding using \verb|onecold| and comparing with the target output, we might see the test accuracy given as (where the \verb|+1| is because Julia uses 1-based indexing and \verb|y_test| starts at 0)
 
 \begin{verbatim}
 sum(Flux.onecold(model(x_test_flat)) .== (y_test .+ 1)) / length(y_test)
@@ -478,7 +478,7 @@ which is normally around $80\%$.  That is great, but not extremely satisfactory.
 
 \subsection{Motivation}
 
-The method of \textit{neural ordinary differential equations} (neural ODEs) was first proposed in a 2018 paper titled "Neural Ordinary Differential Equations" \cite{chen2018neural}. This paper won the Best Paper Award at NeurIPS in the same year. The inspiration for neural ODEs came from observing a specific neural network model called the \textit{residual neural network} (ResNet) which was introduced by a Microsoft research team in 2015 \cite{he2016deep}. Unlike traditional neural networks, ResNet incorporates residual connections by adding a \textit{residual term} to the output of each layer, as shown in the equation below:
+The method of \textit{neural ordinary differential equations} (neural ODEs) was first proposed in a 2018 paper titled "Neural Ordinary Differential Equations" \cite{chen2018neural}. This paper won the Best Paper Award at NeurIPS in the same year. The inspiration for neural ODEs came from the observation of a specific neural network model called the \textit{residual neural network} (ResNet) which was introduced by a Microsoft research team in 2015 \cite{he2016deep}. Unlike traditional neural networks, ResNet incorporates residual connections by adding a \textit{residual term} to the output of each layer, as shown in the equation below:
 \begin{equation}\label{eq1}
     \textbf{h}_{t+1} = \textbf{h}_t + \sigma\left(\textbf{W}_t\textbf{h}_t + \textbf{b}_t\right).
 \end{equation}
@@ -909,8 +909,10 @@ Finally, since the sample size is large, we want to work with several images at 
 const N = 100
 M = length(nums) ÷ N - 1
 data = [(imgs[:, :, N*(b-1)+1:N*b], onehot(nums[N*(b-1)+1:N*b])) for b = 1:M]
-res = solve(opt_prob, Adam(0.003), data)
+@time res = solve(opt_prob, Adam(0.003), data)
 \end{verbatim}
+
+We see that the time used is around $8$ seconds, which is around $38.5\%$ shorter than $13$ seconds before with the neural network model.
 
 The test accuracy on the last batch is then given as
 
@@ -919,7 +921,33 @@ classify(x) = [argmax(x[:,j]) - 1 for j = 1:size(x,2)]
 sum(classify(m(imgs[:,:,end-N+1:end], res.u, st)[1]) .== nums[end-N+1:end])/N
 \end{verbatim}
 
-which is around $95\%$, a huge improvement from the previous result of $80\%$ before!
+which is around $95\%$, a huge improvement from the previous result of $80\%$ before. 
+
+Additionally, we compare the number of parameters we used in this model with the model we used in \ref{sec:cla}. We know that the number of parameters in a neural network includes weights and biases for each layer. The structure of the model in the first section is:
+\begin{verbatim}
+model = Chain(
+    Dense(784, 196, relu),
+    Dense(196, 49, relu)
+    Dense(49, 10)
+)
+\end{verbatim}
+
+The number of parameters related to the weights is $784\times 196+196\times 49+49\times 10$, and the total number of biases is $196+49+10=255$. So, the total number of parameters in this model is $163758+255=164013$.
+
+However, for the network we used here, which embeds a neural ODE layer, since we are using a neural network to initailise the neural ode layer, the model would have the same parameter as a neural network with the following structure:
+\begin{verbatim}
+model = Chain(
+    Dense(784, 20, tanh),
+    Dense(20, 10, tanh),
+    Dense(10, 10, tanh),
+    Dense(10, 20, tanh),
+    Dense(20, 10)
+)
+\end{verbatim}
+
+Using the same method, we find that the number of parameters in this model is $16450$.
+
+This comparison demonstrates that by embedding a neural ODE layer into the network, we use nearly one-tenth of the parameters and shorter training time compared to a simple neural network, while still improving the results.
 
 \pagebreak
 \section{Extension: Neural CDEs}
