@@ -1,8 +1,8 @@
 # M2R Group 29: Scientific Machine Learning
 
-This is the GitHub repository for the MATH50002 Group Research Project (M2R) on Scientific Machine Learning by Group 29 (James Tay, Jiaru Li, Xinyan Wang, Tianshi Liu, Jiankuan Liu).
+This is the GitHub repository for the MATH50002 Group Research Project (M2R) on Scientific Machine Learning by Group 29 (James Tay, Jiaru Li, Xinyan Wang, Tianshi Liu, Jiankuan Liu). You can find all relevant codes, figures and files here.
 
-# Report Outline
+The outline of our report is detailed below.
 
 ## 1. Introduction (Jiaru, James)
 
