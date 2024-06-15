@@ -767,8 +767,6 @@ $$
 \frac{\mathrm{d}\mathcal{J}}{\mathrm{d}\theta}=\int^{t_N}_{t_0}a(t)\frac{\partial f}{\partial \theta}\mathrm{d}t.
 $$
 
-
-
 \subsubsection{Gradient wrt. \(\theta\) and \(t\)}
 
 For this part of the proof, we assume that the loss function $\mathcal{L}$ depends only on the final time point $t_N$. If the loss function also depends on intermediate time points $t_1,\dots,t_{N-1}$, we can simply apply the following method for each interval $[t_{N-1},t_N],\dots,[t_1,t_0]$ in reverse order and sum up the gradients of the parameters at each evaluation point.
@@ -1005,7 +1003,7 @@ Despite the fact that the log-ODE method can be used to solve CDEs under any cir
 
 It can also be noted that the backpropagation through neural CDEs is similar to that through neural ODEs. In particular, the Discretise-then-Optimise method is exactly the same as that of neural ODEs, and the Optimise-then-Discretise method is similar to that of neural ODEs. Since the proofs are very similar, we omit them here.
 
-\subsection{Application}
+\subsection{Application: Time Series Modelling}
 
 It is possible to use neural ODEs to model time series data. However, neural ODEs become less useful when it comes to irregularly sampled time series data. In this final subsection, we propose a naive implementation of using neural CDEs to model financial time series data.
 
@@ -1134,15 +1132,15 @@ $\{(t_0,x_0), (t_1,x_1), \dots, (t_k,x_k)\}$, the \textit{cubic spline} $X_t$ co
 
 That is, if $p_i(t)=X_t|_{[t_i,t_{i+1}]}$, then the following conditions are satisfied:
 \begin{align}
-p_i(t_i)=x_i, p_i(t_{i+1})=x_{i+1},\quad\forall i=0,1,\dots,k-1; \tag{\\
-p_i'(t_i)=m_i, p_i'(t_{i+1})=m_{i+1},\quad\forall i=0,1,\dots,k-1; \\
-p_{i-1}''(t_i)=p_i''(t_i),\quad\forall i=1,\dots,k-1,
+p_i(t_i)=x_i, p_i(t_{i+1})=x_{i+1},\quad\forall i=0,1,\dots,k-1; \tag{A}\label{eqA}\\
+p_i'(t_i)=m_i, p_i'(t_{i+1})=m_{i+1},\quad\forall i=0,1,\dots,k-1; \tag{B}\label{eqB}\\
+p_{i-1}''(t_i)=p_i''(t_i),\quad\forall i=1,\dots,k-1, \tag{C}\label{eqC}
 \end{align}
 
 where $\forall i=0,1,\dots,k$, $m_i$ are chosen constants.
 \end{definition}
 
-One might be sceptical about whether condition (3) is necessary, since in time series modelling we would only ensure that the control path $X_t$ is continuously differentiable. However, if condition (3) is dropped, it means that the curvature of the resultant path (which is related to the second derivative of the control path) might not be continuous and thus we believe that there might exist a drastic change in the curvature of the control path which might then lead to unrealistic modelling.
+One might be sceptical about whether the condition (\ref{eqC}) is necessary, since in time series modelling we would only ensure that the control path $X_t$ is continuously differentiable. However, if condition (\ref{eqC}) is dropped, it means that the curvature of the resultant path (which is related to the second derivative of the control path) might not be continuous, resulting in a possibly drastic change in the curvature of the control path that leads to unrealistic modelling.
 
 Using the table of divided differences and Lemma \ref{lemma53}, we obtain that the Newton polynomial defined on each time segment $t_i,t_{i+1}$ is
 $$p_i(t)=x_i+(t-t_i)m_i+(t-t_i)^2\frac{[t_i,t_{i+1}]f-m_i}{\Delta t_i}+(t-t_i)^2(t-t_{i+1})\frac{m_{i+1}+m_i-2[t_i,t_{i+1}]f}{(\Delta t_i)^2},$$
@@ -1184,17 +1182,17 @@ Adding these equations to the system of $k-1$ linear equations, we can readily s
 
 \subsubsection{A Naive Implementation}
 
-In this section, we propose a naive implementation of neural CDEs to model irregularly sampled time series data.
+In this section, we propose a possible naive implementation of neural CDEs to model irregularly sampled time series data.
 
 \textbf{Description of the time series data:}
 
-The time series data used are adapted from \href{https://www.kaggle.com/datasets/praxitelisk/financial-time-series-datasets}{here} at Kaggle. It records the daily adjusted closing price of Amazon from 15/05/1997 to 02/08/2017 excluding holidays, which is reasonable since the stock market is closed during holidays. Hence, it is an irregularly sampled time series.
+The time series data used are adapted from \href{https://www.kaggle.com/datasets/praxitelisk/financial-time-series-datasets}{Kaggle}. It records the daily adjusted closing price of the Amazon stock AMZN from 15/05/1997 to 02/08/2017 excluding holidays, which is reasonable since the stock market is closed during holidays. Hence, it is an irregularly sampled time series requiring some data pre-processing.
 
-\textbf{Data preprocessing:}
+\textbf{Data preprocessing}
 
-The data preprocessing process contains several steps. Firstly, the time series data are normalised using min-max scaling. In particular, the time series data are now set to be in the range $[0,1]$ using the formula $p_i=\frac{x_i-x_{\min}}{x_{\max}-x_{\min}}$. Secondly, all dates are reorganised into the unified format "yyyy/mm/dd". Then, we transform each date into the relative date, which is the difference in days between the initial date and itself. Finally, we use the time series data of the form $(t_i,x_i)$, where $t_i\in\mathbb{N}, x_i\in[0,1]$ to create a natural cubic spline. The relevant codes are included in Appendix \ref{sec:datatime}.
+The data preprocessing process contains several steps. Firstly, the time series data are normalised using min-max scaling. In particular, the time series data are now set to be in the range $[0,1]$ using the formula $p_i=\frac{x_i-x_{\min}}{x_{\max}-x_{\min}}$. Secondly, all dates are reorganised into the unified format "yyyy/mm/dd". Then, we transform each date into the relative date, which is the difference in days between the initial date and itself. Finally, we use the time series data of the form $(t_i,x_i)$, where $t_i\in\mathbb{N}, x_i\in[0,1]$ to create a natural cubic spline. The relevant code can be found in Appendix \ref{sec:datatime}.
 
-\textbf{Training:}
+\textbf{Training}
 
 In this part, we will only give a brief overview of the training process.
 
@@ -1209,7 +1207,7 @@ There exist online Python libraries that uses neural CDEs to achieve time series
 
 The field of scientific machine learning is a highly active one, attracting scientists and mathematicians alike. Various libraries are being developed, the most important of which in Julia is the \href{https://sciml.ai/}{\texttt{SciML}} package.
 
-\section*{Acknowledgments}
+\section*{Acknowledgment}
 \addcontentsline{toc}{section}{Acknowledgement}
 
 We would like to thank Dr. Olver, our project supervisor, and his PhD students Mr. VandenHeuvel and Mr. Pu for their continued support and guidance throughout the project. Also, we would like to thank Dr. Salvi and Prof. Cass for kindly sharing their lecture notes which inspire the neural CDE extension section in this report.
@@ -1234,14 +1232,14 @@ We first note that since $\mathbf{\hat{y}}$ depends on the values of $\theta$, w
     A function $f$ is $L$\textit{-smooth} if $\nabla f$ is $L$-Lipschitz continuous.
 \end{definition}
 
-\begin{definition}[Convexity]
+\begin{definition}[Convexity\footnote{It should be noted that the `univariate' $f$ takes in a vector of parameters $\theta$, as such the definition of convexity is slightly more complicated - requiring the space for which the function's convexity is defined on to be a \textit{convex set}. We implicitly assume that $\mathbb{R}^p$ is a convex set.}]
     A function $f$ is \textit{convex} on $\mathbb{R}^p$ if $\forall \theta_x, \theta_y \in \mathbb{R}^p$, $\forall t \in [0, 1]$, we have
     $$
     f(t\theta_x + (1 - t)\theta_y) \leq tf(\theta_x) + (1-t)f(\theta_y).
     $$
 \end{definition}
 
-In order to prove the convergence of the gradient descent algorithm, we need two lemmas:
+In order to prove the convergence of the gradient descent algorithm, we need the following lemmas:
 
 \begin{lemma}
     If $\mathcal{L}$ is $L$-smooth, then the following inequalities hold $\forall  \theta_x \in \mathbb{R}^p$: 
@@ -1283,7 +1281,7 @@ In order to prove the convergence of the gradient descent algorithm, we need two
     $$
 \end{proof}
 
-We thus require that $\mathcal{L}(\theta, \mathbf{\hat{y}})$ is $L$-smooth and that $\mathcal{L}$ is convex for the gradient descent algorithm to produce a convergent sequence $(\theta_n)_\infty$ to $\hat{\theta} = \arg\min_\theta \mathcal{L}(\theta, \mathbf{\hat{y}})$:
+We can now state the theorem for convergence, requiring that $\mathcal{L}(\theta, \mathbf{\hat{y}})$ is $L$-smooth and that $\mathcal{L}$ is convex for the gradient descent algorithm to produce a convergent sequence $(\theta_n)_\infty$ to $\hat{\theta} = \arg\min_\theta \mathcal{L}(\theta, \mathbf{\hat{y}})$:
 
 \begin{theorem}[Convergence of Gradient Descent Algorithm]
     Let $\mathcal{L}$ be $L$-smooth and let $\theta_n$ for $n = 1, \dots$ be the sequence of iterates generated by the gradient descent algorithm

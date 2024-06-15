@@ -2,77 +2,79 @@
 
 This is the GitHub repository for the MATH50002 Group Research Project (M2R) on Scientific Machine Learning by Group 29 (James Tay, Jiaru Li, Xinyan Wang, Tianshi Liu, Jiankuan Liu).
 
-## Report Outline
+# Report Outline
 
-### 1. Introduction
+## 1. Introduction (Jiaru, James)
 
-### 2. Basic Neural Networks (Jiaru, James)
+## 2. Neural Networks (Jiaru, James)
 
-2.1 History (Jiaru)
+### 2.1 History (Jiaru)
 
-2.2 Concepts
+### 2.2 Concepts
 
 - Structure (Jiaru)
 - Activation Function (Jiaru)
 - Loss Function (James)
 
-2.3 Optimisation Techniques (James)
+### 2.3 Optimisation Techniques (James)
 
 - Gradient Descent
 - Automatic Differentiation and Discrete Backpropagation
 
-2.4 Example: Regression (Jiaru)
+### 2.4 Example: Regression (Jiaru)
 
-2.5 Example: Classification (Jiaru)
+### 2.5 Example: Classification (Jiaru)
 
-### 3. Introduction to Neural ODEs (Xinyan, James)
+## 3. Neural ODEs (Xinyan, James)
 
-3.1 Motivation (Xinyan)
+### 3.1 Motivation (Xinyan)
 
-3.2 Comparing Neural ODEs with ResNet (Xinyan)
+### 3.2 Comparing Neural ODEs with ResNet (Xinyan)
 
-3.3 Various Neural ODE Models (Xinyan)
+### 3.3 Various Neural ODE Models (Xinyan)
 
 - Augmented Neural ODEs
 - Neural ODEs with Scientific Machine Learning
 
-3.4 Runge-Kutta Methods (James)
+### 3.4 Solving ODEs Numerically (James)
 
-3.5 Discretise-then-Optimise (DO) (Xinyan)
+### 3.5 Backpropagation in Neural ODEs (Xinyan)
 
-3.6 Optimise-then-Discretise (OD) (Xinyan)
+- Discretise-then-Optimise (DO)
+- Optimise-then-Discretise (OD)
 
-- Adjoint Sensitivity Method
+### 3.6 Adjoint Sensitivity Method (Xinyan)
+
 - Continuous Backpropagation
 - Gradient w.r.t. $\theta$ and $t$
 
-### 4. Application: Digit Classifier with Neural ODEs (Jiankuan, Jiaru)
+## 4. Application: Digit Classifier with Neural ODEs (Jiankuan, Jiaru)
 
-### 5. Extension: Neural CDEs (Tianshi)
+## 5. Extension: Neural CDEs (Tianshi)
 
-5.1 Motivation
+### 5.1 Motivation
 
-5.2 Controlled Differential Equations
+### 5.2 Controlled Differential Equations
 
-5.3 Introduction to Neural CDEs
+### 5.3 Neural CDEs
 
-5.4 Solving Neural CDEs
+### 5.4 Solving Neural CDEs
 
-5.5 Application
+### 5.5 Application: Time Series Modelling
 
 - Cubic Splines
 - A Naive Implementation
 
-### 6. Conclusion
+## 6. Conclusion
 
-### Acknowledgement
+## Acknowledgement
 
-### Appendices
+## Appendices
 
-A Comparison of ODE Solvers
+### A Proof of Convergence of Gradient Descent Algorithm (James)
 
-B Proof of Convergence of Gradient Descent Algorithm
+### B Comparison of ODE Solvers (James)
 
-C A Simple Example of the Adjoint Method
+### C A Simple Example of the Adjoint Method (Xinyan)
 
-D Data Preprocessing of Financial Time Series
+### D Data Preprocessing of Financial Time Series (Tianshi)
