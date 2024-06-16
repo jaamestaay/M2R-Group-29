@@ -16,6 +16,7 @@
 \lstset{frame=single,framexleftmargin=15pt}
 \usepackage{caption}
 \DeclareUnicodeCharacter{0302}{\^{}}
+\DeclareUnicodeCharacter{03B8}{$\theta$}
 \captionsetup[figure]{labelfont={bf},labelsep=quad}
 \captionsetup[table]{labelfont={bf},labelsep=quad}
 \usepackage[ruled,vlined]{algorithm2e}
@@ -834,8 +835,14 @@ Thus, we only need to solve this initial value problem. By calling the ODE solve
 In Appendix \ref{sec:adjmethod}, we provide a simple example and use the adjoint method to perform backpropagation. A solution is provided to illustrate how this method can be applied.
 
 \pagebreak
-\section{Application: Digit Classifier with Neural ODEs}
+\section{Application}
 \label{sec:app}
+
+\subsection{Regression with Neural ODEs}
+
+In this section, we return our attention to the example we considered in Section \ref{sec:regex}, in which we implemented nonlinear regression with $y = \sin x$. With the help of neural ODEs, we shall implement a better version of this. The ideas in this section are taken from \cite{nguyen2020exploration}, and we use part of the Julia code from it. The file containing all the code below can be found in the project's GitHub repository at \verb|Neural_ODE.ipynb|.
+
+\subsection{Classification with Neural ODEs}
 
 In this section, we return our attention to the example we considered in Section \ref{sec:cla}, in which we implemented a digit classifier with around $80\%$ accuracy using classic neural networks. With the help of neural ODEs, we shall implement a better version of this, aiming to boost the test accuracy to approximately $95\%$. The idea is largely taken from Lab 6 of \cite{SciMLSANUM2024}. The file containing all the code below can be found in the project's GitHub repository at \verb|Neural_ODE.ipynb|.
 
