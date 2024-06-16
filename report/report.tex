@@ -502,7 +502,7 @@ $$\lim_{\Delta t\to 0}\frac{\textbf{h}_{t+\Delta t} - \textbf{h}_t }{\Delta t}= 
 This motivates us to consider ordinary differential equations, which can be written as
 $$\frac{\mathrm{d}{\textbf{h}}(t)}{\mathrm{d}t}=f(\textbf{h}(t),\theta,t).$$
 
-This is the most essential equation for defining a neural ODE. The function $f$ here on the right is a function derived from a neural network, with $\theta$ representing the parameters of that network. But in practise, $f$ is not necessar By convention, since there is no concept of hidden layers in neural ODEs, we usually write this function as
+This is the most essential equation for defining a neural ODE. The function $f$ here on the right is a function derived from a neural network, with $\theta$ representing the parameters of that network. In practice, however, $f$ does not necessarily need to be a function derived from a neural network. By convention, since there is no clear concept of hidden layers in neural ODEs, we usually write this function as
 \begin{equation}
     \dot{z}=f(z(t),\theta,t).
     \label{nodeeqn}
@@ -510,11 +510,7 @@ This is the most essential equation for defining a neural ODE. The function $f$ 
 
 \subsection{Comparing Neural ODEs with ResNet}
 
-In this section, we compare neural ODEs as defined above with ResNets. Within a ResNet with a finite number of layers, the transition between states from one layer to the next is discrete, and each layer has its own function to alter the current state. However, in an ODE network, it defines a continuous vector field which essentially represents a neural network with infinitely many layers. The state change can thus be interpreted as a \textit{flow} within this vector field.
-
-For neural ODEs, we want to solve a problem like this: 
-
-We know (or assume) that our data follow an unknown ODE $\dot{z}=f(z(t),t)$, and we have some observations of the model at time $(t_i)_{i=1,\dots,N}$ along the trajectory; we want to find an approximation $\hat{f}(z(t),\theta,t)$ to the target $f(z(t),t)$.
+In this section, we compare neural ODEs as defined above with ResNets. Within a ResNet with a finite number of layers, the transition between states from one layer to the next is discrete, and each layer has its own parameters to alter the current state. However, in an ODE network, it defines a continuous vector field which essentially represents a neural network with infinitely many layers. The state change can thus be interpreted as a \textit{flow} within this vector field.
 
 \begin{figure}[htbp]
     \centering
@@ -534,7 +530,7 @@ $$z(t_i)=\mathrm{ODESolve}\left(z(t_0),f,t_0,t_i\right),\quad i=1,\dots,N.$$
 
 Then the time span here for defining a neural ODE would be $[t_0,t_N]$. Since all these points are in the same space, each output has the same dimension as the input vector.
 
-Unlike neural networks, where depth refers to the number of layers, the depth of neural ODEs can be considered as the number of observation points. For neural networks, more layers can help the model fit the training dataset better in general. Similarly, in neural ODEs, more observation points can provide a better understanding of the $f$ we are looking for, allowing the model to fit the training set better.
+Unlike neural networks, where depth refers to the number of layers, the depth of neural ODEs can be considered as the number of observation points. For neural networks, more layers can help the model fit the training dataset better in general. Similarly, in neural ODEs, adding more observation points is the most direct way to help the model fit the training set better.
 
 \subsection{Various Neural ODE Models}
 
@@ -673,17 +669,17 @@ Since there will be $N$ evaluation points and all values at these points contrib
 
 In this section, we provide a proof of the adjoint sensitivity method. The proof references the method from \cite{hu2024note}. However, we adjust the choice of the Lagrange multiplier to ensure that the adjoint states adjust in the same direction as outlined in the original neural ODE paper \cite{chen2018neural}. Additionally, we use clearer notation to illustrate the adjustment process at each evaluation point.
 
-We know that there will be multiple evaluation points $z(t_i)_{i=1,\dots,N}$ on the trajectory and that these points are obtained as the output of the model - thus contributing to the loss function. Our first goal is to find the gradient of the loss function with respect to the parameter $\theta$. We can turn this into an optimisation problem:
+We know that there will be multiple evaluation points $z(t_i)_{i=1,\dots,N}$ on the trajectory and these points are obtained as the output of the model - thus contributing to the loss function. Our first goal is to find the gradient of the loss function with respect to the parameter $\theta$. We can turn this into an optimisation problem:
 $$
-\min_{\theta} \mathcal{L}(z(t_1),\dots,z(t_{N})),
+\min_{\theta} \mathcal{L}\left(z(t_1),\dots,z(t_{N})\right),
 $$
 $$
-\mathrm{s.t.}\quad\dot{z}=f(z,\theta,t).
+\mathrm{with}\quad\dot{z}=f(z,\theta,t).
 $$
 
 Then we introduce a Lagrange multiplier $\lambda(t)$ which is a function of time, and use $\lambda$ to define the Lagrange cost as
 $$
-\mathcal{J}(\theta) = \mathcal{L}(z(t_1),\dots,z(t_{N}))-\int^{t_N}_{t_0}\lambda(t)(\dot{z}(t)-f(z(t),\theta,t))\mathrm{d}t.
+\mathcal{J}(\theta) = \mathcal{L}(z(t_1),\dots,z(t_{N}))-\int^{t_N}_{t_0}\lambda(t)\left(\dot{z}(t)-f(z(t),\theta,t)\right)\mathrm{d}t.
 $$
 
 Note that we also impose a constraint on $\lambda(t)$ such that $\lambda(t_N)=\lambda(t_N^+)=0$. To find the gradient with respect to $\theta$, we introduce a small perturbation to $\theta$ to see how it affects the loss function. Therefore, we define the perturbed parameter as
@@ -707,7 +703,7 @@ $$
 \mathcal{L}\left(z(t_1),\dots,z(t_{N})\right)-\mathcal{L}\left(z^*(t_1),\dots,z^*(t_{N})\right) = \sum^N_{i=1}\frac{\partial \mathcal{L}}{\partial z(t_i)}\epsilon\eta(t_i)+\mathcal{O}\left(\epsilon^2\right).\notag
 $$
 
-Assuming that $\lambda(t)$ is continuous in each pair of successive time steps $[t_i,t_{i+1}]_{i=0,\dots,N-1}$, the second term of (\ref{eq:differenceeqn}) yields 
+Assuming that $\lambda(t)$ is continuous in each pair of successive time steps $[t_i,t_{i+1}]_{i=0,\dots,N-1}$, and that the value of $\lambda$ at each discrete point is equal to the right-hand limit at that point. The second term of (\ref{eq:differenceeqn}) yields 
 \begin{align}
 -\int^{t_N}_{t_0}\lambda(\dot{z}^*(t)-\dot{z}(t))\mathrm{d}t&=-\sum^{N}_{i=1}[\lambda(t)(z^*(t)-z(t))]_{t_{i-1}^+}^{t_{i}^-}+\int^{t_N}_{t_0}\dot{\lambda}(t)(z^*(t)-z(t))\mathrm{d}t\notag\\
 &=-\sum^{N}_{i=1}[\lambda(t)\epsilon\eta(t)]_{t_{i-1}^+}^{t_{i}^-}+\int^{t_N}_{t_0}\dot{\lambda}(t)\epsilon\eta(t)\mathrm{d}t+\mathcal{O}(\epsilon^2)\notag\\
@@ -773,7 +769,9 @@ $$
 
 For this part of the proof, we assume that the loss function $\mathcal{L}$ depends only on the final time point $t_N$. If the loss function also depends on intermediate time points $t_1,\dots,t_{N-1}$, we can simply apply the following method for each interval $[t_{N-1},t_N],\dots,[t_1,t_0]$ in reverse order and sum up the gradients of the parameters at each evaluation point.
 
-To calculate the gradient with respect to $\theta$ and $t$, similarly, we try to turn the problem into solving two initial value problems. 
+Compared to the simplified derivation in the original paper \cite{chen2018neural}, here we provide a detailed derivation of the choice of the initial values and how to obtain each derivative. 
+
+To calculate the gradient with respect to $\theta$ and $t$, similarly, we try to turn the problem into solving two initial value problems.
 
 We first try to find the value of the gradient of loss function with respect to $\theta$ at the start time $t_0$. Notice that the loss $\mathcal{L}$ is the same as the Lagrange loss $\mathcal{J}$. We define $a_\theta$ as a function such that $\frac{\mathrm{d}a_\theta}{\mathrm{d}t}=-a(t)\frac{\partial f}{\partial \theta}$. Thus, we have
 \begin{align}
@@ -822,7 +820,9 @@ $$a_{\mathrm{aug}}:= \begin{pmatrix}a\\ a_\theta\\ a_t\end{pmatrix}\quad\quad f_
 \end{pmatrix}.
 \]
 
-This allows us to concatenate all these three equations (\ref{eq7}), (\ref{eq8}), (\ref{eq9}) together. Plugging $a_{\mathrm{aug}}$ into (\ref{eq7}), we have
+This step follows the approach suggested by the origional neural ODE paper \cite{chen2018neural}, which allows us to concatenate all three equations (\ref{eq7}), (\ref{eq8}), (\ref{eq9}) together. 
+
+Plugging $a_{\mathrm{aug}}$ into (\ref{eq7}), we have
 $$
 \frac{\mathrm{d}a_{\mathrm{aug}}}{\mathrm{d}t} = -[a(t), a_\theta(t), a_t(t)]\frac{\partial f_{\mathrm{aug}}}{\partial [z,\theta,t]}(t)=-\left[a\frac{\partial f}{\partial z},a\frac{\partial f}{\partial \theta},a\frac{\partial f}{\partial t}\right](t)
 $$
@@ -1442,7 +1442,7 @@ plot!(times, vern9_discrete, label="Vern9")
 \section{A Simple Example of the Adjoint Method}
 \label{sec:adjmethod}
 
-In this appendix, we provide a simple example and try to apply the adjoint method to find the desired gradients. We aim to create a model where, given an input $x$, the output is $xe$. We initialise our neural ODE with $f(z(t),\theta,t)=\theta z$, or $\dot{z}=\theta z$ over the timespan $[t_0,t_1]$, where $\theta$, $t_0$, $t_1$ are constants. Since $f$ is autonomous, we can fix $t_0 = 0$, and only make $t_1$ a trainable time parameter. Suppose that the model has one evaluation point at time $t_1$. Given an input $x$, the output will be $xe^{\theta t_1}$. So, the model will perfectly align with our goal if $\theta t_1=1$.
+In this appendix, we provide a simple example and try to apply the adjoint method to find the desired gradients. We aim to create a model where, given an input $x$, the output is $xe$. We initialise our neural ODE with $f(z(t),\theta,t)=\theta z$, or $\dot{z}=\theta z$ over the timespan $[t_0,t_1]$, where $\theta$, $t_0$, $t_1$ are constants. We can fix $t_0 = 0$, and then $t_1$ and $\theta$ are trainable parameters. Suppose that the model has one evaluation point at time $t_1$. Given an input $x$, the output will be $xe^{\theta t_1}$. So, the model will perfectly align with our goal if $\theta t_1=1$.
 
 After setting up the model, we provide one training data as $z(t_0)$. We can then solve the initial value problem and get $z(t) = z(t_0)e^{\theta(t-t_0)}$, then output $z(t_1)=z(t_0)e^{\theta t_1}$. We also provide the expected output value $c:=z(t_0)e$.
 To use the adjoint method, we first calculate the loss function. For simplicity, we choose the mean square error (MSE) as the loss function. Thus, we have
@@ -1464,19 +1464,19 @@ So we have
 &= -(z(t_1)-c)z(t_0)e^{\theta t_1}.\notag
 \end{align}
 
-Here, $c_\theta:=-\frac{\mathrm{d}{a_\theta}}{\mathrm{d}{t}}$ is a constant. Hence, $a_\theta(t_0) =\frac{\mathrm{d}L}{\mathrm{d}\theta} =t_1c_\theta$, and this is the gradient we need for updating $\theta$.
+Here, $c_\theta:=-\frac{\mathrm{d}{a_\theta}}{\mathrm{d}{t}}$ is a constant. Hence, $a_\theta(t_0) =\frac{\mathrm{d}\mathcal{L}}{\mathrm{d}\theta} =t_1c_\theta$, and this is the gradient we need for updating $\theta$.
 
 For $a_t$,
 $$
 \frac{\mathrm{d}{a_t}}{\mathrm{d}{t}}=-a\frac{\partial f(z(t),\theta,t)}{\partial t}=0,
 $$
 \begin{align}
-a^{\mathrm{initial}}_t &= -a(t_1)f(z(t_1),\theta,t)\notag\\
+-\frac{\mathrm{d}\mathcal{L}}{\mathrm{d}t}\Bigg|_{t=t_1}=a^{\mathrm{initial}}_t &= -a(t_1)f(z(t_1),\theta,t)\notag\\
 &=-a(t_1)z(t_1)\theta\notag\\
 &=-(z(t_1)-c)z(t_1)\theta.\notag
 \end{align}
 
-So we can obtain the required gradients to update the time parameter $\frac{\mathrm{d}L}{\mathrm{d}t_1}=(z(t_1)-c)z(t_1)\theta$.
+So we can obtain the required gradients to update the time parameter $\frac{\mathrm{d}\mathcal{L}}{\mathrm{d}t_1}=(z(t_1)-c)z(t_1)\theta$.
 
 After obtaining these gradients, we can use them in the gradient descent to adjust the parameters in the model. Additionally, by setting some random values for $\theta$ and $t_1$, we can see that the gradients we get always point in the right direction to make $t_1\theta$ closer to $1$.
 
