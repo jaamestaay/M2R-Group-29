@@ -703,7 +703,7 @@ $$
 \mathcal{L}\left(z(t_1),\dots,z(t_{N})\right)-\mathcal{L}\left(z^*(t_1),\dots,z^*(t_{N})\right) = \sum^N_{i=1}\frac{\partial \mathcal{L}}{\partial z(t_i)}\epsilon\eta(t_i)+\mathcal{O}\left(\epsilon^2\right).\notag
 $$
 
-Assuming that $\lambda(t)$ is continuous in each pair of successive time steps $[t_i,t_{i+1}]_{i=0,\dots,N-1}$, and that the value of $\lambda$ at each discrete point is equal to the right-hand limit at that point. The second term of (\ref{eq:differenceeqn}) yields 
+Assuming that $\lambda(t)$ is continuous in each pair of successive time steps $[t_i,t_{i+1}]_{i=0,\dots,N-1}$, and that the value of $\lambda$ at each discrete point is equal to the right-hand limit at that point, the second term of (\ref{eq:differenceeqn}) yields 
 \begin{align}
 -\int^{t_N}_{t_0}\lambda(\dot{z}^*(t)-\dot{z}(t))\mathrm{d}t&=-\sum^{N}_{i=1}[\lambda(t)(z^*(t)-z(t))]_{t_{i-1}^+}^{t_{i}^-}+\int^{t_N}_{t_0}\dot{\lambda}(t)(z^*(t)-z(t))\mathrm{d}t\notag\\
 &=-\sum^{N}_{i=1}[\lambda(t)\epsilon\eta(t)]_{t_{i-1}^+}^{t_{i}^-}+\int^{t_N}_{t_0}\dot{\lambda}(t)\epsilon\eta(t)\mathrm{d}t+\mathcal{O}(\epsilon^2)\notag\\
@@ -1193,7 +1193,7 @@ where $\forall i=0,1,\dots,k$, $m_i$ are chosen constants.
 
 One might be sceptical about whether the condition (\ref{eqC}) is necessary, since in time series modelling we only ensure that the control path $X_t$ is continuously differentiable. However, if condition (\ref{eqC}) is dropped, it means that the curvature of the resultant path (which is related to the second derivative of the control path) might not be continuous, resulting in a possibly drastic change in the curvature of the control path that leads to unrealistic modelling.
 
-Using the table of divided differences and Lemma \ref{lemma53}, we obtain that the Newton polynomial defined on each time segment $t_i,t_{i+1}$ is
+Using the table of divided differences and Lemma \ref{lemma53}, we obtain that the Newton polynomial defined on each time segment $[t_i,t_{i+1}]$ is
 $$p_i(t)=x_i+(t-t_i)m_i+(t-t_i)^2\frac{[t_i,t_{i+1}]f-m_i}{\Delta t_i}+(t-t_i)^2(t-t_{i+1})\frac{m_{i+1}+m_i-2[t_i,t_{i+1}]f}{(\Delta t_i)^2},$$
 
 where $\Delta t_i=t_{i+1}-t_i$.
