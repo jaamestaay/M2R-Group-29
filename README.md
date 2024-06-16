@@ -1,6 +1,18 @@
-# M2R Group 29: Scientific Machine Learning
+# Scientific Machine Learning: Neural Networks and Neural Differential Equations
 
-This is the GitHub repository for the MATH50002 Group Research Project (M2R) on Scientific Machine Learning by Group 29 (Jiaru (Eric) Li, James Tay, Xinyan Wang, Tianshi Liu, Jiankuan Liu). You can find all relevant codes, figures, and LaTeX files here.
+This is the GitHub repository for the MATH50002 Group Research Project (M2R) by Group 29. You can find all relevant codes, figures, and LaTeX files here.
+
+Group Members:
+
+- Jiaru (Eric) Li (CID: 02216531)
+- James Tay (CID: 02015786)
+- Xinyan Wang (CID: 02205857)
+- Jiankuan Liu (CID: 02215415)
+- Tianshi Liu (CID: 02218664)
+
+Group Supervisor:
+
+- Dr Sheehan Olver
 
 The outline of our report is detailed below.
 
@@ -67,7 +79,9 @@ The outline of our report is detailed below.
 
 ## 6. Conclusion
 
-## Acknowledgement
+## Acknowledgements
+
+## References
 
 ## Appendices
 
