@@ -60,7 +60,11 @@ The outline of our report is detailed below.
 - Continuous Backpropagation
 - Gradient wrt. $\theta$ and $t$
 
-## 4. Application: Digit Classifier with Neural ODEs (Jiankuan, Jiaru)
+## 4. Application: Digit Classifier with Neural ODEs (Jiankuan, Jiaru, Xinyan)
+
+### 4.1 Implementation (Jiankuan, Jiaru)
+
+### 4.2 Comparison (Jiankuan, Xinyan)
 
 ## 5. Extension: Neural CDEs (Tianshi)
 
@@ -75,9 +79,9 @@ The outline of our report is detailed below.
 ### 5.5 Application: Time Series Modelling
 
 - Cubic Splines
-- A Naive Implementation
+- Implementation
 
-## 6. Conclusion
+## 6. Conclusion (James)
 
 ## Acknowledgements
 

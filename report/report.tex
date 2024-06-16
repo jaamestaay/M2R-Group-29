@@ -106,7 +106,7 @@ In the next section, we describe some foundational notions of neural networks. W
 
 Subsequently, we dive into the formulation and implementation of neural ordinary differential equations (ODEs) and discuss their connection to residual neural networks. Most importantly, the backpropagation of gradients needs to be derived in the gradient descent algorithm process. We discuss the methods to do so with neural ODEs, elaborating on numerical ODE solvers and the adjoint method.
 
-Furthermore, we provide two applications for neural ODEs. We first extend the MNIST handwritten digit classification task from classical neural networks to neural ODEs, improving the accuracy from $80\%$ to around $95\%$ with even faster running time and a smaller number of parameters, thereby demonstrating the capabilities of neural ODEs.
+Furthermore, we provide two applications for neural ODEs. We first extend the MNIST handwritten digit classification task from classical neural networks to neural ODEs, improving the accuracy from $80\%$ to around $95\%$ with a faster running time and a smaller number of parameters, thereby demonstrating the capabilities of neural ODEs.
 
 Finally, building on the framework of neural ODEs to handle more complex and irregular data streams, we extend our discussion to neural controlled differential equations (CDEs). We examine the definition of neural CDEs and discuss and apply methods to model time series data using neural CDEs and a technique from numerical analysis called cubic splines.
 
@@ -129,7 +129,7 @@ Later in 1958, Frank Rosenblatt described an implementation of perceptron in det
 
 \subsubsection{Structure}
 
-An \textit{(artificial) neural network} ((A)NN) consists of interconnected neurons, each of which can be thought of as a function $\mathbb{R}\rightarrow\mathbb{R}$. They are typically organised into \textit{layers} consisting of
+An \textit{(artificial) neural network} ((A)NN) consists of interconnected neurons, each of which can be thought of as a function $\mathbb{R}\rightarrow\mathbb{R}$. These neurons are typically organised into \textit{layers} consisting of
 
 \begin{itemize}
     \item an \textit{input layer} that receives the input,
@@ -177,7 +177,7 @@ A simple neural network with an input layer (1 neuron), a hidden layer (5 neuron
 
 For neural networks with multiple layers, an \textit{activation function} $\sigma$ is usually used. This is because it helps to decide whether a neuron should be ‘activated’ and introduces non-linearity into the model. The output of each layer is therefore calculated as $\mathbf{h}_{t+1}=\sigma\left(\mathbf{W}_t\mathbf{h}_t+\mathbf{b}_t\right)$, where $\sigma$ acts element-wise, $\mathbf{h}_t$ is the output vector for layer $t$, $\mathbf{W}_t$ is the weight matrix connecting layer $t$ to layer $t+1$, and $\mathbf{b}_t$ is the bias vector for layer $t$. 
 
-Regarding the choice of the activation function, the S-shaped \textit{sigmoid function} has some nice properties: it is bounded, differentiable with a non-negative derivative, and has exactly one point of inflection \cite{HanMoraga}. Two familiar examples of sigmoid functions are the \textit{logistic function} $\sigma(x)=1/\left(1+e^{-x}\right)$ and the hyperbolic tangent function $\sigma(x)=\tanh x$. Another commonly used activation function is the \textit{rectifier}, or \textit{rectified linear unit} (ReLU), defined as $\sigma(x)=\max(0, x)$.
+Regarding the choice of the activation function, the S-shaped \textit{sigmoid function} has some nice properties: it is bounded, differentiable with a non-negative derivative, and has exactly one point of inflection \cite{HanMoraga}. Two familiar examples of sigmoid functions are the \textit{logistic function} $\sigma(x)=1/\left(1+e^{-x}\right)$ and the hyperbolic tangent function $\sigma(x)=\tanh x$. Another commonly used activation function is the \textit{rectifier}, or \textit{rectified linear unit} (ReLU), defined as $\sigma(x)=\max(0, x)$. The graphs of these three functions are shown in Figure \ref{fig:actfun}.
 
 \begin{figure}[htbp]
     \centering
@@ -236,6 +236,7 @@ Regarding the choice of the activation function, the S-shaped \textit{sigmoid fu
     \end{minipage}
     \centering
     \caption{Three activation functions.}
+    \label{fig:actfun}
 \end{figure}
 
 \subsubsection{Loss Function}
@@ -274,25 +275,25 @@ Having now introduced the general structure of optimisation problems involving n
 \subsubsection{Gradient Descent}
 \label{sec:gd}
 
-As described in Section \ref{sec:loss}, we want to find the parameters $\theta$ that minimise $\mathcal{L}$. In essence, we want to find $\hat{\theta} = \argmin_\theta \mathcal{L}(\theta, \mathbf{\hat{y}}) $. The most conventional strategy to achieve this is to perform \textit{gradient descent}: that is, to use the gradient of $\mathcal{L}$ with respect to some $\theta$, say $\theta_n$, to calculate the next iteration $\theta_{n+1}$, which will then be used to calculate $\mathbf{\hat{y}}$ and therefore the value of $\mathcal{L}(\theta_{n+1}, \mathbf{\hat{y}})$. This generates a sequence $(\theta_n)_N$, ideally with $N = \infty$, but usually up to some $N$ determined by a stopping condition (typically a hard limit on the number of iterations or when the difference between two consecutive estimates of $\hat{\theta}$ is sufficiently close). 
+As described in Section \ref{sec:loss}, we want to find the parameters $\theta$ that minimise $\mathcal{L}$. In essence, we want to find $\hat{\theta} = \argmin_\theta \mathcal{L}(\theta, \mathbf{\hat{y}}) $. The most conventional strategy to achieve this is to perform \textit{gradient descent}: that is, to use the gradient of $\mathcal{L}$ with respect to some $\theta$, say $\theta_n$, to calculate the next iteration $\theta_{n+1}$, which will then be used to calculate $\mathbf{\hat{y}}$ and therefore the value of $\mathcal{L}(\theta_{n+1}, \mathbf{\hat{y}})$. This generates a sequence $(\theta_n)_N$, ideally with $N = \infty$, but usually up to some $N$ determined by a stopping condition (typically a hard limit on the number of iterations or when the difference in $\mathcal{L}$ evaluated between two consecutive estimates of $\hat{\theta}$ is sufficiently close). 
 
 In order to represent the dependence of a given $\theta_n$, we rewrite the loss function as $\mathcal{L}(\theta,\mathbf{\hat{y}}) = \mathcal{L}(\theta_n, \mathbf{\hat{y}})$. The basic gradient descent method can be described as the following iterative process, given an initial guess $\theta_0$, $\forall n < N$:
 $$\theta_{n+1} = \theta_n - \eta \nabla\mathcal{L}(\theta_n, \mathbf{\hat{y}}),$$
 
 where $\nabla\mathcal{L}(\theta_n, \mathbf{\hat{y}})$ is the vector of gradients of $\mathcal{L}$ with respect to each parameter in $\theta_n$, and $\eta$ represents the \textit{learning rate} of the algorithm. This algorithm intuitively makes sense: $\nabla\mathcal{L}(\theta_n, \mathbf{\hat{y}})$ points toward the steepest ascent. By subtracting a multiple of the learning rate from it, we try to find new parameters $\theta_{n+1}$ that give $\mathcal{L}(\theta_{n+1}, \mathbf{\hat{y}}) < \mathcal{L}(\theta_{n}, \mathbf{\hat{y}})$ \cite{nazarathy2021}.
 
-There are several conditions on $\eta$ and $\mathcal{L}$ to be fulfilled for the basic gradient descent algorithm to converge to $\hat{\theta}$. In particular, we require that $\nabla\mathcal{L}$ is Lipschitz continuous with constant $L$ and convex for the convergence of $(\theta_n)_\infty$ to $\hat{\theta}$ (the proof of which can be found in Appendix \ref{sec:gdproof}). It is also helpful to have the learning rate $\eta := \frac{1}{L}$, which has a linear convergence at a rate proportional to $\frac{1}{L}$ \cite{gower2015}.
+There are several conditions on $\eta$ and $\mathcal{L}$ to be fulfilled for the basic gradient descent algorithm to converge to $\hat{\theta}$. In particular, we require that $\nabla\mathcal{L}$ is Lipschitz continuous (with constant $L$) and convex for the convergence of $(\theta_n)_\infty$ to $\hat{\theta}$ (the proof of which can be found in Appendix \ref{sec:gdproof}). It is also helpful to have the learning rate $\eta := \frac{1}{L}$, which has a linear convergence at a rate proportional to $\frac{1}{L}$ \cite{gower2015}.
 
 In practice, most loss functions are Lipschitz continuous and convex, and thus the gradient descent algorithm will converge. However, there are several considerations that might affect the effectiveness of the basic gradient descent algorithm:
 \begin{enumerate}
-    \item In optimisation problems where training data with ground truth outputs are available, if the training data is sufficiently large, the computation of gradients (no matter the algorithm, the most efficient of which are discussed further in \ref{sec:ad} and \ref{sec:contback}) might be too costly. A stronger method of calculating gradients in such a context would be to conduct \textit{stochastic gradient descent} by choosing a random subset of the training data to evaluate in the loss function. We note that each loss function $\mathcal{L}$ can be described as finding the average of the errors of each training point, say $\mathcal{L}(\theta_n,\mathbf{\hat{y}}) = \frac{1}{n} \sum_{i=1}^n l(y_i, \hat{y_i})$. As such, we can think of $\mathcal{L}$ as the expected loss of the function $l$ at each point $i$. Suppose we define some random variable $K$ with $\mathrm{P}(K = j) = \frac{1}{n}$ for $j = 1, ..., n$. It can be easily proven that for any $k \ll n$, we can estimate $\mathcal{L}$ by taking the average of the loss function $g$ at training points $\{y_{K_1}, \dots, y_{K_k}\}$, where $\{K_1, \dots, K_k\}$ are i.i.d. copies of $K$ \cite{kroese2019}. These subsets of data points can alternatively define a partition on whole dataset and be trained individually - these are known as \textit{epochs}. This greatly reduces the computational cost of gradient calculations for gradient descent in particularly large training datasets. 
+    \item In optimisation problems where training data with ground truth outputs are available, if the training data is sufficiently large, the computation of gradients (no matter the algorithm, the most efficient of which are discussed further in \ref{sec:ad} and \ref{sec:contback}) might be too costly. A stronger method of calculating gradients in such a context would be to conduct \textit{stochastic gradient descent} by choosing a random subset of the training data to evaluate in the loss function. We note that each loss function $\mathcal{L}$ can be described as finding the average of the errors of each training point, say $\mathcal{L}(\theta_n,\mathbf{\hat{y}}) = \frac{1}{n} \sum_{i=1}^n l(y_i, \hat{y_i})$. As such, we can think of $\mathcal{L}$ as the \textit{expected loss} of the function $l$ at each point $i$. Suppose we define some discrete random variable $K$ with $\mathrm{P}(K = j) = \frac{1}{n}$ for $j = 1, \dots, n$. It can be easily proven that for any $k \ll n$, we can estimate $\mathcal{L}$ by taking the average of the loss function $g$ at training points $\{y_{K_1}, \dots, y_{K_k}\}$, where $\{K_1, \dots, K_k\}$ are i.i.d. copies of $K$ \cite{kroese2019}. These subsets of data points can alternatively define a partition on the whole dataset and be trained individually - these are known as \textit{mini-batches}. This greatly reduces the computational cost of gradient calculations for gradient descent in particularly large training datasets. 
     
-    \item The learning rate $\eta = \frac{1}{L}$ is idealistic in practice. Such a small (and constant) learning rate, while guaranteeing convergence, takes far too long to converge. However, having too large of a learning rate might not allow the sequence $\theta_t$ to converge. As such, more effort is required to estimate the \textit{hyperparameter} $\eta$. There are multiple methods that attempt to remedy this issue. A straightforward method is to decrease the learning rate according to the size of the recalculation of the loss function. Suppose in a certain iteration $\theta_n$, the current learning rate is $\eta = 1$. A possible algorithm is to check whether $\theta_{n+1} = \theta_n - \eta \nabla\mathcal{L}(\theta_n, \mathbf{\hat{y}})$ satisfies $\mathcal{L}(\theta_{n+1}, \mathbf{\hat{y}}) \leq \mathcal{L}(\theta_n, \mathbf{\hat{y}})$. If not, this suggests that the current learning rate overcompensates too much - and we can halve the learning rate and check whether the equality is achieved. This reduces the need to calculate a ‘perfect’ constant for $\eta$, instead treating $\eta$ as some function of $t$. Other (more sophisticated) methods include adaptive gradient techniques such as \texttt{AdaGrad}, \texttt{RMSProp} and \texttt{Adam}.
+    \item The learning rate $\eta = \frac{1}{L}$ is idealistic in practice. Such a small (and constant) learning rate, while guaranteeing convergence, takes far too long to converge. However, having too large of a learning rate might not allow the sequence $(\theta_n)_\infty$ to converge. As such, more effort is required to estimate the \textit{hyperparameter} $\eta$. There are multiple methods that attempt to remedy this issue. A straightforward method is to decrease the learning rate according to the size of the recalculation of the loss function. Suppose in a certain iteration $\theta_n$, the current learning rate is $\eta = 1$. A possible algorithm is to check whether $\theta_{n+1} = \theta_n - \eta \nabla\mathcal{L}(\theta_n, \mathbf{\hat{y}})$ satisfies $\mathcal{L}(\theta_{n+1}, \mathbf{\hat{y}}) \leq \mathcal{L}(\theta_n, \mathbf{\hat{y}})$. If not, this suggests that the current learning rate overcompensates too much - and we can halve the learning rate and check whether the equality is achieved. This reduces the need to calculate a ‘perfect’ constant for $\eta$, instead treating $\eta$ as some function of $t$. Other (more sophisticated) methods include adaptive gradient techniques such as \texttt{AdaGrad}, \texttt{RMSProp} and \texttt{Adam}.
 
-    \item As seen in Section \ref{sec:loss}, there exists some non-convex loss functions (such as the commonly used cross-entropy loss function in classification problems). This complicates the gradient descent process, since the choice of starting parameters $\theta_0$ would determine whether the sequence $(\theta_n)_\infty$ would provide a local or global minimum of $\mathcal{L}$. There is a need to ‘escape’ local minima so that the algorithm can give $\hat{\theta}$ as required. The stochastic gradient descent mentioned above actually works to solve this issue: the stochasticity creates \textit{noisy gradients} that helps to nudge $\theta_t$ out of difficult spots \cite{nazarathy2021}.
+    \item As seen in Section \ref{sec:loss}, there exists some non-convex loss functions (such as the commonly used cross-entropy loss function in classification problems). This complicates the gradient descent process, since the choice of starting parameters $\theta_0$ would determine whether the sequence $(\theta_n)_\infty$ would provide a local or global minimum of $\mathcal{L}$. There is a need to ‘escape’ local minima so that the algorithm can give $\hat{\theta}$ as required. The stochastic gradient descent mentioned above actually works to solve this issue: the stochasticity creates \textit{noisy gradients} that helps to nudge $\theta_n$ out of problematic spots \cite{nazarathy2021}.
 \end{enumerate}
 
-With all these considerations in mind, a popular choice for gradient descent algorithms is the \textit{Adaptive Moment Estimation} (Adam) algorithm. It makes use of previous gradients in the algorithm to determine the next parameter $\theta_{t+1}$ as well as a separate learning rate for each parameter, scaled to the gradients of the other parameters. With such a combination of methods, it has been empirically the most robust on real datasets \cite{nazarathy2021}.
+With all these considerations in mind, a popular choice for gradient descent algorithms is the \textit{adaptive moment estimation} (Adam) algorithm. It makes use of previous gradients in the algorithm to determine the next parameter $\theta_{n+1}$ as well as a separate learning rate for each parameter, scaled to the gradients of the other parameters. With such a combination of methods, it has been empirically the most robust on real datasets \cite{nazarathy2021}.
 
 \subsubsection{Automatic Differentiation and Discrete Backpropagation}
 \label{sec:ad}
@@ -303,9 +304,9 @@ There are a number of methods that do so with varying computational costs. The c
 
 There are two distinct types of AD. \textit{Forward-mode AD} computes the derivative of the function along with the function evaluation. A familiar (albeit limited) concept that implements this is the commutative ring of \textit{dual numbers} $\mathbb{D}$ over $\mathbb{R}$ generated by $1$ and $\epsilon$, where $\epsilon^2 = 0$. In the context of neural networks and loss functions, instead of simply evaluating functions with the value of $\theta_n$, evaluating them using dual numbers allows both $\mathcal{L}(\theta_n, \mathbf{\hat{y}})$ and its derivative with respect to $\theta_n$ to be calculated at once. \textit{Reverse-mode AD}, and in particular \textit{backpropagation}, instead evaluates the function first before propagating the derivatives from the output to the input. 
 
-Computationally speaking, reverse-mode AD is a ‘cheaper’ alternative to forward-mode AD. We note that this is especially true for neural networks, which typically have a large number of parameters (that is, $\theta$ has dimension $p \gg 1$). This means that using forward-mode AD, we need to calculate $p$ forward passes to find the gradients of each parameter \cite{griewank2008}. This section aims to discuss how backpropagation, in particular, makes for a more efficient method.
+Computationally speaking, reverse-mode AD is a ‘cheaper’ alternative to forward-mode AD. We note that this is especially true for neural networks, which typically have a large number of parameters (that is, $\theta$ has dimension $p \gg 1$). This means that, using forward-mode AD, we need to calculate $p$ forward passes to find the gradients of each parameter \cite{griewank2008}. This section aims to discuss how backpropagation, in particular, makes for a more efficient method.
 
-Backpropagation can be used to derive the gradients of $\mathcal{L}(\theta, \mathbf{\hat{y}})$ with respect to $\theta$. Here we define $\theta :=  (\theta^1, \dots, \theta^p)$. Suppose that we calculate $\hat{y_i} = g(\theta)$, where $g$ is made up of a composition of $m$ elementary operators $g_1, ..., g_m$. Additionally, suppose that we know the value of $\frac{\partial \mathcal{L}}{\partial \hat{y_i}}$, which we will represent with $\overline{\hat{y_i}}$. These assumptions are valid: First, the functions that define the neural network are (in most circumstances) differentiable. Next, the derivative of the loss function with respect to $\hat{y_i}$ is readily available in practice, as $\mathcal{L}$ is typically explicitly defined and differentiable. This process can thus be conducted using the following algorithm:
+Backpropagation can be used to derive the gradients of $\mathcal{L}(\theta, \mathbf{\hat{y}})$ with respect to $\theta$. Here we define $\theta :=  (\theta^1, \dots, \theta^p)$. Suppose that we calculate $\hat{y_i} = g(\theta)$, where $g$ is made up of a composition of $m$ elementary operators $g_1, \dots, g_m$. Additionally, suppose that we know the value of $\frac{\partial \mathcal{L}}{\partial \hat{y_i}}$, which we will represent with $\overline{\hat{y_i}}$. These assumptions are valid: First, the functions that define the neural network are (in most circumstances) differentiable. Next, the derivative of the loss function with respect to $\hat{y_i}$ is readily available in practice, as $\mathcal{L}$ is typically explicitly defined and differentiable. This process can thus be conducted using the following algorithm:
 \begin{enumerate}
     \item \textit{Forward Pass.} Evaluate $g$ with the given values of $\theta$, recording the intermediate values after each $g_l$. Thus, we receive a set of values $\{v_1, v_2, \dots, v_m \}$, where $v_m = \hat{y_i}$. These intermediate values (and the functions that connect them) can be represented by a directed acyclic graph (DAG) (an example of which is found in Figure \ref{fig:discretebackprop}) that flows (via the functions $g_l$) from each of the $\theta^j$.
     \item \textit{Chain Rule Application.} By the chain rule, we can easily calculate the values of $\overline{v_l}$, $q = 1, \dots, m$. If $v_l$ contributes directly to some $v_{q}$ via the function $g_q$, then
@@ -313,7 +314,7 @@ Backpropagation can be used to derive the gradients of $\mathcal{L}(\theta, \mat
     \overline{v_l} = \overline{v_{q}} \cdot \frac{\partial v_{q}}{\partial v_l} = \overline{v_{q}} \cdot \dot{g_q}(v_l).
     \label{eq:chainrule}
     \end{equation}
-    \item \textit{Backward Pass.} Suppose we want to consider the value of $\overline{\theta^j}$. Given $v_p ( = \hat{y_i})$ and $\overline{\hat{y_i}}$, we can work our way up the DAG to $\theta_j$, calculating the intermediate derivatives $\overline{v_q}$ along the way. This can be done for all $\theta^j$.
+    \item \textit{Backward Pass.} Suppose we want to consider the value of $\overline{\theta^j}$. Given $\overline{\hat{y_i}}$, we can work our way up the DAG to $\theta^j$, calculating the intermediate derivatives $\overline{v_q}$ along the way. This can be done for all $\theta^j$.
 \end{enumerate}
 
 An example of such an algorithm can be found in Figure \ref{fig:discretebackprop}. Such an algorithm to calculate derivatives only requires a single forward pass and a reverse pass. This means that the algorithm scales well even for more complex models with high dimensional $\theta$ \cite{ketkar2017}.
@@ -321,7 +322,7 @@ An example of such an algorithm can be found in Figure \ref{fig:discretebackprop
 \begin{figure}[htbp]\label{discretebackprop}
     \centering
     \includegraphics[width=0.8\textwidth]{report/figures/backpropdiscrete.png}
-    \caption{A direct acyclic graph representing the intermediate values and the derivatives of $\mathcal{L}$ with respect to each $v_l$. The function used to illustrate this property is $g(\theta_1, \theta_2) = (\theta_1^2 + \theta_2^2)^\frac{1}{2}$. The forward pass is represented in black, while the backward pass is represented in blue.}
+    \caption{A directed acyclic graph representing the intermediate values and the derivatives of $\mathcal{L}$ with respect to each $v_l$. The function used to illustrate this property is $g(\theta_1, \theta_2) = (\theta_1^2 + \theta_2^2)^\frac{1}{2}$. Note that the $\theta_1$ in the figure represents $\theta^1$ in the algorithmic process described above for clearer notation. The forward pass is represented in black, while the backward pass is represented in blue.}
     \label{fig:discretebackprop}
 \end{figure}
 
@@ -350,7 +351,7 @@ x = range(-pi, pi; length = 100)
 y = sin.(x)
 \end{verbatim}
 
-To create the neural network model, a Julia package \verb|Lux| is usually used. For the purpose of this example, we could use three layers, all of which are dense. For 100 data points, 10 neurons in the hidden layer would be enough. We can create the composition of such layers using the \verb|Chain| command. The input and hidden layers will have ReLU as the activation function.
+To create the neural network model, a Julia package \verb|Lux| is usually used. For the purpose of this example, we use three layers, all of which are dense. For 100 data points, 10 neurons in the hidden layer would be enough. We can create the composition of such layers using the \verb|Chain| command. The input and hidden layers will have ReLU as the activation function.
 
 \begin{verbatim}
 model = Chain(
@@ -381,7 +382,7 @@ prob = OptimizationProblem(OptimizationFunction(regression_loss,
        Optimization.AutoZygote()), ComponentArray(ps), (model, st, (x, y)))
 \end{verbatim}
 
-To solve the optimisation problem, we use the gradient descent method supplied by the aforementioned \verb|Adam| in \verb|OptimizationOptimisers| with appropriate parameters. We fix the learning rate at $\eta = 0.03$ in this scenario, and let the maximum number of iterations be $N = 250$.
+To solve the optimisation problem, we use the gradient descent method supplied by the aforementioned \verb|Adam| in \verb|OptimizationOptimisers| with appropriate parameters. We fix the learning rate at a constant $\eta = 0.03$ in this scenario and let the maximum number of iterations be $N = 250$.
 
 \begin{verbatim}
 ret = solve(prob, Adam(0.03), maxiters = 250)
@@ -408,7 +409,7 @@ The result of the regression is found in Figure \ref{fig:regression}. This is a 
 
 Neural networks can also be applied to \textit{classification} problems. They involve using a neural network to assign labels to input data based on some patterns learnt during the training process. A classic example is digit recognition based on the \textit{Modified National Institute of Standards and Technology database} (MNIST database). This database presents a large collection of handwritten digits given in pixels. The task is to learn from the database and classify the digits. As we can see, it is basically another form of regression; therefore, neural networks would be a suitable model.
 
-A sample image from MNIST is shown below. We immediately see that it is a $6$. We want our model to recognise it as a $6$ as well, i.e., that the model thinks that the probability that this digit is a $6$ is higher than any other digit.
+A sample image from MNIST is shown below. We immediately see that it is a $6$. We want our model to recognise it as a $6$ as well, that is, the model thinks that the probability that this digit is a $6$ is higher than that of any other digit.
 
 \begin{figure}[htbp]
     \centering
@@ -465,13 +466,13 @@ We are now ready to train our neural network. For this task, it is better to tra
 end
 \end{verbatim}
 
-We see that the training process takes $13$ seconds. By inverting the one-hot encoding using \verb|onecold| and comparing with the target output, we might see the test accuracy given as (where the \verb|+1| is because Julia uses 1-based indexing and \verb|y_test| starts at 0)
+We see that the training process takes $13$ seconds. By inverting the one-hot encoding using \verb|onecold| and comparing with the target output, we might see the test accuracy given as 
 
 \begin{verbatim}
 sum(Flux.onecold(model(x_test_flat)) .== (y_test .+ 1)) / length(y_test)
 \end{verbatim}
 
-which is normally around $80\%$ - satisfactory, but not perfect. This inspires us to consider a better model that incorporates other structures such as neural differential equations, as detailed in the following sections. In Section \ref{sec:app}, we will show that implementing a network with a neural ODE improves the test accuracy to around $95\%$.
+where \verb|+1| is added as Julia uses 1-based indexing and \verb|y_test| starts at 0. We note that the result is normally around $80\%$ - satisfactory but not perfect. This inspires us to consider a better model that incorporates other structures such as neural differential equations, as detailed in the following sections. In Section \ref{sec:app}, we will show that implementing a network with a neural ODE improves the test accuracy to around $95\%$.
 
 \pagebreak
 \section{Neural ODEs}
@@ -489,7 +490,7 @@ The second term in equation (\ref{eq1}) is in the form of a typical neural netwo
     \textbf{h}_{t+1} = \textbf{h}_t + f\left(\textbf{h}_t, \theta_t\right).
 \end{equation}
 
-We write equation (\ref{eq1}) in the form of equation (\ref{eq2}), where $f$ is a function that depends on the state of layer $t$ and some parameters $\theta_t$ related to this layer. Then, by transforming equation (\ref{eq2}), we get
+We write equation (\ref{eq1}) in the form of equation (\ref{eq2}), where $f$ is a function that depends on the state of layer $t$ and some parameters $\theta_t$ related to this layer (which belong to the larger parameter vector $\theta$). Then, by transforming equation (\ref{eq2}), we get
 $$\frac{\textbf{h}_{t+1} - \textbf{h}_t}{1}=f\left(\textbf{h}_t, \theta_t\right),$$
 
 which gives
@@ -501,7 +502,7 @@ $$\lim_{\Delta t\to 0}\frac{\textbf{h}_{t+\Delta t} - \textbf{h}_t }{\Delta t}= 
 This motivates us to consider ordinary differential equations, which can be written as
 $$\frac{\mathrm{d}{\textbf{h}}(t)}{\mathrm{d}t}=f(\textbf{h}(t),\theta,t).$$
 
-This is the most essential equation for defining a neural ODE. The function $f$ on the right is a function derived from a neural network, with $\theta$ representing the parameters of that network. By convention, since there is no concept of hidden layers in neural ODEs, we usually write this function as
+This is the most essential equation for defining a neural ODE. The function $f$ here on the right is a function derived from a neural network, with $\theta$ representing the parameters of that network. But in practise, $f$ is not necessar By convention, since there is no concept of hidden layers in neural ODEs, we usually write this function as
 \begin{equation}
     \dot{z}=f(z(t),\theta,t).
     \label{nodeeqn}
@@ -522,7 +523,7 @@ We know (or assume) that our data follow an unknown ODE $\dot{z}=f(z(t),t)$, and
     \label{fig:resnettoneuralODE}
 \end{figure}
 
-Note that the points in both graphs in Figure \ref{fig:resnettoneuralODE} represent the evaluation points. In the residual network, these points correspond to different layers, whereas in the ODE network, the points are taken according to an increasing sequence of time stamps $(t_i)_{i=1,\dots,N}$, and $\left(z(t_0),t_0\right)$ is the initial condition. The values given by the model at these points are $z(t_i)_{i=1,\dots,N}$. These can be obtained by solving an ODE:
+Note that the points in both graphs in Figure \ref{fig:resnettoneuralODE} represent the evaluation points. In the residual network, these points correspond to different layers, whereas in the ODE network, the points are taken according to an increasing sequence of time stamps $(t_i)_{i=1,\dots,N}$, and $\left(z(t_0),t_0\right)$ is the initial condition. The values given by the model at these points are $z(t_i)_{i=1,\dots,N}$. These can be obtained by solving the ODE:
 $$z(t_i)=\mathrm{ODESolve}\left(z(t_0),f,t_0,t_i\right),\quad i=1,\dots,N.$$
 
 \begin{figure}[htbp]
@@ -629,9 +630,9 @@ The characteristics specified above make the RK4 method a much stronger algorith
     \label{fig:odesolver}
 \end{figure}
 
-With such a wide range of numerical methods, there is much consideration in which method is the best. One such consideration is the \textit{absolute stability} of the numerical method. This is an especially important consideration when dealing with stiff ODEs, where the eigenvalues of the linear approximations of $f$ are all negative, with a large ratio between the maximum and minimum real values of the set of eigenvalues. These give rise to numerical instabilities to the numerical methods introduced thus far - essentially requiring an extremely (and thus inefficiently) small value of $h$. A possible alternative to this is to use implicit methods instead. In the context of the Runge-Kutta methods, this means removing the restriction that the matrix $\mathbf{A}$ must be lower triangular. It can be proven that such methods have an \textit{unbounded region of absolute stability}, as compared to explicit Runge-Kutta methods which have \textit{bounded regions of absolute stability} \cite{sulimayers2003}. There is, however, a trade-off in using such implicit methods. The derivation of $k_1, \dots, k_s$ in implicit methods requires solving the $s$ equations simultaneously, instead of in succession as seen in explicit methods. This requires more computational power and might make computation inefficient.
+With such a wide range of numerical methods, there is much consideration in which method is the best. One such consideration is the \textit{absolute stability} of the numerical method. This is an especially important consideration when dealing with stiff ODEs, where the eigenvalues of the linear approximations of $f$ are all negative, with a large ratio between the maximum and minimum real values of the set of eigenvalues. These give rise to numerical instabilities to the numerical methods introduced thus far - essentially requiring an extremely (and thus inefficiently) small value of $h$. A possible alternative to this is to use implicit methods instead. In the context of the Runge-Kutta methods, this means removing the restriction that the matrix $\mathbf{A}$ must be lower triangular. It can be proven that such methods have an \textit{unbounded region of absolute stability}, as compared to explicit Runge-Kutta methods which have \textit{bounded regions of absolute stability} \cite{sulimayers2003}. In the context of solving ODEs numerically, this means that larger values of $h$ still give accurate approximations of the actual solution. There is, however, a trade-off in using such implicit methods. The derivation of $k_1, \dots, k_s$ in implicit methods requires solving the $s$ equations simultaneously, instead of in succession as seen in explicit methods. This requires more computational power and might make computation inefficient.
 
-Through the Runge-Kutta methods, we derive equations that iteratively define evaluations of $z$ at every time point $t_N, ..., t_0$. This allows us to easily differentiate and perform backpropagation throughout the solution of the neural ODE as prescribed in \ref{sec:ad}.
+Through the Runge-Kutta methods, we derive equations that iteratively define evaluations of $z$ at every time point $t_N, \dots, t_0$. This allows us to easily differentiate and perform backpropagation throughout the solution of the neural ODE as prescribed in Section \ref{sec:ad}.
 
 \subsection{Backpropagation in Neural ODEs}
 
@@ -642,7 +643,7 @@ Consider a neural ODE defined by a neural network $f$. This gives us the differe
 
 The Discretise-then-Optimise (DO) method can be described in the following steps:
 \begin{enumerate}
-    \item \textit{Solve the neural ODE numerically with starting parameters.} This involves choosing an initial ‘guess’ of parameters $\theta$ and solving the neural ODE with the guessed parameters. The Runge-Kutta methods described in Section \ref{sec:rungekutta} are most commonly used to achieve this.
+    \item \textit{Solve the neural ODE numerically with current parameters.} This involves choosing an initial ‘guess’ of parameters $\theta$ and solving the neural ODE with the guessed parameters. The Runge-Kutta methods described in Section \ref{sec:rungekutta} are most commonly used to achieve this.
     \item \textit{Perform backpropagation with the chain rule with respect to parameters $\theta$.} This is done using the methods detailed in \ref{sec:ad}, going from the final time $t_N$ of the neural ODE to the initial time $t_0$.
 \end{enumerate}
 
@@ -651,13 +652,13 @@ However, we see a trade-off between the accuracy of the solution and the computa
 \subsubsection{Optimise-then-Discretise (OD)}
 \label{sec:od}
 
-In contrast to DO, the Optimise-then-Discretise (OD) method can be described in the following steps.
+In contrast to DO, the Optimise-then-Discretise (OD) method can be described in the following steps:
 \begin{enumerate}
     \item \textit{Formulate the continuous adjoint equations of neural ODE.} The resulting problem is a backwards differential equation known as the \textit{adjoint ODE}.
     \item \textit{Solve the adjoint ODE.} Once the adjoint ODE has been formulated, the numerical methods for solving ODEs (as seen in \ref{sec:rungekutta}) can be utilised to find the relevant gradients required.
 \end{enumerate}
 
-We note that the OD method does not require to store any intermediate states through backpropagation, because it makes use of the \textit{adjoint method}, in comparison to the one described in \ref{sec:ad}. This method is described below.
+We note that the OD method does not require to store any intermediate states through backpropagation, because it makes use of the \textit{adjoint method}, in comparison to the one described in Section \ref{sec:ad}. This method is described below.
 
 \subsection{Adjoint Sensitivity Method}
 
@@ -839,6 +840,8 @@ In Appendix \ref{sec:adjmethod}, we provide a simple example and use the adjoint
 
 In this section, we return our attention to the example we considered in Section \ref{sec:cla}, in which we implemented a digit classifier with around $80\%$ accuracy using classic neural networks. With the help of neural ODEs, we shall implement a better version of this, aiming to boost the test accuracy to approximately $95\%$. The idea is largely taken from Lab 6 of \cite{SciMLSANUM2024}. The file containing all the code below can be found in the project's \href{https://github.com/jaamestaay/M2R-Group-29}{GitHub repository} at \verb|Neural_ODE.ipynb|.
 
+\subsection{Implementation}
+
 To start, we need to import some essential packages. We will use the \verb|DifferentialEquations| and \verb|DiffEqFlux| packages for neural ODEs, and despite the name, \verb|DiffEqFlux| uses \verb|Lux| instead of \verb|Flux|. We also want to load the MNIST database from the \verb|MLDatasets| package, and the \verb|Images| package is useful for plotting images given by pixels.
 
 \begin{verbatim}
@@ -865,8 +868,7 @@ We then ‘flatten’ the images and setup the input layer of the neural network
 
 \begin{verbatim}
 down = Chain(FlattenLayer(), Dense(784, 20, tanh))
-rng = MersenneTwister()
-down_p, down_st = Lux.setup(rng, down)
+down_p, down_st = Lux.setup(MersenneTwister(), down)
 \end{verbatim}
 
 The hidden layers $\mathbb{R}^{20}\rightarrow\mathbb{R}^{20}$ are given as a map from initial conditions to final values before passing through the output layer $\mathbb{R}^{20}\rightarrow\mathbb{R}^{10}$ since the output must be a 10-vector. Here, \verb|Tsit5| is a numerical ODE solver which is a modified form of RK4 mentioned before \cite{TSITOURAS2011770}.
@@ -913,6 +915,8 @@ data = [(imgs[:, :, N*(b-1)+1:N*b], onehot(nums[N*(b-1)+1:N*b])) for b = 1:M]
 @time res = solve(opt_prob, Adam(0.003), data)
 \end{verbatim}
 
+\subsection{Comparison}
+
 We see that the time used is around $8$ seconds, which is around $38.5\%$ shorter than $13$ seconds before with the neural network model.
 
 The test accuracy on the last batch is then given as
@@ -922,9 +926,10 @@ classify(x) = [argmax(x[:,j]) - 1 for j = 1:size(x,2)]
 sum(classify(m(imgs[:,:,end-N+1:end], res.u, st)[1]) .== nums[end-N+1:end])/N
 \end{verbatim}
 
-which is around $95\%$, a huge improvement from the previous result of $80\%$ before. 
+which is around $95\%$, a huge improvement from the previous result of $80\%$ before.
 
-Additionally, we compare the number of parameters we used in this model with the model we used in \ref{sec:cla}. We know that the number of parameters in a neural network includes weights and biases for each layer. The structure of the model in the first section is:
+We also compare the number of parameters we used in this model with the model that we used in Section \ref{sec:cla}. We know that the number of parameters in a neural network includes weights and biases for each layer. The structure of the model in the first section is
+
 \begin{verbatim}
 model = Chain(
     Dense(784, 196, relu),
@@ -948,7 +953,7 @@ model = Chain(
 
 Using the same method, we find that the number of parameters in this model is $16450$.
 
-This comparison demonstrates that by embedding a neural ODE layer into the network, we use nearly one-tenth of the parameters and shorter training time compared to a simple neural network, while still improving the results.
+This demonstrates that by embedding a neural ODE layer into the network, we use nearly one-tenth of the parameters compared to a simple neural network while still improving the results.
 
 \pagebreak
 \section{Extension: Neural CDEs}
@@ -962,7 +967,7 @@ As we have seen before, neural networks and differential equations seem to be ir
 
 Before defining neural CDEs, it is essential to understand the definition of CDEs. To formally define them, we need to introduce a new notion of integration called \textit{Riemann-Stieltjes integral} and a new concept of real functions called \textit{bounded variation}.
 
-\begin{definition}[Riemann-Stieltjes integral] Let $f$ and $g$ be two bounded, real functions defined on $[a,b]$, and let $P=\{a=t_0<t_1<...<t_n=b\}$ be an arbitrary partition of $[a,b]$. $\forall i = 1,...,n$, let $\Delta g_i = g(t_i) - g(t_{i-1})$, $M_i=\mathrm{sup}f(t)$, and $m_i=\mathrm{inf}f(t)$, where $t\in[t_{i-1},t_i]$.
+\begin{definition}[Riemann-Stieltjes integral] Let $f$ and $g$ be two bounded, real functions defined on $[a,b]$, and let $P=\{a=t_0<t_1<\dots<t_n=b\}$ be an arbitrary partition of $[a,b]$. $\forall i = 1,\dots,n$, let $\Delta g_i = g(t_i) - g(t_{i-1})$, $M_i=\mathrm{sup}f(t)$, and $m_i=\mathrm{inf}f(t)$, where $t\in[t_{i-1},t_i]$.
     
     Define the upper and lower ‘Darboux sums’ similar to those in the construction of Riemann integrals as $U(P,f,g)=\sum M_i\Delta g_i$ and $L(P,f,g)=\sum m_i\Delta g_i$.
 
@@ -974,7 +979,7 @@ In short, the Riemann-Stieltjes integral is just a simple extension of the Riema
 \begin{definition}[Bounded variation] The total variation of a real-valued function $f$ in an interval $[a,b]$, denoted by $V_a^b(f)$, is defined as
 $$\sup_{P\in\mathbb{P}}\sum_{i=0}^{n_P-1}\left|f(t_{i+1})-f(t_i)\right|,$$
 
-where $\mathbb{P}=\{P=\{a=t_0<t_1<...<t_{n_P}=b\}\}$, the set of all partitions on $[a,b]$.
+where $\mathbb{P}=\{P=\{a=t_0<t_1<\dots<t_{n_P}=b\}\}$, the set of all partitions on $[a,b]$.
 
 Then $f$ is a function of \textit{bounded variation} iff $V_a^b(f)<\infty$.
 \end{definition}
@@ -1012,7 +1017,7 @@ From now on $y(t)$ will be referred to as $y_t$, which is a notation commonly us
 
 \subsection{Neural CDEs}
 
-Before we introduce neural CDEs, we first explore the idea of a \textit{recurrent neural network} (RNN). In fact, so far, we have been discussing \textit{feedforward neural networks} (FNNs) only, whose flow of information is uni-directional, from the input layer to the output layer, without any cycles or loops. FNNs are sufficient for ordinary tasks such as regression and classification. However, for more complicated problems, RNNs play an important role. In RNNs, the output of previous steps can be fed as input to the current step, allowing it to maintain a form of ‘memory’. This makes RNNs particularly effective for tasks such as time series prediction, natural language processing, and speech recognition.
+Before we introduce neural CDEs, we first explore the idea of a \textit{recurrent neural network} (RNN). In fact, so far, we have been discussing \textit{feedforward neural networks} (FNNs) only, whose flow of information is in one direction only, from the input layer to the output layer, without any cycles or loops. FNNs are sufficient for ordinary tasks such as regression and classification. However, for more complicated problems, RNNs play an important role. In RNNs, the output of previous steps can be fed as input to the current step, allowing it to maintain a form of ‘memory’. This makes RNNs particularly effective for tasks such as time series prediction, natural language processing, and speech recognition.
 
 One fundamental assumption of neural CDEs is that the data we observe should form a continuous path $X:[a,b]\rightarrow\mathbb{R}^v$ with bounded variation. This assumption is made simply for theoretical purposes, i.e. the continuous data correspond to an evolutionary process or control path in the neural CDE. However, it is worthwhile to note that it is highly unlikely to observe data in such a form in real-life applications, and thus a trick that converts discrete observations to a continuous control path would be introduced in later parts of this extension. Let us now formulate the definition of neural CDEs rigorously, and then it will be clear that neural CDE is the continuous analogue to the recurrent neural network.
 
@@ -1034,7 +1039,7 @@ From the above CDE, we may conclude that the hidden state $Z_t$ of the recurrent
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.75\linewidth]{report/figures/ODE vs CDE implementation Neural CDE for irregular time series.jpeg}
-    \caption{The comparison of neural ODE and neural CDE when modelling time series data. This figure is taken from \cite{kidger2020}.}
+    \caption{The comparison of neural ODEs and neural CDEs, respectively, when modelling time series data. This figure is taken from \cite{kidger2020}.}
     \label{fig:nodesncdes}
 \end{figure}
 
@@ -1060,7 +1065,7 @@ In the context of financial time series, the input data consists of a sequence o
 Lagrange basis polynomials and how they can be used to interpolate data are standard ideas introduced in undergraduate numerical analysis courses that provide a continuous path between data points. However, whenever an additional data point is added to the original set of data points, the existing Lagrange polynomials would have to be recalculated. This makes Lagrange basis polynomials computationally inefficient. We seek an alternative set of basis polynomials for interpolation, called the \textit{Newton basis polynomials}. The following lemma is not included in \cite{Gautschi2012}, but we state and prove it for completeness in defining the newton basis polynomials.
 
 \begin{lemma}
-    Let $n_0(t)=1$, and $\forall j=1,...,k$, let $n_j(t)=\prod_{i=0}^{j-1}(t-t_i)$. Let $P_k$ denote the space of polynomials in $\mathbb{R}$ with  degree less than or equal to $k$. Then $B=\{n_0(t),n_1(t),...,n_k(t)\}$ forms a basis of $P_k$.
+    Let $n_0(t)=1$, and $\forall j=1,\dots,k$, let $n_j(t)=\prod_{i=0}^{j-1}(t-t_i)$. Let $P_k$ denote the space of polynomials in $\mathbb{R}$ with  degree less than or equal to $k$. Then $B=\{n_0(t),n_1(t),\dots,n_k(t)\}$ forms a basis of $P_k$.
 \end{lemma}
 
 \begin{proof}
@@ -1077,7 +1082,7 @@ After proving this lemma, we are confident in making the following definitions.
 
 \begin{definition}
     [Newton basis polynomials] Given a sample of $k+1$ data points
-$\{(t_0,x_0), (t_1,x_1), \\\dots, (t_k,x_k)\}$, the \textit{Newton basis polynomials} corresponding to this sample are defined as $n_0(t)=1$ and $\forall j=1,...,k, n_j(t)=\prod_{i=0}^{j-1}(t-t_i)$.
+$\{(t_0,x_0), (t_1,x_1), \\\dots, (t_k,x_k)\}$, the \textit{Newton basis polynomials} corresponding to this sample are defined as $n_0(t)=1$ and $\forall j=1,\dots,k, n_j(t)=\prod_{i=0}^{j-1}(t-t_i)$.
 \label{def:nbp}
 \end{definition}
 
@@ -1098,7 +1103,7 @@ Since $a_i$ is a linear combination of $x_0,x_1,\dots,x_i$, the coefficients are
     
     We claim that
     \begin{equation}\label{eq}
-        N_k(f;t_0,t_1,\dots,t_k;t)=r(t)+\frac{t-t_k}{t_k-t_0}(r(t)-s(t)).\tag{*}
+        N_k(f;t_0,t_1,\dots,t_k;t)=r(t)+\frac{t-t_k}{t_k-t_0}(r(t)-s(t)). \tag{$\ast$}
     \end{equation}
 
     By the definition of Newton basis polynomials, it is obvious that the degree of $\mathrm{RHS}$ is less than or equal to $k$. Since Newton interpolatory polynomials are unique, it suffices to show that $\mathrm{RHS}$ passes through $(t_0,x_0), (t_1,x_1), \dots, (t_k,x_k)$.
@@ -1226,7 +1231,7 @@ $$m_{k-1}+2m_k=3[t_{k-1},t_k]f.$$
 
 Adding these equations to the system of $k-1$ linear equations, we can readily solve for the constants $m_0,m_1,\dots,m_k$, and thus we can obtain an explicit expression for the control path $X_t$. 
 
-\subsubsection{A Naive Implementation}
+\subsubsection{Implementation}
 \label{sec:implementation}
 
 In this section, we propose a possible naive implementation of neural CDEs to model irregularly sampled time series data.
@@ -1252,11 +1257,11 @@ There exist online Python libraries that uses neural CDEs to achieve time series
 \pagebreak
 \section{Conclusion}
 
-In this paper, we discussed the power of neural ODEs in scientific machine learning. We focussed on three main areas. First, an initial introduction to neural networks and several optimisation strategies was conducted. We trained a standard neural network model to recognise handwritten digits from the MNIST dataset. Next, we introduced neural ODEs and explained their use in the machine learning process, incorporating them into the training of the same MNIST dataset and showing the improvement in test accuracy. Finally, we extended our discussion to neural CDEs, discussing their power and application in time series data analysis.
+In this paper, we discussed the power of neural ODEs in scientific machine learning. We focussed on three main areas. Firstly, an initial introduction to neural networks and several optimisation strategies was conducted. We trained a standard neural network model to recognise handwritten digits from the MNIST dataset. Next, we introduced neural ODEs and explained their use in the machine learning process, incorporating them into the training of the same MNIST dataset and showing the improvement in test accuracy. Finally, we extended our discussion to neural CDEs, discussing their power and application in time series data analysis.
 
 The research conducted through this paper has provided valuable learning opportunities in the area of scientific machine learning. We have gained a better appreciation of the methods taught and described in various undergraduate modules that provided the bridge to the complex ideas brought forward in this paper. Finally, the exposure to neural networks and neural differential equations has been beneficial in understanding more complicated theories in future courses and career paths.
 
-At the same time, however, it is important to recognise and acknowledge the limitations of the paper. Given the context and timeline of the project, there was a limit to the extent of exploration in this area. Neural differential equations, while being a new field, are extremely rich and require much more time to be fully utilised. Additionally, the discussion was largely theoretical, with several simple applications brought forward. Further applications could examine more subtle ideas, such as the optimisation of layer dimensions for better results or a more extensive comparison between neural ODEs and neural CDEs.
+At the same time, however, it is important to recognise and acknowledge the limitations of the paper. Given the context and timeline of the project, there was a limit to the extent of exploration in this area. Neural differential equations, while being new fields, are extremely rich and require much more time to be fully utilised. Additionally, the discussion was largely theoretical, with several simple applications brought forward. Further applications could examine more subtle ideas, such as the optimisation of layer dimensions for better results or a more extensive comparison between neural ODEs and neural CDEs.
 
 This gives rise to future research that could be built on this paper. Further elaboration of the improvements in accuracy and efficiency could enrich the understanding of neural differential equations. Another area worth pursuing is studying perhaps more complex neural differential equations and how they better represent other data. These could thus be extended to other fields, such as studying neural differential equations in physics-informed neural networks (PINNs). These could give a more holistic understanding on the power of neural differential equations.
 
@@ -1265,7 +1270,7 @@ The field of scientific machine learning is a highly active one, attracting scie
 \section*{Acknowledgments}
 \addcontentsline{toc}{section}{Acknowledgements}
 
-We would like to thank Dr. Olver, our project supervisor, and his PhD students Mr. VandenHeuvel and Mr. Pu for their continued support and guidance throughout the project. Also, we would like to thank Dr. Salvi and Prof. Cass for kindly sharing their lecture notes which inspire the neural CDE extension section in this paper.
+We would like to thank Dr Olver, our project supervisor, and his PhD students Mr VandenHeuvel and Mr Pu for their continued support and guidance throughout the project. Also, we would like to thank Dr Salvi and Prof Cass for kindly sharing their lecture notes which inspire the neural CDE extension section in this paper.
 
 \pagebreak
 \phantomsection
@@ -1344,7 +1349,7 @@ In order to prove the convergence of the gradient descent algorithm, we need the
 We can now state the theorem for convergence, requiring that $\mathcal{L}(\theta, \mathbf{\hat{y}})$ is $L$-smooth and that $\mathcal{L}$ is convex. This produces a convergent sequence $(\theta_n)_\infty$ to $\hat{\theta} = \arg\min_\theta \mathcal{L}(\theta, \mathbf{\hat{y}})$ through the gradient descent algorithm described in Section \ref{sec:gd}:
 
 \begin{theorem}[Convergence of Gradient Descent Algorithm]
-    Let $\mathcal{L}$ be $L$-smooth and let $\theta_n$ for $n = 1, \dots$ be the sequence of iterates generated by the gradient descent algorithm
+    Let $\mathcal{L}$ be $L$-smooth and let $\theta_n$ for $n = 0, 1, \dots$ be the sequence of iterates generated by the gradient descent algorithm
     $$
     \theta_{n+1} = \theta_{n} - \eta \nabla \mathcal{L}(\theta_n).
     $$
@@ -1367,29 +1372,29 @@ We can now state the theorem for convergence, requiring that $\mathcal{L}(\theta
     \begin{align*}
         \mathcal{L}(\theta_t) - \mathcal{L}(\hat{\theta}) &\leq \langle \nabla \mathcal{L}(\theta_t), \theta_t - \hat{\theta} \rangle \\
         &\leq \| \nabla \mathcal{L}(\theta_t)\|_2 \| \theta_t - \hat{\theta} \| \\
-        &\leq \| \nabla \mathcal{L}(\theta_t)\|_2 \| \theta_1 - \hat{\theta} \|.
+        &\leq \| \nabla \mathcal{L}(\theta_t)\|_2 \| \theta_0 - \hat{\theta} \|.
     \end{align*}
     
     Combining the above statement with (\ref{B5}) gives
     \begin{equation}
-        \mathcal{L}(\theta_{t+1}) - \mathcal{L}(\theta_{t}) \leq \mathcal{L}(\theta_{t}) - \mathcal{L}(\hat{\theta}) - \frac{1}{2L} \frac{1}{\| \theta_1 - \hat{\theta} \|^2}\left(\mathcal{L}(\theta_t) - \mathcal{L}(\hat{\theta})\right)^2. \label{B6}
+        \mathcal{L}(\theta_{t+1}) - \mathcal{L}(\theta_{t}) \leq \mathcal{L}(\theta_{t}) - \mathcal{L}(\hat{\theta}) - \frac{1}{2L} \frac{1}{\| \theta_0 - \hat{\theta} \|^2}\left(\mathcal{L}(\theta_t) - \mathcal{L}(\hat{\theta})\right)^2. \label{B6}
     \end{equation}
     
-    We define $\delta_t = \mathcal{L}(\theta_{t}) - \mathcal{L}(\hat{\theta})$, $\beta = \frac{1}{2L} \frac{1}{\| \theta_1 - \hat{\theta} \|^2}$, and manipulating (\ref{B6}) gives:
+    We define $\delta_t = \mathcal{L}(\theta_{t}) - \mathcal{L}(\hat{\theta})$, $\beta = \frac{1}{2L} \frac{1}{\| \theta_0 - \hat{\theta} \|^2}$, and manipulating (\ref{B6}) gives:
     \begin{align*}
         \delta_{t+1} &\leq \delta_t - \beta \delta_t^2 \\
         \beta \frac{\delta_t}{\delta_{t+1}} &\leq \frac{1}{\delta_{t+1}} - \frac{1}{\delta_{t}} \\
         \beta &\leq \frac{1}{\delta_{t+1}} - \frac{1}{\delta_{t}}.
     \end{align*}
     
-    Summing both sides over $t = 1, ..., n - 1$ gives 
+    Summing both sides over $t = 1, \dots, n - 1$ gives 
     $$
     (n-1)\beta \leq \frac{1}{\delta_n} - \frac{1}{\delta_1} \leq \frac{1}{\delta_n}.
     $$
     
     This means that for any given $n$,
     \begin{equation}
-        \mathcal{L}(\theta_n) - \mathcal{L}(\hat{\theta}) \leq \frac{2L\|\theta_1 - \hat{\theta}\|^2}{n-1},
+        \mathcal{L}(\theta_n) - \mathcal{L}(\hat{\theta}) \leq \frac{2L\|\theta_0 - \hat{\theta}\|^2}{n-1},
     \end{equation}
     
     which means that for any arbitrarily small $\epsilon > 0$, we can find $N$ sufficiently large, such that $\forall n > N$, $|\mathcal{L}(\theta_n) - \mathcal{L}(\hat{\theta})| < \epsilon$. This concludes the proof.
