@@ -102,13 +102,13 @@ In recent years, the intersection of machine learning and scientific computing h
 
 The motivation behind neural differential equations stems from the limitations of traditional neural networks, such as their inability to handle continuous time series data. Neural differential equations address these issues by providing a continuous-time analogue to discrete-layer architectures, such as residual neural networks. Additionally, neural differential equations are advantageous because of their efficient memory use \cite{haoxuan2023}.
 
-In the first section, we describe some foundational notions of neural networks. We review the history and basic structure of neural networks, including key concepts such as layers, activation functions, and loss functions. Optimisation strategies are also discussed, specifically gradient descent and automatic differentiation for efficient calculations. We then explore some simple applications to further illustrate these ideas and help us to discover how neural networks work in terms of real-world scenarios, such as regression and classification problems.
+In the next section, we describe some foundational notions of neural networks. We review the history and basic structure of neural networks, including key concepts such as layers, activation functions, and loss functions. Optimisation strategies are also discussed, specifically gradient descent and automatic differentiation for efficient calculations. We then explore some simple applications to further illustrate these ideas and help us to discover how neural networks work in terms of real-world scenarios, such as regression and classification problems.
 
 Subsequently, we dive into the formulation and implementation of neural ordinary differential equations (ODEs) and discuss their connection to residual neural networks. Most importantly, the backpropagation of gradients needs to be derived in the gradient descent algorithm process. We discuss the methods to do so with neural ODEs, elaborating on numerical ODE solvers and the adjoint method.
 
-Furthermore, we provide two applications for neural ODEs. We first extend the MNIST handwritten digit classification task from classic neural networks to neural ODEs, improving the accuracy from $80\%$ to around $95\%$ with even faster running time and a smaller number of parameters, thereby demonstrating the capabilities of neural ODEs. \textcolor{red}{We then provide another application of using neural ODEs using a regression optimisation problem.}
+Furthermore, we provide two applications for neural ODEs. We first extend the MNIST handwritten digit classification task from classical neural networks to neural ODEs, improving the accuracy from $80\%$ to around $95\%$ with even faster running time and a smaller number of parameters, thereby demonstrating the capabilities of neural ODEs.
 
-Finally, building on the framework of neural ODEs to handle more complex and irregular data streams, we extend our discussion to neural controlled differential equations (CDEs). We delve into the definition of neural CDEs and discuss and apply methods to model time series data using neural CDEs and a technique from numerical analysis called cubic splines.
+Finally, building on the framework of neural ODEs to handle more complex and irregular data streams, we extend our discussion to neural controlled differential equations (CDEs). We examine the definition of neural CDEs and discuss and apply methods to model time series data using neural CDEs and a technique from numerical analysis called cubic splines.
 
 Throughout this section, we use the Julia programming language. Julia is a modern, compiled, high-level, open-source language developed at MIT. It is becoming increasingly important in scientific machine learning and is widely used in high-performance computing and artificial intelligence, including by Astrazeneca, Moderna, and Pfizer in drug development and clinical trial acceleration, IBM for medical diagnosis, MIT for robot locomotion, and elsewhere \cite{SciMLSANUM2024}. Where appropriate, we supplement suitable Julia code to accompany the ideas presented. All code can be found in the project's \href{https://github.com/jaamestaay/M2R-Group-29}{GitHub repository}.
 
@@ -334,8 +334,7 @@ Now we turn our attention to two examples that utilise neural networks. We consi
 
 Consider a simple example of a neural network that performs regression-based analysis on $y = \sin x$. Assume that we are given $n$ data points between $[-\pi, \pi]$, denoted by $\mathbf{x}$. We try to minimise the difference between the predicted output $f(\mathbf{x})$ and the target output $\sin (\mathbf{x})$, where $f$ is the neural network being considered.
 
-We now present an implementation of this neural network in Julia. The file containing all the code below can be found in the project's GitHub repository at \texttt{Neural\_Network}
-\texttt{.ipynb}.
+We now present an implementation of this neural network in Julia. The file containing all the code below can be found in the project's \href{https://github.com/jaamestaay/M2R-Group-29}{GitHub repository} at \verb|Neural_Network.ipynb|.
 
 We first need to import some packages for later use.
 
@@ -418,7 +417,7 @@ A sample image from MNIST is shown below. We immediately see that it is a $6$. W
     \label{fig:6}
 \end{figure}
 
-We now present a simple implementation of this neural network in Julia. At this point, we will not dive into the details too much; the details will be discussed in Section \ref{sec:app} where more sophisticated methods are used to perform a stronger analysis. Some of the ideas presented here are taken from \cite{Piotr}. The file containing all the code below can be found in the project's GitHub repository at \verb|Neural_Network.ipynb|.
+We now present a simple implementation of this neural network in Julia. At this point, we will not dive into the details too much; the details will be discussed in Section \ref{sec:app} where more sophisticated methods are used to perform a stronger analysis. Some of the ideas presented here are taken from \cite{Piotr}. The file containing all the code below can be found in the project's \href{https://github.com/jaamestaay/M2R-Group-29}{GitHub repository} at \verb|Neural_Network.ipynb|.
 
 We first need to import some packages for later use. For this task, we introduce another package \verb|Flux|, which is similar to the aforementioned \verb|Lux|. We also want to import the MNIST database from the \verb|MLDatasets| package.
 
@@ -838,7 +837,7 @@ In Appendix \ref{sec:adjmethod}, we provide a simple example and use the adjoint
 \section{Application: Digit Classifier with Neural ODEs}
 \label{sec:app}
 
-In this section, we return our attention to the example we considered in Section \ref{sec:cla}, in which we implemented a digit classifier with around $80\%$ accuracy using classic neural networks. With the help of neural ODEs, we shall implement a better version of this, aiming to boost the test accuracy to approximately $95\%$. The idea is largely taken from Lab 6 of \cite{SciMLSANUM2024}. The file containing all the code below can be found in the project's GitHub repository at \verb|Neural_ODE.ipynb|.
+In this section, we return our attention to the example we considered in Section \ref{sec:cla}, in which we implemented a digit classifier with around $80\%$ accuracy using classic neural networks. With the help of neural ODEs, we shall implement a better version of this, aiming to boost the test accuracy to approximately $95\%$. The idea is largely taken from Lab 6 of \cite{SciMLSANUM2024}. The file containing all the code below can be found in the project's \href{https://github.com/jaamestaay/M2R-Group-29}{GitHub repository} at \verb|Neural_ODE.ipynb|.
 
 To start, we need to import some essential packages. We will use the \verb|DifferentialEquations| and \verb|DiffEqFlux| packages for neural ODEs, and despite the name, \verb|DiffEqFlux| uses \verb|Lux| instead of \verb|Flux|. We also want to load the MNIST database from the \verb|MLDatasets| package, and the \verb|Images| package is useful for plotting images given by pixels.
 
@@ -1253,8 +1252,15 @@ There exist online Python libraries that uses neural CDEs to achieve time series
 \pagebreak
 \section{Conclusion}
 
-\textcolor{red}{to work on and make longer(?)}
-The field of scientific machine learning is a highly active one, attracting scientists and mathematicians alike. Various libraries are being developed, the most important of which in Julia is the \href{https://sciml.ai/}{\texttt{SciML}} package.
+In this paper, we discussed the power of neural ODEs in scientific machine learning. We focussed on three main areas. First, an initial introduction to neural networks and several optimisation strategies was conducted. We trained a standard neural network model to recognise handwritten digits from the MNIST dataset. Next, we introduced neural ODEs and explained their use in the machine learning process, incorporating them into the training of the same MNIST dataset and showing the improvement in test accuracy. Finally, we extended our discussion to neural CDEs, discussing their power and application in time series data analysis.
+
+The research conducted through this paper has provided valuable learning opportunities in the area of scientific machine learning. We have gained a better appreciation of the methods taught and described in various undergraduate modules that provided the bridge to the complex ideas brought forward in this paper. Finally, the exposure to neural networks and neural differential equations has been beneficial in understanding more complicated theories in future courses and career paths.
+
+At the same time, however, it is important to recognise and acknowledge the limitations of the paper. Given the context and timeline of the project, there was a limit to the extent of exploration in this area. Neural differential equations, while being a new field, are extremely rich and require much more time to be fully utilised. Additionally, the discussion was largely theoretical, with several simple applications brought forward. Further applications could examine more subtle ideas, such as the optimisation of layer dimensions for better results or a more extensive comparison between neural ODEs and neural CDEs.
+
+This gives rise to future research that could be built on this paper. Further elaboration of the improvements in accuracy and efficiency could enrich the understanding of neural differential equations. Another area worth pursuing is studying perhaps more complex neural differential equations and how they better represent other data. These could thus be extended to other fields, such as studying neural differential equations in physics-informed neural networks (PINNs). These could give a more holistic understanding on the power of neural differential equations.
+
+The field of scientific machine learning is a highly active one, attracting scientists and mathematicians alike. Various libraries are being developed, the most important of which in Julia is the \href{https://sciml.ai/}{\texttt{SciML}} package. There is much anticipation surrounding the improvements and advancements in scientific machine learning - neural differential equations are merely the start. It remains to see just how powerful these tools can be in scientific machine learning and beyond.
 
 \section*{Acknowledgments}
 \addcontentsline{toc}{section}{Acknowledgements}
@@ -1395,7 +1401,7 @@ A more detailed proof, as well as further theorems for convergence rates involvi
 \section{Comparison of ODE Solvers}
 \label{sec:odesolvecode}
 
-In this appendix, we provide the Julia code used to compare several numerical ODE solvers, namely the \texttt{Euler()}, \texttt{RK4()} and \texttt{Vern9()} methods. The file containing all the code below can be found in the project's GitHub repository at \verb|ODE_Solvers.ipynb|. The initial value problem evaluated here was $\dot{z} = \cos(t)z, z(0) = 1$ in the interval $[0.0, 10.0]$, which has the trivial solution $z(t) = e^{\sin t}$. We first import relevant packages and define the problem in Julia:
+In this appendix, we provide the Julia code used to compare several numerical ODE solvers, namely the \texttt{Euler()}, \texttt{RK4()} and \texttt{Vern9()} methods. The file containing all the code below can be found in the project's \href{https://github.com/jaamestaay/M2R-Group-29}{GitHub repository} at \verb|ODE_Solvers.ipynb|. The initial value problem evaluated here was $\dot{z} = \cos(t)z, z(0) = 1$ in the interval $[0.0, 10.0]$, which has the trivial solution $z(t) = e^{\sin t}$. We first import relevant packages and define the problem in Julia:
 \begin{verbatim}
 using DifferentialEquations, Plots
 function ode_problem!(dz, z, p, t)
@@ -1473,7 +1479,7 @@ After obtaining these gradients, we can use them in the gradient descent to adju
 \section{Data Preprocessing of Financial Time Series}
 \label{sec:datatime}
 
-In this appendix, we provide the Julia code used to preprocess the financial time series. The file containing all the code below can be found in the project's GitHub repository at \verb|Neural_CDE.ipynb|.
+In this appendix, we provide the Julia code used to preprocess the financial time series. The file containing all the code below can be found in the project's \href{https://github.com/jaamestaay/M2R-Group-29}{GitHub repository} at \verb|Neural_CDE.ipynb|.
 
 We first read the data into the compiler.
 \begin{verbatim}
