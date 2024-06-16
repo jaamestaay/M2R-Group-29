@@ -490,7 +490,7 @@ The second term in equation (\ref{eq1}) is in the form of a typical neural netwo
     \textbf{h}_{t+1} = \textbf{h}_t + f\left(\textbf{h}_t, \theta_t\right).
 \end{equation}
 
-We  write equation (\ref{eq1}) in the form of equation (\ref{eq2}), where $f$ is a function that depends on the state of layer $t$ and some parameters $\theta_t$ related to this layer. Then, by transforming equation (\ref{eq2}), we get
+We write equation (\ref{eq1}) in the form of equation (\ref{eq2}), where $f$ is a function that depends on the state of layer $t$ and some parameters $\theta_t$ related to this layer. Then, by transforming equation (\ref{eq2}), we get
 $$\frac{\textbf{h}_{t+1} - \textbf{h}_t}{1}=f\left(\textbf{h}_t, \theta_t\right),$$
 
 which gives
@@ -835,14 +835,8 @@ Thus, we only need to solve this initial value problem. By calling the ODE solve
 In Appendix \ref{sec:adjmethod}, we provide a simple example and use the adjoint method to perform backpropagation. A solution is provided to illustrate how this method can be applied.
 
 \pagebreak
-\section{Application}
+\section{Application: Digit Classifier with Neural ODEs}
 \label{sec:app}
-
-\subsection{Regression with Neural ODEs}
-
-In this section, we return our attention to the example we considered in Section \ref{sec:regex}, in which we implemented nonlinear regression with $y = \sin x$. With the help of neural ODEs, we shall implement a better version of this. The ideas in this section are taken from \cite{nguyen2020exploration}, and we use part of the Julia code from it. The file containing all the code below can be found in the project's GitHub repository at \verb|Neural_ODE.ipynb|.
-
-\subsection{Classification with Neural ODEs}
 
 In this section, we return our attention to the example we considered in Section \ref{sec:cla}, in which we implemented a digit classifier with around $80\%$ accuracy using classic neural networks. With the help of neural ODEs, we shall implement a better version of this, aiming to boost the test accuracy to approximately $95\%$. The idea is largely taken from Lab 6 of \cite{SciMLSANUM2024}. The file containing all the code below can be found in the project's GitHub repository at \verb|Neural_ODE.ipynb|.
 
@@ -1089,7 +1083,7 @@ $\{(t_0,x_0), (t_1,x_1), \\\dots, (t_k,x_k)\}$, the \textit{Newton basis polynom
 \end{definition}
 
 \begin{definition}
-    [Newton polynomial] The \textit{Newton polynomial} that interpolates a sample of data points $\{(t_0,x_0), (t_1,x_1), \dots, (t_k,x_k)\}$ is defined as $p_k(t)=\sum_{i=0}^ka_in_i(t)$, where $n_i(t)$ is taken from Definition \ref{def:nbp}.
+    [Newton polynomial] The \textit{Newton polynomial} that interpolates a sample of data points $\{(t_0,x_0), (t_1,x_1), \dots, (t_k,x_k)\}$ is defined as $N_k(t)=\sum_{i=0}^ka_in_i(t)$, where $n_i(t)$ is taken from Definition \ref{def:nbp}.
 \end{definition}
 
 As the Newton polynomial passes through data points $(t_0,x_0), (t_1,x_1), \dots, (t_k,x_k)$, the coefficients of the Newton polynomial can be uniquely determined by solving a system of linear equations. The details of this computation are left for the interested readers to check. In other words, given a sample of $k+1$ data points
@@ -1101,11 +1095,11 @@ Since $a_i$ is a linear combination of $x_0,x_1,\dots,x_i$, the coefficients are
     $\forall k\in\mathbb{N}_{>0}$, we have $$[t_0,t_1,t_2\dots,t_k]f=\frac{[t_1,t_2\dots,t_k]f-[t_0,t_1,\dots,t_{k-1}]f}{t_k-t_0}.$$
 \end{lemma}
 \begin{proof}
-    Let $r(t)=n_{k-1}(f;t_1,t_2,\dots,t_k;t)$ and $s(t)=n_{k-1}(f;t_0,t_1,\dots,t_{k-1};t)$, where $n_{k-1}(f;\\t_1,t_2,\dots,t_k;t)$ means that it is approximating $f$ that passes through $(t_1,x_1), (t_2,x_2), \dots, (t_k,x_k)$, and other Newton basis polynomials are expressed in a similar way \cite{Gautschi2012}.
+    Let $r(t)=N_{k-1}(f;t_1,t_2,\dots,t_k;t)$ and $s(t)=N_{k-1}(f;t_0,t_1,\dots,t_{k-1};t)$, where $N_{k-1}(f;\\t_1,t_2,\dots,t_k;t)$ means that it is approximating $f$ that passes through $(t_1,x_1), (t_2,x_2), \dots, (t_k,x_k)$, and other Newton basis polynomials are expressed in a similar way \cite{Gautschi2012}.
     
     We claim that
     \begin{equation}\label{eq}
-        n_k(f;t_0,t_1,\dots,t_k;t)=r(t)+\frac{t-t_k}{t_k-t_0}(r(t)-s(t)).\tag{*}
+        N_k(f;t_0,t_1,\dots,t_k;t)=r(t)+\frac{t-t_k}{t_k-t_0}(r(t)-s(t)).\tag{*}
     \end{equation}
 
     By the definition of Newton basis polynomials, it is obvious that the degree of $\mathrm{RHS}$ is less than or equal to $k$. Since Newton interpolatory polynomials are unique, it suffices to show that $\mathrm{RHS}$ passes through $(t_0,x_0), (t_1,x_1), \dots, (t_k,x_k)$.

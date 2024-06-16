@@ -58,7 +58,7 @@ The outline of our report is detailed below.
 ### 3.6 Adjoint Sensitivity Method (Xinyan)
 
 - Continuous Backpropagation
-- Gradient w.r.t. $\theta$ and $t$
+- Gradient wrt. $\theta$ and $t$
 
 ## 4. Application: Digit Classifier with Neural ODEs (Jiankuan, Jiaru)
 
