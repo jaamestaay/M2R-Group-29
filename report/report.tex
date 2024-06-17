@@ -502,7 +502,7 @@ $$\lim_{\Delta t\to 0}\frac{\textbf{h}_{t+\Delta t} - \textbf{h}_t }{\Delta t}= 
 This motivates us to consider ordinary differential equations, which can be written as
 $$\frac{\mathrm{d}{\textbf{h}}(t)}{\mathrm{d}t}=f(\textbf{h}(t),\theta,t).$$
 
-This is the most essential equation for defining a neural ODE. The function $f$ here on the right is a function derived from a neural network, with $\theta$ representing the parameters of that network. In practice, however, $f$ does not necessarily need to be a function derived from a neural network. By convention, since there is no clear concept of hidden layers in neural ODEs, we usually write this function as
+This is the most essential equation for defining a neural ODE. The function $f$ here on the right is a function derived from a neural network, with $\theta$ representing the parameters of that network. In practice, however, $f$ does not necessarily need to be entirely a function derived from a neural network. By convention, since there is no clear concept of hidden layers in neural ODEs, we usually write this function as
 \begin{equation}
     \dot{z}=f(z(t),\theta,t).
     \label{nodeeqn}
