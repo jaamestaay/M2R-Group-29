@@ -1,6 +1,8 @@
 # Scientific Machine Learning: Neural Networks and Neural Differential Equations
 
-This is the GitHub repository for the MATH50002 Group Research Project (M2R) by Group 29. You can find all relevant codes, figures, and LaTeX files here.
+This is the GitHub repository for the MATH50002 Group Research Project (M2R) by Group 29.
+
+You can find all relevant codes, figures, and LaTeX files here.
 
 Group Members:
 
@@ -18,7 +20,7 @@ The outline of our report is detailed below.
 
 ## 1. Introduction (Jiaru, James)
 
-## 2. Neural Networks (Jiaru, James)
+## 2. Neural Networks
 
 ### 2.1 History (Jiaru)
 
@@ -37,7 +39,7 @@ The outline of our report is detailed below.
 
 ### 2.5 Example: Classification (Jiaru)
 
-## 3. Neural ODEs (Xinyan, James)
+## 3. Neural ODEs
 
 ### 3.1 Motivation (Xinyan)
 
@@ -60,7 +62,7 @@ The outline of our report is detailed below.
 - Continuous Backpropagation
 - Gradient wrt. $\theta$ and $t$
 
-## 4. Application: Digit Classifier with Neural ODEs (Jiankuan, Jiaru, Xinyan)
+## 4. Application: Digit Classifier with Neural ODEs
 
 ### 4.1 Implementation (Jiankuan, Jiaru)
 
@@ -83,7 +85,7 @@ The outline of our report is detailed below.
 
 ## 6. Conclusion (James)
 
-## Acknowledgements
+## Acknowledgements (James)
 
 ## References
 
