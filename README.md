@@ -6,17 +6,17 @@ You can find all relevant codes, figures, and LaTeX files here.
 
 Group Members:
 
-- Jiaru (Eric) Li (CID: 02216531)
-- James Tay (CID: 02015786)
-- Xinyan Wang (CID: 02205857)
-- Jiankuan Liu (CID: 02215415)
-- Tianshi Liu (CID: 02218664)
+- Jiaru (Eric) Li
+- James Tay
+- Xinyan Wang
+- Jiankuan Liu
+- Tianshi Liu
 
 Group Supervisor:
 
 - Dr Sheehan Olver
 
-The outline of our report is detailed below.
+The outline of our report (along with the relevant contributors) is detailed below.
 
 ## 1. Introduction (Jiaru, James)
 
@@ -52,7 +52,7 @@ The outline of our report is detailed below.
 
 ### 3.4 Solving ODEs Numerically (James)
 
-### 3.5 Backpropagation in Neural ODEs (Xinyan)
+### 3.5 Backpropagation in Neural ODEs (James, Xinyan)
 
 - Discretise-then-Optimise (DO)
 - Optimise-then-Discretise (OD)
